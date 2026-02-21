@@ -1,0 +1,226 @@
+@layer theme, base, mui, components, utilities;
+@import 'tailwindcss';
+
+/*
+  Design Token Contract
+  - Project uses single-theme mode by design
+  - These CSS variables are the stable public API for styling (Tailwind + MUI + future Micro-FEs)
+
+  Notes:
+  - Keep this file framework-agnostic.
+  - Avoid relying on MUI internal component variables (e.g. --mui-palette-Alert-*).
+*/
+
+@theme inline {
+  /* -----------------------------
+   * Typography
+   * ----------------------------- */
+  --font-h1: var(--mui-font-h1);
+  --font-h2: var(--mui-font-h2);
+  --font-h3: var(--mui-font-h3);
+  --font-h4: var(--mui-font-h4);
+  --font-h5: var(--mui-font-h5);
+  --font-h6: var(--mui-font-h6);
+  --font-subtitle1: var(--mui-font-subtitle1);
+  --font-subtitle2: var(--mui-font-subtitle2);
+  --font-body1: var(--mui-font-body1);
+  --font-body2: var(--mui-font-body2);
+  --font-button: var(--mui-font-button);
+  --font-caption: var(--mui-font-caption);
+  --font-overline: var(--mui-font-overline);
+
+  --letter-spacing-h1: -0.01562em;
+  --letter-spacing-h2: -0.00833em;
+  --letter-spacing-h4: 0.00735em;
+  --letter-spacing-h6: 0.0075em;
+  --letter-spacing-body1: 0.00938em;
+  --letter-spacing-body2: 0.01071em;
+
+  /* -----------------------------
+   * Breakpoints
+   * ----------------------------- */
+  --breakpoint-sm: 37.5rem; /* 600px */
+  --breakpoint-md: 56.25rem; /* 900px */
+  --breakpoint-lg: 75rem; /* 1200px */
+  --breakpoint-xl: 96rem; /* 1536px */
+  --breakpoint-2xl: 120rem; /* 1920px */
+
+  /* -----------------------------
+   * Core Colors (semantic)
+   * ----------------------------- */
+  --color-primary: rgb(var(--mui-palette-primary-mainChannel));
+  --color-primary-light: rgb(var(--mui-palette-primary-lightChannel));
+  --color-primary-dark: rgb(var(--mui-palette-primary-darkChannel));
+  --color-primary-contrast: rgb(var(--mui-palette-primary-contrastTextChannel));
+
+  --color-secondary: rgb(var(--mui-palette-secondary-mainChannel));
+  --color-secondary-light: rgb(var(--mui-palette-secondary-lightChannel));
+  --color-secondary-dark: rgb(var(--mui-palette-secondary-darkChannel));
+  --color-secondary-contrast: rgb(var(--mui-palette-secondary-contrastTextChannel));
+
+  --color-info: rgb(var(--mui-palette-info-mainChannel));
+  --color-info-light: rgb(var(--mui-palette-info-lightChannel));
+  --color-info-dark: rgb(var(--mui-palette-info-darkChannel));
+  --color-info-contrast: rgb(var(--mui-palette-info-contrastTextChannel));
+
+  --color-error: rgb(var(--mui-palette-error-mainChannel));
+  --color-error-light: rgb(var(--mui-palette-error-lightChannel));
+  --color-error-dark: rgb(var(--mui-palette-error-darkChannel));
+  --color-error-contrast: rgb(var(--mui-palette-error-contrastTextChannel));
+
+  --color-success: rgb(var(--mui-palette-success-mainChannel));
+  --color-success-light: rgb(var(--mui-palette-success-lightChannel));
+  --color-success-dark: rgb(var(--mui-palette-success-darkChannel));
+  --color-success-contrast: rgb(var(--mui-palette-success-contrastTextChannel));
+
+  --color-warning: rgb(var(--mui-palette-warning-mainChannel));
+  --color-warning-light: rgb(var(--mui-palette-warning-lightChannel));
+  --color-warning-dark: rgb(var(--mui-palette-warning-darkChannel));
+  --color-warning-contrast: rgb(var(--mui-palette-warning-contrastTextChannel));
+
+  --color-text-primary: rgb(var(--mui-palette-text-primaryChannel));
+  --color-text-secondary: rgb(var(--mui-palette-text-secondaryChannel));
+  --color-text-disabled: var(--mui-palette-text-disabled);
+
+  --color-divider: var(--mui-palette-divider);
+
+  --color-background-default: rgb(var(--mui-palette-background-defaultChannel));
+  --color-background-paper: rgb(var(--mui-palette-background-paperChannel));
+
+  /* -----------------------------
+   * Layout Tokens
+   * ----------------------------- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+
+  /* Shadows (design system elevations) */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 5%);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -1px rgb(0 0 0 / 6%);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -2px rgb(0 0 0 / 5%);
+
+  /* Action tokens (derived from MUI) */
+  --color-action-active: var(--mui-palette-action-active);
+  --color-action-hover: var(--mui-palette-action-hover);
+  --color-action-selected: var(--mui-palette-action-selected);
+  --color-action-disabled: var(--mui-palette-action-disabled);
+  --color-action-focus: var(--mui-palette-action-focus);
+
+  /* Overlays & elevation utilities */
+  --overlay-1: var(--mui-overlays-1);
+  --overlay-2: var(--mui-overlays-2);
+  --overlay-3: var(--mui-overlays-3);
+  --overlay-4: var(--mui-overlays-4);
+  --overlay-5: var(--mui-overlays-5);
+  --overlay-6: var(--mui-overlays-6);
+  --overlay-7: var(--mui-overlays-7);
+  --overlay-8: var(--mui-overlays-8);
+  --overlay-9: var(--mui-overlays-9);
+  --overlay-10: var(--mui-overlays-10);
+  --overlay-11: var(--mui-overlays-11);
+  --overlay-12: var(--mui-overlays-12);
+  --overlay-13: var(--mui-overlays-13);
+  --overlay-14: var(--mui-overlays-14);
+  --overlay-15: var(--mui-overlays-15);
+  --overlay-16: var(--mui-overlays-16);
+  --overlay-17: var(--mui-overlays-17);
+  --overlay-18: var(--mui-overlays-18);
+  --overlay-19: var(--mui-overlays-19);
+  --overlay-20: var(--mui-overlays-20);
+  --overlay-21: var(--mui-overlays-21);
+  --overlay-22: var(--mui-overlays-22);
+  --overlay-23: var(--mui-overlays-23);
+  --overlay-24: var(--mui-overlays-24);
+
+  --shadow-1: var(--mui-shadows-1);
+  --shadow-2: var(--mui-shadows-2);
+  --shadow-3: var(--mui-shadows-3);
+  --shadow-4: var(--mui-shadows-4);
+  --shadow-5: var(--mui-shadows-5);
+  --shadow-6: var(--mui-shadows-6);
+  --shadow-7: var(--mui-shadows-7);
+  --shadow-8: var(--mui-shadows-8);
+  --shadow-9: var(--mui-shadows-9);
+  --shadow-10: var(--mui-shadows-10);
+  --shadow-11: var(--mui-shadows-11);
+  --shadow-12: var(--mui-shadows-12);
+  --shadow-13: var(--mui-shadows-13);
+  --shadow-14: var(--mui-shadows-14);
+  --shadow-15: var(--mui-shadows-15);
+  --shadow-16: var(--mui-shadows-16);
+  --shadow-17: var(--mui-shadows-17);
+  --shadow-18: var(--mui-shadows-18);
+  --shadow-19: var(--mui-shadows-19);
+  --shadow-20: var(--mui-shadows-20);
+  --shadow-21: var(--mui-shadows-21);
+  --shadow-22: var(--mui-shadows-22);
+  --shadow-23: var(--mui-shadows-23);
+  --shadow-24: var(--mui-shadows-24);
+
+  --opacity-activated: calc(100% * var(--mui-palette-action-activatedOpacity));
+  --opacity-disabled: calc(100% * var(--mui-palette-action-disabledOpacity));
+  --opacity-focus: calc(100% * var(--mui-palette-action-focusOpacity));
+  --opacity-hover: calc(100% * var(--mui-palette-action-hoverOpacity));
+  --opacity-selected: calc(100% * var(--mui-palette-action-selectedOpacity));
+}
+
+@layer base {
+  h1 {
+    font: var(--mui-font-h1);
+    letter-spacing: -0.01562em;
+  }
+
+  h2 {
+    font: var(--mui-font-h2);
+    letter-spacing: -0.00833em;
+  }
+
+  h3 {
+    font: var(--mui-font-h3);
+  }
+
+  h4 {
+    font: var(--mui-font-h4);
+    letter-spacing: 0.00735em;
+  }
+
+  h5 {
+    font: var(--mui-font-h5);
+  }
+
+  h6 {
+    font: var(--mui-font-h6);
+    letter-spacing: 0.0075em;
+  }
+
+  p {
+    font: var(--mui-font-body1);
+    letter-spacing: 0.00938em;
+  }
+
+  span {
+    font: var(--mui-font-body2);
+    letter-spacing: 0.01071em;
+  }
+}
+
+@utility typography-* {
+  font: --value(--font-*);
+}
+
+@utility overlay-* {
+  background-image: --value(--overlay-*);
+}
+
+@utility elevation-* {
+  background-image: --value(--overlay-*);
+  box-shadow: --value(--shadow-*);
+}

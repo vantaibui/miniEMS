@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "types": ["vite/client"],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@modules/*": ["./src/modules/*"],
+      "@app/*": ["./src/app/*"],
+      "@libs/ui": ["./src/libs/ui/index.ts"],
+      "@libs/utils": ["./src/libs/utils/index.ts"],
+      "@libs/types": ["./src/libs/types/index.ts"],
+      "@libs/store": ["./src/libs/store/index.ts"],
+      "@libs/constants": ["./src/libs/constants/index.ts"],
+      "@libs/query": ["./src/libs/query/index.ts"],
+      "@libs/hooks": ["./src/libs/hooks/index.ts"],
+      "@libs/configs": ["./src/libs/configs/index.ts"],
+      "@libs/pages": ["./src/libs/pages/index.ts"],
+      "@services/*": ["./src/services/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["src/**/__tests__/**", "src/**/*.test.ts", "src/**/*.test.tsx"]
+}
