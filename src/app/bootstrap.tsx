@@ -1,13 +1,8 @@
 import { createRoot } from 'react-dom/client';
-import { AuthProvider } from '@modules/auth';
-import AppShell from './AppShell';
+import App from './App';
 
 export function mount(container: HTMLElement) {
   const root = createRoot(container);
-  root.render(
-    <AuthProvider>
-      <AppShell />
-    </AuthProvider>
-  );
+  root.render(<App />);
   return () => root.unmount();
 }

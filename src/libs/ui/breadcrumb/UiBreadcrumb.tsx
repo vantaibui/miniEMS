@@ -1,52 +1,73 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { Breadcrumbs as MuiBreadcrumbs, Typography } from '@mui/material';
+import { Breadcrumbs as MuiBreadcrumbs, Typography, Box } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import HomeIcon from '@mui/icons-material/Home';
 import type { BreadcrumbProps } from './UiBreadcrumb.types';
-
 
 const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className = '' }) => {
   return (
     <MuiBreadcrumbs
-      separator={<NavigateNextIcon fontSize="small" />} 
+      separator={
+        <NavigateNextIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+      }
       aria-label="breadcrumb"
       className={className}
+      sx={{ mb: 1 }}
     >
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
-        
+        const isFirst = index === 0;
+
+        const content = (
+          <Box
+            component="span"
+            sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+          >
+            {isFirst && (
+              <HomeIcon
+                sx={{
+                  fontSize: 16,
+                  mr: 0.5,
+                  color: isLast ? 'text.primary' : 'text.secondary',
+                }}
+              />
+            )}
+            {item.icon}
+            {item.label}
+          </Box>
+        );
+
         if (isLast || !item.href) {
           return (
-            <Typography 
-              key={index} 
-              color="text.primary" 
-              sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 500, fontSize: '0.875rem' }}
+            <Typography
+              key={index}
+              color="text.primary"
+              sx={{
+                fontWeight: isLast ? 600 : 400,
+                fontSize: '0.8125rem',
+                color: isLast ? 'primary.main' : 'text.primary',
+              }}
             >
-              {item.icon}
-              {item.label}
+              {content}
             </Typography>
           );
         }
 
         return (
-          <Link
-            key={index}
-            to={item.href}
-            style={{ textDecoration: 'none' }}
-          >
-            <Typography 
-              color="text.secondary" 
-              sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 0.5, 
-                fontSize: '0.875rem',
-                '&:hover': { color: 'primary.main' }
+          <Link key={index} to={item.href} style={{ textDecoration: 'none' }}>
+            <Typography
+              color="text.secondary"
+              sx={{
+                fontSize: '0.8125rem',
+                '&:hover': {
+                  color: 'primary.main',
+                  textDecoration: 'underline',
+                },
               }}
             >
-              {item.icon}
-              {item.label}
+              {content}
             </Typography>
           </Link>
         );

@@ -1,12 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import {
-  UiButton,
-  UiFormField,
-  UiInput,
-  UiSelect,
-  UiText,
-} from '@libs/ui';
+import { UiButton, UiFormField, UiInput, UiSelect, UiText } from '@libs/ui';
 
 interface FormState {
   fullName: string;
@@ -45,7 +39,8 @@ export const FormDemo = () => {
 
     if (!state.fullName.trim()) next.fullName = 'Full name is required.';
     if (!state.email.trim()) next.email = 'Email is required.';
-    else if (!/^\S+@\S+\.\S+$/.test(state.email)) next.email = 'Email is invalid.';
+    else if (!/^\S+@\S+\.\S+$/.test(state.email))
+      next.email = 'Email is invalid.';
     if (!state.role) next.role = 'Please select a role.';
 
     return next;
@@ -86,7 +81,9 @@ export const FormDemo = () => {
           >
             <UiInput
               value={state.fullName}
-              onChange={(e) => setState((s) => ({ ...s, fullName: e.target.value }))}
+              onChange={(e) =>
+                setState((s) => ({ ...s, fullName: e.target.value }))
+              }
               onBlur={() => setTouched((t) => ({ ...t, fullName: true }))}
               placeholder="e.g. Alex Rivers"
             />
@@ -99,7 +96,9 @@ export const FormDemo = () => {
           >
             <UiInput
               value={state.email}
-              onChange={(e) => setState((s) => ({ ...s, email: e.target.value }))}
+              onChange={(e) =>
+                setState((s) => ({ ...s, email: e.target.value }))
+              }
               onBlur={() => setTouched((t) => ({ ...t, email: true }))}
               placeholder="e.g. alex.rivers@company.com"
               type="email"
@@ -144,7 +143,8 @@ export const FormDemo = () => {
           </div>
 
           <UiText variant="caption" tone="muted">
-            Common pitfall: don’t render inconsistent error text spacing; always use UiFormField.
+            Common pitfall: don’t render inconsistent error text spacing; always
+            use UiFormField.
           </UiText>
         </div>
 
@@ -155,12 +155,22 @@ export const FormDemo = () => {
             <UiInput disabled defaultValue="System-managed value" />
           </UiFormField>
 
-          <UiFormField label="Loading field" helperText="Use loading to prevent edits during async work">
+          <UiFormField
+            label="Loading field"
+            helperText="Use loading to prevent edits during async work"
+          >
             <UiInput loading defaultValue="Fetching..." />
           </UiFormField>
 
-          <UiFormField label="Disabled select" helperText="Used when options depend on other fields">
-            <UiSelect disabled options={roleOptions} placeholder="Select a role" />
+          <UiFormField
+            label="Disabled select"
+            helperText="Used when options depend on other fields"
+          >
+            <UiSelect
+              disabled
+              options={roleOptions}
+              placeholder="Select a role"
+            />
           </UiFormField>
         </div>
       </div>

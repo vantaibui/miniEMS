@@ -54,3 +54,4 @@ export { default as EditOutlinedIcon } from '@mui/icons-material/EditOutlined';
 export { default as Brightness4Icon } from '@mui/icons-material/Brightness4';
 export { default as Brightness7Icon } from '@mui/icons-material/Brightness7';
 export { default as LoginIcon } from '@mui/icons-material/Login';
+export { default as AccountCircleOutlinedIcon } from '@mui/icons-material/AccountCircleOutlined';

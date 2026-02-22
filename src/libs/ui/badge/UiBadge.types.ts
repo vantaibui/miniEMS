@@ -1,6 +1,12 @@
 import type { ReactNode } from 'react';
 
-export type UiBadgeVariant = 'default' | 'success' | 'warning' | 'danger' | 'info' | 'neutral';
+export type UiBadgeVariant =
+  | 'default'
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'info'
+  | 'neutral';
 export type UiBadgeSize = 'sm' | 'md' | 'lg';
 
 export interface UiBadgeProps {

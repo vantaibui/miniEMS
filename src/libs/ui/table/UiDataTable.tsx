@@ -32,9 +32,13 @@ export function UiDataTable<TData>({
   const hasSelection = Boolean(selectable);
 
   const allSelectableIds = rows.map(getRowId);
-  const selectedCount = allSelectableIds.filter((id) => selectedSet.has(id)).length;
-  const allSelected = hasSelection && rows.length > 0 && selectedCount === rows.length;
-  const someSelected = hasSelection && selectedCount > 0 && selectedCount < rows.length;
+  const selectedCount = allSelectableIds.filter((id) =>
+    selectedSet.has(id),
+  ).length;
+  const allSelected =
+    hasSelection && rows.length > 0 && selectedCount === rows.length;
+  const someSelected =
+    hasSelection && selectedCount > 0 && selectedCount < rows.length;
 
   const toggleAll = (checked: boolean) => {
     if (!hasSelection) return;
@@ -113,7 +117,9 @@ export function UiDataTable<TData>({
                       <Checkbox
                         checked={isChecked}
                         onChange={(e) => toggleOne(id, e.target.checked)}
-                        inputProps={{ 'aria-label': `Select row ${String(id)}` }}
+                        inputProps={{
+                          'aria-label': `Select row ${String(id)}`,
+                        }}
                         disabled={loading}
                       />
                     </TableCell>
@@ -138,7 +144,9 @@ export function UiDataTable<TData>({
           page={pagination.page}
           rowsPerPage={pagination.rowsPerPage}
           onPageChange={(_e, page) => pagination.onPageChange(page)}
-          onRowsPerPageChange={(e) => pagination.onRowsPerPageChange(Number(e.target.value))}
+          onRowsPerPageChange={(e) =>
+            pagination.onRowsPerPageChange(Number(e.target.value))
+          }
           rowsPerPageOptions={[10, 25, 50]}
         />
       ) : null}

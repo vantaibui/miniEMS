@@ -1,7 +1,14 @@
 import type { ElementType, ReactNode } from 'react';
 
 export type UiTextVariant = 'heading' | 'subheading' | 'body' | 'caption';
-export type UiTextTone = 'default' | 'secondary' | 'muted' | 'danger' | 'success' | 'warning' | 'info';
+export type UiTextTone =
+  | 'default'
+  | 'secondary'
+  | 'muted'
+  | 'danger'
+  | 'success'
+  | 'warning'
+  | 'info';
 
 export interface UiTextProps {
   children: ReactNode;

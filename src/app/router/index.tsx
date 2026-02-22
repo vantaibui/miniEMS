@@ -12,7 +12,10 @@ import { ProtectedRoute } from './ProtectedRoute';
 import { RouteGuard } from '@modules/auth';
 import { NotFoundPage } from '@libs/pages';
 
-export const HomePage = lazy(() => import('@/modules/dashboard/pages/HomePage'));
+/**
+ * Centrally managed route registry for the application shell.
+ * Delegates feature-specific routing to their respective modules.
+ */
 
 const withSuspense = (Component: ComponentType<unknown>) => (
   <Suspense
@@ -33,13 +36,14 @@ const withSuspense = (Component: ComponentType<unknown>) => (
   </Suspense>
 );
 
+const HomePage = lazy(() => import('@/modules/dashboard/pages/HomePage'));
+
 const routes: Array<RouteObject> = [
   {
     path: '/login',
     element: <AuthLayout />,
     children: authRoutes,
   },
-
   {
     path: '/',
     element: (
@@ -55,27 +59,21 @@ const routes: Array<RouteObject> = [
       ...deviceRoutes,
     ],
   },
-
   {
     path: '/admin',
     element: (
       <ProtectedRoute>
-        <RouteGuard permissionPath="ACCESS_MANAGEMENT.USER_MANAGEMENT.read">
-          <AdminLayout />
-        </RouteGuard>
+        {/* <RouteGuard permissionPath="ACCESS_MANAGEMENT.USER_MANAGEMENT.read"> */}
+        <AdminLayout />
+        {/* </RouteGuard> */}
       </ProtectedRoute>
     ),
-    children: [
-      ...usersRoutes,
-      ...rolesRoutes,
-    ],
+    children: [...usersRoutes, ...rolesRoutes],
   },
-
   {
     path: '*',
     element: withSuspense(NotFoundPage),
   },
 ];
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const router = createBrowserRouter(routes);

@@ -5,7 +5,6 @@ import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 
 interface AppShellLayoutProps {
-
   sidebarWidth?: number;
   headerHeight?: number;
   sidebarContent?: ReactNode;
@@ -26,27 +25,33 @@ export const AppShellLayout = ({
         bgcolor: 'background.default',
       }}
     >
-      <Header height={headerHeight} />
+      <Header height={headerHeight} sidebarWidth={sidebarWidth} />
 
-      <Box sx={{ display: 'flex', flex: 1, minHeight: 0 }}>
-        <Sidebar width={sidebarWidth} headerHeight={headerHeight}>
-          {sidebarContent}
-        </Sidebar>
+      <Box
+        sx={{
+          display: 'flex',
+          flex: 1,
+          minHeight: 0,
+          borderTop: 1,
+          borderColor: 'divider',
+        }}
+      >
+        <Sidebar width={sidebarWidth}>{sidebarContent}</Sidebar>
 
         <Box
           component="main"
           sx={{
             flexGrow: 1,
             minWidth: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            bgcolor: 'background.default',
+            minHeight: 0,
+            overflow: 'auto',
+            bgcolor: '#F7FAFC',
+            p: { xs: 2, md: 3 },
           }}
         >
           <Outlet />
         </Box>
       </Box>
-
     </Box>
   );
 };

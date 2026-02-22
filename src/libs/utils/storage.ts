@@ -1,4 +1,4 @@
-import { APP_PREFIX } from "../constants/app";
+import { APP_PREFIX } from '../constants/app';
 
 export function setStorage<T>(key: string, value: T): void {
   try {

@@ -3,13 +3,24 @@ import MuiButton from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import { cn } from '../utils/cn';
-import type { UiButtonProps, UiButtonSize, UiButtonVariant } from './UiButton.types';
+import type {
+  UiButtonProps,
+  UiButtonSize,
+  UiButtonVariant,
+} from './UiButton.types';
 
 type MuiButtonVariant = 'contained' | 'outlined' | 'text';
 
 type VariantMapping = {
   muiVariant: MuiButtonVariant;
-  muiColor?: 'primary' | 'secondary' | 'error' | 'inherit';
+  muiColor?:
+    | 'primary'
+    | 'secondary'
+    | 'error'
+    | 'inherit'
+    | 'info'
+    | 'success'
+    | 'warning';
 };
 
 function mapVariant(variant: UiButtonVariant): VariantMapping {
@@ -22,9 +33,12 @@ function mapVariant(variant: UiButtonVariant): VariantMapping {
       return { muiVariant: 'text', muiColor: 'inherit' };
     case 'danger':
       return { muiVariant: 'contained', muiColor: 'error' };
+    case 'contained':
+    case 'outlined':
+    case 'text':
+      return { muiVariant: variant };
     default: {
-      const _exhaustive: never = variant;
-      return _exhaustive;
+      return { muiVariant: 'contained', muiColor: 'primary' };
     }
   }
 }
@@ -37,9 +51,12 @@ function mapSize(size: UiButtonSize): 'small' | 'medium' | 'large' {
       return 'medium';
     case 'lg':
       return 'large';
+    case 'small':
+    case 'medium':
+    case 'large':
+      return size;
     default: {
-      const _exhaustive: never = size;
-      return _exhaustive;
+      return 'medium';
     }
   }
 }
@@ -77,15 +94,16 @@ export const UiButton = forwardRef<HTMLButtonElement, UiButtonProps>(
         fullWidth={fullWidth}
         startIcon={loading ? undefined : startIcon}
         endIcon={loading ? undefined : endIcon}
-        className={cn(
-          'min-w-0',
-          loading && 'pointer-events-none',
-          className,
-        )}
+        className={cn('min-w-0', loading && 'pointer-events-none', className)}
         {...rest}
       >
         {loading ? (
-          <span className={cn('inline-flex items-center gap-2', fullWidth && 'justify-center')}>
+          <span
+            className={cn(
+              'inline-flex items-center gap-2',
+              fullWidth && 'justify-center',
+            )}
+          >
             <CircularProgress size={16} color="inherit" />
             <span>{children}</span>
           </span>

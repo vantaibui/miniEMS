@@ -40,7 +40,8 @@ export function UiSelect({
   const labelId = label ? `${name ?? 'ui-select'}-label` : undefined;
 
   const handleChange = (event: unknown) => {
-    const nextValue = (event as { target: { value: UiSelectOptionValue } }).target.value;
+    const nextValue = (event as { target: { value: UiSelectOptionValue } })
+      .target.value;
     onChange?.(nextValue);
   };
 
@@ -60,8 +61,9 @@ export function UiSelect({
         label={label ? String(label) : undefined}
         name={name}
         value={value as unknown as string | number | '' | undefined}
-        defaultValue={defaultValue as unknown as string | number | '' | undefined}
-
+        defaultValue={
+          defaultValue as unknown as string | number | '' | undefined
+        }
         onChange={handleChange}
         displayEmpty={Boolean(placeholder)}
         inputProps={{ 'aria-label': ariaLabel }}
@@ -73,9 +75,16 @@ export function UiSelect({
           ) : undefined
         }
         renderValue={(selected) => {
-          if (placeholder && isEmptyValue(selected as UiSelectOptionValue | undefined)) {
+          if (
+            placeholder &&
+            isEmptyValue(selected as UiSelectOptionValue | undefined)
+          ) {
             return (
-              <Typography component="span" variant="body2" color="text.secondary">
+              <Typography
+                component="span"
+                variant="body2"
+                color="text.secondary"
+              >
                 {placeholder}
               </Typography>
             );
@@ -92,7 +101,11 @@ export function UiSelect({
         ) : null}
         {options
           ? options.map((opt) => (
-              <MenuItem key={String(opt.value)} value={opt.value} disabled={opt.disabled}>
+              <MenuItem
+                key={String(opt.value)}
+                value={opt.value}
+                disabled={opt.disabled}
+              >
                 {opt.label}
               </MenuItem>
             ))

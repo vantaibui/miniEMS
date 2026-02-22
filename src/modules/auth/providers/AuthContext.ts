@@ -10,4 +10,6 @@ export interface AuthContextType {
   logout: (redirectUri?: string) => Promise<void>;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(
+  undefined,
+);

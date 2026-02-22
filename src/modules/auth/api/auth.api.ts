@@ -1,5 +1,5 @@
 import type { PermissionNode, UserMe } from '@libs/types';
-import http from '@services/http/httpClient';
+import { http } from '@services/http';
 
 export const authService = {
   getMe: async (): Promise<UserMe> => {

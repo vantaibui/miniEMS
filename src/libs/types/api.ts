@@ -1,5 +1,7 @@
 import type { PaginationResult } from './pagination';
 
+// ----- Error response (from backend spec) -----
+
 export interface ErrorDetails {
   field: string;
   message: string;
@@ -13,7 +15,7 @@ export interface ErrorData {
 
 export interface BaseApiResponse {
   success: boolean;
-  timestamp: number;
+  timestamp: number; // epoch millis
 }
 
 export interface ApiSuccessResponse<T> extends BaseApiResponse {
@@ -31,14 +33,16 @@ export interface ApiErrorResponse extends BaseApiResponse {
   error: ErrorData;
 }
 
+export type ApiResponse<T = unknown> = ApiSuccessResponse<T> | ApiErrorResponse;
+
+// ----- Frontend normalized error for UI (forms etc.) -----
+
 export interface NormalizedApiError {
   message: string;
   code?: string;
-  details: Record<string, string>;
+  fieldErrors: Record<string, string>;
   raw?: ApiErrorResponse;
   status?: number;
 }
 
-export type ApiResponse<T = unknown> = ApiSuccessResponse<T> | ApiErrorResponse;
-
-export type { ApiErrorResponse as ApiError };
+export type ApiError = ApiErrorResponse;

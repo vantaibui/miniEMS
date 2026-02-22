@@ -19,11 +19,46 @@ interface DemoRow {
 }
 
 const mockData: Array<DemoRow> = [
-  { id: 1, name: 'Alex Rivers', email: 'alex.rivers@tma.com.vn', role: 'Super Admin', status: 'Active', lastActive: 'Just now' },
-  { id: 2, name: 'Sarah Chen', email: 'sarah.chen@tma.com.vn', role: 'Project Manager', status: 'Active', lastActive: '15 mins ago' },
-  { id: 3, name: 'Marco Verratti', email: 'marco.v@tma.com.vn', role: 'Viewer', status: 'Inactive', lastActive: '12 days ago' },
-  { id: 4, name: 'John Doe', email: 'john.doe@tma.com.vn', role: 'Developer', status: 'Pending', lastActive: 'N/A' },
-  { id: 5, name: 'Jane Smith', email: 'jane.smith@tma.com.vn', role: 'Designer', status: 'Active', lastActive: '2 hours ago' },
+  {
+    id: 1,
+    name: 'Alex Rivers',
+    email: 'alex.rivers@tma.com.vn',
+    role: 'Super Admin',
+    status: 'Active',
+    lastActive: 'Just now',
+  },
+  {
+    id: 2,
+    name: 'Sarah Chen',
+    email: 'sarah.chen@tma.com.vn',
+    role: 'Project Manager',
+    status: 'Active',
+    lastActive: '15 mins ago',
+  },
+  {
+    id: 3,
+    name: 'Marco Verratti',
+    email: 'marco.v@tma.com.vn',
+    role: 'Viewer',
+    status: 'Inactive',
+    lastActive: '12 days ago',
+  },
+  {
+    id: 4,
+    name: 'John Doe',
+    email: 'john.doe@tma.com.vn',
+    role: 'Developer',
+    status: 'Pending',
+    lastActive: 'N/A',
+  },
+  {
+    id: 5,
+    name: 'Jane Smith',
+    email: 'jane.smith@tma.com.vn',
+    role: 'Designer',
+    status: 'Active',
+    lastActive: '2 hours ago',
+  },
 ];
 
 /**
@@ -47,8 +82,12 @@ export const TableDemo = () => {
         header: 'User Identity',
         render: (row) => (
           <div className="flex flex-col">
-            <UiText variant="body" className="font-medium">{row.name}</UiText>
-            <UiText variant="caption" tone="secondary">{row.email}</UiText>
+            <UiText variant="body" className="font-medium">
+              {row.name}
+            </UiText>
+            <UiText variant="caption" tone="secondary">
+              {row.email}
+            </UiText>
           </div>
         ),
       },
@@ -65,7 +104,10 @@ export const TableDemo = () => {
         key: 'status',
         header: 'Status',
         render: (row) => {
-          const variantMap: Record<DemoRow['status'], 'success' | 'neutral' | 'warning' | 'info'> = {
+          const variantMap: Record<
+            DemoRow['status'],
+            'success' | 'neutral' | 'warning' | 'info'
+          > = {
             Active: 'success',
             Inactive: 'neutral',
             Pending: 'warning',
@@ -87,11 +129,13 @@ export const TableDemo = () => {
         header: 'Actions',
         align: 'right',
         render: () => (
-          <UiButton variant="ghost" size="sm">Edit</UiButton>
+          <UiButton variant="ghost" size="sm">
+            Edit
+          </UiButton>
         ),
       },
     ],
-    []
+    [],
   );
 
   const handleSimulateLoading = () => {
@@ -102,7 +146,9 @@ export const TableDemo = () => {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <UiText variant="heading" gutterBottom>Data Tables</UiText>
+        <UiText variant="heading" gutterBottom>
+          Data Tables
+        </UiText>
         <UiText variant="caption" tone="secondary">
           Complex table organism with selection, pagination, and filters.
         </UiText>
@@ -123,7 +169,12 @@ export const TableDemo = () => {
             tabValue={statusTab}
             onTabChange={setStatusTab}
             right={
-              <UiButton variant="secondary" size="sm" onClick={handleSimulateLoading} loading={loading}>
+              <UiButton
+                variant="secondary"
+                size="sm"
+                onClick={handleSimulateLoading}
+                loading={loading}
+              >
                 Refresh Data
               </UiButton>
             }

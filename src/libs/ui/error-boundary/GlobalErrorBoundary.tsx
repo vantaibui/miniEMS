@@ -50,10 +50,18 @@ export class GlobalErrorBoundary extends Component<Props, State> {
           <Typography variant="h5" gutterBottom>
             Something went wrong.
           </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 500 }}>
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ mb: 4, maxWidth: 500 }}
+          >
             {this.state.error?.message || 'An unexpected error occurred.'}
           </Typography>
-          <Button variant="contained" color="primary" onClick={this.handleReset}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={this.handleReset}
+          >
             Back to Home
           </Button>
         </Box>

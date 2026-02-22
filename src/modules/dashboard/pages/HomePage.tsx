@@ -27,11 +27,41 @@ interface UserRow {
 }
 
 const mockUsers: Array<UserRow> = [
-  { id: 1, name: 'Alex Rivers', email: 'alex.rivers@tma.com.vn', role: 'Super Admin', status: 'Active' },
-  { id: 2, name: 'Sarah Chen', email: 'sarah.chen@tma.com.vn', role: 'Project Manager', status: 'Active' },
-  { id: 3, name: 'Marco Verratti', email: 'marco.v@tma.com.vn', role: 'Viewer', status: 'Inactive' },
-  { id: 4, name: 'John Doe', email: 'john.doe@tma.com.vn', role: 'Developer', status: 'Active' },
-  { id: 5, name: 'Jane Smith', email: 'jane.smith@tma.com.vn', role: 'Designer', status: 'Active' },
+  {
+    id: 1,
+    name: 'Alex Rivers',
+    email: 'alex.rivers@tma.com.vn',
+    role: 'Super Admin',
+    status: 'Active',
+  },
+  {
+    id: 2,
+    name: 'Sarah Chen',
+    email: 'sarah.chen@tma.com.vn',
+    role: 'Project Manager',
+    status: 'Active',
+  },
+  {
+    id: 3,
+    name: 'Marco Verratti',
+    email: 'marco.v@tma.com.vn',
+    role: 'Viewer',
+    status: 'Inactive',
+  },
+  {
+    id: 4,
+    name: 'John Doe',
+    email: 'john.doe@tma.com.vn',
+    role: 'Developer',
+    status: 'Active',
+  },
+  {
+    id: 5,
+    name: 'Jane Smith',
+    email: 'jane.smith@tma.com.vn',
+    role: 'Designer',
+    status: 'Active',
+  },
 ];
 
 const roleOptions = [
@@ -84,7 +114,10 @@ export default function HomePage() {
       key: 'status',
       header: 'Status',
       render: (row) => (
-        <UiBadge variant={row.status === 'Active' ? 'success' : 'neutral'} size="sm">
+        <UiBadge
+          variant={row.status === 'Active' ? 'success' : 'neutral'}
+          size="sm"
+        >
           {row.status}
         </UiBadge>
       ),
@@ -112,7 +145,8 @@ export default function HomePage() {
         <Stack spacing={0.5}>
           <UiText variant="heading">Design System Showcase</UiText>
           <UiText variant="body" tone="secondary">
-            Reusable UI component library built with React, MUI v7, and Tailwind v4.
+            Reusable UI component library built with React, MUI v7, and Tailwind
+            v4.
           </UiText>
         </Stack>
         <UiButton startIcon={<DownloadIcon />} variant="secondary">
@@ -166,8 +200,12 @@ export default function HomePage() {
             <section className="space-y-4">
               <UiText variant="subheading">Typography</UiText>
               <UiText variant="heading">Heading - Inter Bold 1.875rem</UiText>
-              <UiText variant="subheading">Subheading - Inter Medium 1rem</UiText>
-              <UiText variant="body">Body - Inter Regular 1rem. Default text tone.</UiText>
+              <UiText variant="subheading">
+                Subheading - Inter Medium 1rem
+              </UiText>
+              <UiText variant="body">
+                Body - Inter Regular 1rem. Default text tone.
+              </UiText>
               <UiText variant="caption" tone="secondary">
                 Caption - Inter Regular 0.875rem. Secondary text tone.
               </UiText>
@@ -180,11 +218,21 @@ export default function HomePage() {
             <section className="space-y-4">
               <UiText variant="subheading">Form Fields & Inputs</UiText>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
-                <UiFormField label="Full Name" required helperText="Enter your legal name.">
+                <UiFormField
+                  label="Full Name"
+                  required
+                  helperText="Enter your legal name."
+                >
                   <UiInput placeholder="e.g. Alex Rivers" />
                 </UiFormField>
-                <UiFormField label="Security Role" errorText="Please select a role.">
-                  <UiSelect options={roleOptions} placeholder="Select a role..." />
+                <UiFormField
+                  label="Security Role"
+                  errorText="Please select a role."
+                >
+                  <UiSelect
+                    options={roleOptions}
+                    placeholder="Select a role..."
+                  />
                 </UiFormField>
                 <UiFormField label="Search with Loading">
                   <UiInput loading placeholder="Processing..." />
@@ -197,17 +245,25 @@ export default function HomePage() {
 
             <section className="space-y-4">
               <UiText variant="subheading">Modals</UiText>
-              <UiButton onClick={() => setIsModalOpen(true)}>Open Showcase Modal</UiButton>
+              <UiButton onClick={() => setIsModalOpen(true)}>
+                Open Showcase Modal
+              </UiButton>
               <UiModal
                 open={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 title="Update User Profile"
                 actions={
                   <>
-                    <UiButton variant="ghost" onClick={() => setIsModalOpen(false)}>
+                    <UiButton
+                      variant="ghost"
+                      onClick={() => setIsModalOpen(false)}
+                    >
                       Cancel
                     </UiButton>
-                    <UiButton loading={isLoading} onClick={handleSimulateLoading}>
+                    <UiButton
+                      loading={isLoading}
+                      onClick={handleSimulateLoading}
+                    >
                       Save Changes
                     </UiButton>
                   </>
@@ -215,13 +271,17 @@ export default function HomePage() {
               >
                 <Stack spacing={3} className="py-2">
                   <UiText variant="body">
-                    Update the user details below. This action will be logged in the audit history.
+                    Update the user details below. This action will be logged in
+                    the audit history.
                   </UiText>
                   <UiFormField label="Display Name">
                     <UiInput defaultValue="Alex Rivers" />
                   </UiFormField>
                   <UiFormField label="Department">
-                    <UiSelect options={[{ value: 'it', label: 'IT' }]} defaultValue="it" />
+                    <UiSelect
+                      options={[{ value: 'it', label: 'IT' }]}
+                      defaultValue="it"
+                    />
                   </UiFormField>
                 </Stack>
               </UiModal>
@@ -243,7 +303,10 @@ export default function HomePage() {
               tabValue={statusTab}
               onTabChange={setStatusTab}
               right={
-                <UiButton startIcon={<AddIcon />} onClick={() => setIsModalOpen(true)}>
+                <UiButton
+                  startIcon={<AddIcon />}
+                  onClick={() => setIsModalOpen(true)}
+                >
                   Add New User
                 </UiButton>
               }

@@ -1,5 +1,5 @@
-import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
+import { Box, Typography } from '@mui/material';
 
 import { Footer } from './Footer';
 
@@ -18,25 +18,36 @@ export interface SidebarNavGroup {
 
 interface SidebarProps {
   width?: number;
-  headerHeight?: number;
   children?: ReactNode;
 }
 
-export const Sidebar = ({ width = 260, headerHeight = 64, children }: SidebarProps) => {
+export const Sidebar = ({ width = 260, children }: SidebarProps) => {
   return (
     <Box
       component="aside"
       className="shrink-0 border-r flex flex-col"
       sx={{
         width,
-        height: `calc(100vh - ${headerHeight}px)`,
-        position: 'sticky',
-        top: headerHeight,
+        minWidth: width,
+        height: '100%',
+        borderRight: '1px solid',
         borderColor: 'divider',
         bgcolor: 'background.paper',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
       }}
     >
-      <Box className="flex-1 p-4 overflow-auto">
+      <Box
+        className="flex-1 p-4"
+        sx={{
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          p: 2,
+        }}
+      >
         {children || (
           <Typography variant="body2" color="text.secondary">
             No navigation configured.
@@ -44,7 +55,13 @@ export const Sidebar = ({ width = 260, headerHeight = 64, children }: SidebarPro
         )}
       </Box>
 
-      <Box className="p-4 mt-auto">
+      <Box
+        className="p-4"
+        sx={{
+          flexShrink: 0,
+          mt: 'auto',
+        }}
+      >
         <Footer />
       </Box>
     </Box>

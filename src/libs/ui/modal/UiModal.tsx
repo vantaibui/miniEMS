@@ -43,7 +43,10 @@ export function UiModal({
       open={open}
       onClose={(_event, reason) => {
         if (loading) return;
-        if (disableBackdropClose && (reason === 'backdropClick' || reason === 'escapeKeyDown')) {
+        if (
+          disableBackdropClose &&
+          (reason === 'backdropClick' || reason === 'escapeKeyDown')
+        ) {
           return;
         }
         onClose();

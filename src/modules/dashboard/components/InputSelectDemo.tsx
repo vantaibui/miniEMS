@@ -47,12 +47,23 @@ export const InputSelectDemo = () => {
             <UiSelect options={roleOptions} placeholder="Select a role" />
           </UiFormField>
           <UiFormField label="Disabled Select">
-            <UiSelect disabled options={roleOptions} placeholder="Select a role" />
+            <UiSelect
+              disabled
+              options={roleOptions}
+              placeholder="Select a role"
+            />
           </UiFormField>
           <UiFormField label="Loading Select">
-            <UiSelect loading options={roleOptions} placeholder="Select a role" />
+            <UiSelect
+              loading
+              options={roleOptions}
+              placeholder="Select a role"
+            />
           </UiFormField>
-          <UiFormField label="Select with Error" errorText="Please select a role">
+          <UiFormField
+            label="Select with Error"
+            errorText="Please select a role"
+          >
             <UiSelect options={roleOptions} placeholder="Select a role" />
           </UiFormField>
         </div>

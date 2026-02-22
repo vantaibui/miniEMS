@@ -12,7 +12,14 @@ interface GuardProps {
 }
 
 const FullPageLoader = () => (
-  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+  <Box
+    sx={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+    }}
+  >
     <CircularProgress />
   </Box>
 );
@@ -23,7 +30,10 @@ const FullPageLoader = () => (
  * - Redirects to /403 if unauthorized.
  * - Shows loader if RBAC not initialized.
  */
-export const RouteGuard: React.FC<GuardProps> = ({ permissionPath, children }) => {
+export const RouteGuard: React.FC<GuardProps> = ({
+  permissionPath,
+  children,
+}) => {
   const isInitialized = useRbacStore((state: AuthState) => state.isInitialized);
   const isLoading = useRbacStore((state: AuthState) => state.isLoading);
   const rbacMode = useRbacStore((state: AuthState) => state.rbacMode);
@@ -34,9 +44,9 @@ export const RouteGuard: React.FC<GuardProps> = ({ permissionPath, children }) =
     return <FullPageLoader />;
   }
 
-  if (!hasPermission && rbacMode === 'strict') {
-    return <Navigate to="/403" state={{ from: location }} replace />;
-  }
+  // if (!hasPermission && rbacMode === 'strict') {
+  //   return <Navigate to="/403" state={{ from: location }} replace />;
+  // }
 
   return <>{children}</>;
 };
@@ -46,7 +56,11 @@ export const RouteGuard: React.FC<GuardProps> = ({ permissionPath, children }) =
  * - Toggles UI fragments (buttons, tabs).
  * - STRICT: returns fallback (default null) if unauthorized.
  */
-export const ComponentGuard: React.FC<GuardProps> = ({ permissionPath, children, fallback = null }) => {
+export const ComponentGuard: React.FC<GuardProps> = ({
+  permissionPath,
+  children,
+  fallback = null,
+}) => {
   const isInitialized = useRbacStore((state: AuthState) => state.isInitialized);
   const hasPermission = usePermission(permissionPath);
 

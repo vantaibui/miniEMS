@@ -15,7 +15,8 @@ export function UiSearchInput({
   className,
   'aria-label': ariaLabel,
 }: UiSearchInputProps) {
-  const showClear = Boolean(onClear) && value.length > 0 && !disabled && !loading;
+  const showClear =
+    Boolean(onClear) && value.length > 0 && !disabled && !loading;
 
   return (
     <UiInput

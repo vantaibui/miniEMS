@@ -1,11 +1,26 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import type { TokenPayload, UserProfile } from '@libs/types';
 import { useAuthStore } from '@/modules/auth/store/auth.store';
-import { initKeycloak, keycloak, login, logout, refreshToken, startSessionWatcher } from '../api/keycloak';
+import {
+  initKeycloak,
+  keycloak,
+  login,
+  logout,
+  refreshToken,
+  startSessionWatcher,
+} from '../api/keycloak';
 import { AuthContext } from './AuthContext';
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const setAuth = useAuthStore((s) => s.setAuth);
   const setInitializedZustand = useAuthStore((s) => s.setInitialized);
 
@@ -13,7 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<UserProfile | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  
+
   const isInitialized = useRef(false);
 
   const syncAuthState = useCallback(() => {
@@ -135,7 +150,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       login: handleLogin,
       logout: handleLogout,
     }),
-    [isAuthenticated, user, token, loading, handleLogin, handleLogout]
+    [isAuthenticated, user, token, loading, handleLogin, handleLogout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -6,7 +6,10 @@ import type { UiTextProps, UiTextVariant, UiTextTone } from './UiText.types';
 
 type MuiTypographyVariant = 'h4' | 'h6' | 'body1' | 'body2';
 
-function mapVariant(variant: UiTextVariant): { muiVariant: MuiTypographyVariant; defaultComponent: React.ElementType } {
+function mapVariant(variant: UiTextVariant): {
+  muiVariant: MuiTypographyVariant;
+  defaultComponent: React.ElementType;
+} {
   switch (variant) {
     case 'heading':
       return { muiVariant: 'h4', defaultComponent: 'h1' };

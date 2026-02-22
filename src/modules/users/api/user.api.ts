@@ -1,8 +1,9 @@
-import http from '@services/http/httpClient';
-import type { UserMe } from '@libs/types';
+import { usersApi } from './users.api';
 
+/**
+ * Backward-compatible facade.
+ * Prefer importing `usersApi` from `@modules/users`.
+ */
 export const userService = {
-  getMe: async (): Promise<UserMe> => {
-    return http.get<UserMe>('/v1/users/me');
-  },
+  getMe: () => usersApi.getMe(),
 };

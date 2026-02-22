@@ -25,7 +25,9 @@ export function UiTableFilters({
 }: UiTableFiltersProps) {
   const hasTabs = Boolean(tabs && tabs.length > 0);
   const hasSearch = Boolean(onSearchChange);
-  const hasSelect = Boolean(onSelectChange && selectOptions && selectOptions.length > 0);
+  const hasSelect = Boolean(
+    onSelectChange && selectOptions && selectOptions.length > 0,
+  );
 
   return (
     <div className={cn('flex min-w-0 flex-col gap-3', className)}>

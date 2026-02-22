@@ -9,9 +9,19 @@ export interface UiToolbarProps {
   className?: string;
 }
 
-export function UiToolbar({ left, right, children, className }: UiToolbarProps) {
+export function UiToolbar({
+  left,
+  right,
+  children,
+  className,
+}: UiToolbarProps) {
   return (
-    <div className={cn('flex min-w-0 items-center justify-between gap-3', className)}>
+    <div
+      className={cn(
+        'flex min-w-0 items-center justify-between gap-3',
+        className,
+      )}
+    >
       {children ? (
         children
       ) : (

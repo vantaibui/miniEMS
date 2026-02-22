@@ -1,11 +1,5 @@
 import { useState } from 'react';
-import {
-  UiButton,
-  UiFormField,
-  UiInput,
-  UiModal,
-  UiText,
-} from '@libs/ui';
+import { UiButton, UiFormField, UiInput, UiModal, UiText } from '@libs/ui';
 
 /**
  * Demo for Modal component.
@@ -89,10 +83,7 @@ export const ModalDemo = () => {
             <UiInput placeholder="e.g. Content Auditor" disabled={loading} />
           </UiFormField>
           <UiFormField label="Description">
-            <UiInput
-              placeholder="What does this role do?"
-              disabled={loading}
-            />
+            <UiInput placeholder="What does this role do?" disabled={loading} />
           </UiFormField>
         </div>
       </UiModal>

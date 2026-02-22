@@ -24,7 +24,8 @@ export const CardDemo = () => {
             Default Card
           </UiText>
           <UiText variant="body">
-            This is a default card with medium padding. It uses the project's standard shadow and border tokens.
+            This is a default card with medium padding. It uses the project's
+            standard shadow and border tokens.
           </UiText>
         </UiCard>
 
@@ -33,7 +34,8 @@ export const CardDemo = () => {
             Outlined Card
           </UiText>
           <UiText variant="body">
-            Outlined cards use a 1px border without a shadow. Ideal for secondary information or nested content.
+            Outlined cards use a 1px border without a shadow. Ideal for
+            secondary information or nested content.
           </UiText>
         </UiCard>
 
@@ -51,7 +53,8 @@ export const CardDemo = () => {
             Large Padding
           </UiText>
           <UiText variant="body">
-            Spacious card layout, great for main content or dashboard highlights.
+            Spacious card layout, great for main content or dashboard
+            highlights.
           </UiText>
         </UiCard>
       </div>

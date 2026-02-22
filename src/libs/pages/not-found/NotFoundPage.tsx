@@ -1,4 +1,12 @@
-import { Box, Typography, Container, Stack, Button, DashboardIcon, HeadsetMicIcon } from '@libs/ui';
+import {
+  Box,
+  Typography,
+  Container,
+  Stack,
+  Button,
+  DashboardIcon,
+  HeadsetMicIcon,
+} from '@libs/ui';
 import { useNavigate } from 'react-router-dom';
 
 const NotFoundPage = () => {
@@ -80,8 +88,8 @@ const NotFoundPage = () => {
             color="text.secondary"
             sx={{ mb: 4, mt: 2, px: { xs: 2, md: 0 } }}
           >
-            The page you are looking for might have been removed, had its name changed, or is temporarily
-            unavailable.
+            The page you are looking for might have been removed, had its name
+            changed, or is temporarily unavailable.
           </Typography>
 
           <Stack
@@ -101,7 +109,9 @@ const NotFoundPage = () => {
             <Button
               variant="outlined"
               startIcon={<HeadsetMicIcon />}
-              onClick={() => (window.location.href = 'mailto:support@sonicvista.com')}
+              onClick={() =>
+                (window.location.href = 'mailto:support@sonicvista.com')
+              }
             >
               Contact Support
             </Button>

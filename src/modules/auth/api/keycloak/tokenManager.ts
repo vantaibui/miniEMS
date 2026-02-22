@@ -25,7 +25,9 @@ const flushRefreshQueue = (err: unknown, token?: string) => {
  * Refresh Token with Mutex/Queue
  * Prevents multiple concurrent refresh calls.
  */
-export const refreshToken = async (minValiditySeconds = 60): Promise<string | undefined> => {
+export const refreshToken = async (
+  minValiditySeconds = 60,
+): Promise<string | undefined> => {
   if (!isAuthenticated()) return undefined;
 
   if (isRefreshing && refreshPromise) {

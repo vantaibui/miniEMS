@@ -1,19 +1,19 @@
-import type { MouseEventHandler, ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import type { ButtonProps } from '@mui/material/Button';
 
-export type UiButtonSize = 'sm' | 'md' | 'lg';
-export type UiButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+export type UiButtonSize = 'sm' | 'md' | 'lg' | 'small' | 'medium' | 'large';
+export type UiButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'ghost'
+  | 'danger'
+  | 'contained'
+  | 'outlined'
+  | 'text';
 
-export interface UiButtonProps {
-  children: ReactNode;
+export interface UiButtonProps extends Omit<ButtonProps, 'variant' | 'size'> {
+  children?: ReactNode;
   size?: UiButtonSize;
   variant?: UiButtonVariant;
-  disabled?: boolean;
   loading?: boolean;
-  fullWidth?: boolean;
-  startIcon?: ReactNode;
-  endIcon?: ReactNode;
-  type?: 'button' | 'submit' | 'reset';
-  className?: string;
-  onClick?: MouseEventHandler<HTMLButtonElement>;
-  'aria-label'?: string;
 }

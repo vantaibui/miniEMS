@@ -1,7 +1,11 @@
 import Chip from '@mui/material/Chip';
 
 import { cn } from '@libs/utils';
-import type { UiBadgeProps, UiBadgeSize, UiBadgeVariant } from './UiBadge.types';
+import type {
+  UiBadgeProps,
+  UiBadgeSize,
+  UiBadgeVariant,
+} from './UiBadge.types';
 
 function mapVariant(
   variant: UiBadgeVariant,
@@ -40,7 +44,12 @@ function mapSize(size: UiBadgeSize): 'small' | 'medium' {
   }
 }
 
-export function UiBadge({ children, variant = 'neutral', size = 'md', className }: UiBadgeProps) {
+export function UiBadge({
+  children,
+  variant = 'neutral',
+  size = 'md',
+  className,
+}: UiBadgeProps) {
   const muiColor = mapVariant(variant);
 
   return (

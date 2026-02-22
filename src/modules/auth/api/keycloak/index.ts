@@ -1,7 +1,19 @@
 import { keycloak, initKeycloak } from './client';
-import { refreshToken, startSessionWatcher, getToken, isAuthenticated } from './tokenManager';
+import {
+  refreshToken,
+  startSessionWatcher,
+  getToken,
+  isAuthenticated,
+} from './tokenManager';
 
-export { keycloak, initKeycloak, refreshToken, startSessionWatcher, getToken, isAuthenticated };
+export {
+  keycloak,
+  initKeycloak,
+  refreshToken,
+  startSessionWatcher,
+  getToken,
+  isAuthenticated,
+};
 
 export const login = (redirectUri: string = window.location.href) =>
   keycloak.login({ redirectUri });

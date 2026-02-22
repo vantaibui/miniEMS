@@ -1,18 +1,37 @@
 import type { RouteObject } from 'react-router-dom';
-import { RouteGuard } from '@modules/auth';
+import { Navigate } from 'react-router-dom';
+
+import { RouteGuard } from '../auth';
+
+import { RoleCreatePage, RoleEditPage, RoleListPage } from './pages';
 
 export const rolesRoutes: Array<RouteObject> = [
   {
     path: 'roles',
     element: (
       <RouteGuard permissionPath="ACCESS_MANAGEMENT.ROLE_MANAGEMENT.read">
-        <div className="p-8">
-          <div className="rounded-2xl border border-(--color-divider) bg-white p-8">
-            <h1 className="text-2xl font-extrabold">Roles & Permissions</h1>
-            <p className="mt-2 text-(--color-text-secondary)">Under development.</p>
-          </div>
-        </div>
+        <RoleListPage />
       </RouteGuard>
     ),
+  },
+  {
+    path: 'roles/create',
+    element: (
+      <RouteGuard permissionPath="ACCESS_MANAGEMENT.ROLE_MANAGEMENT.create">
+        <RoleCreatePage />
+      </RouteGuard>
+    ),
+  },
+  {
+    path: 'roles/:id/edit',
+    element: (
+      <RouteGuard permissionPath="ACCESS_MANAGEMENT.ROLE_MANAGEMENT.update">
+        <RoleEditPage />
+      </RouteGuard>
+    ),
+  },
+  {
+    path: 'roles/:id',
+    element: <Navigate to="edit" replace />,
   },
 ];

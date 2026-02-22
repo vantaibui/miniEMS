@@ -20,10 +20,14 @@ export const usePermission = (path: string): boolean => {
 export const useHasAction = (
   moduleKey: string,
   subModuleKey: string,
-  actionKey: keyof Actions
+  actionKey: keyof Actions,
 ): boolean => {
   const permissions = useRbacStore((state) => state.permissions);
   const rbacMode = useRbacStore((state) => state.rbacMode);
 
-  return checkPermissionRaw(permissions, `${moduleKey}.${subModuleKey}.${actionKey}`, rbacMode);
+  return checkPermissionRaw(
+    permissions,
+    `${moduleKey}.${subModuleKey}.${actionKey}`,
+    rbacMode,
+  );
 };

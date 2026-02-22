@@ -2,7 +2,12 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { AxiosError } from 'axios';
 
-import type { AuthState, PermissionNode, UserMe, UserProfile } from '@libs/types';
+import type {
+  AuthState,
+  PermissionNode,
+  UserMe,
+  UserProfile,
+} from '@libs/types';
 import { login, logout } from '../api/keycloak';
 
 export interface KeycloakAuthState {
@@ -11,23 +16,33 @@ export interface KeycloakAuthState {
   refreshToken?: string;
   userProfile: UserProfile | null;
   isInitialized: boolean;
-  setAuth: (payload: { isAuthenticated: boolean; token?: string; refreshToken?: string; userProfile: UserProfile | null }) => void;
+  setAuth: (payload: {
+    isAuthenticated: boolean;
+    token?: string;
+    refreshToken?: string;
+    userProfile: UserProfile | null;
+  }) => void;
   setInitialized: (isInitialized: boolean) => void;
   login: (redirectUri?: string) => Promise<void>;
   logout: (redirectUri?: string) => Promise<void>;
 }
 
-export const useAuthStore = create<KeycloakAuthState>()(devtools((set) => ({
-  isAuthenticated: false,
-  token: undefined,
-  refreshToken: undefined,
-  userProfile: null,
-  isInitialized: false,
-  setAuth: (payload) => set((state) => ({ ...state, ...payload })),
-  setInitialized: (isInitialized) => set({ isInitialized }),
-  login: async (redirectUri) => login(redirectUri),
-  logout: async (redirectUri) => logout(redirectUri),
-}), { name: 'AuthStore' }));
+export const useAuthStore = create<KeycloakAuthState>()(
+  devtools(
+    (set) => ({
+      isAuthenticated: false,
+      token: undefined,
+      refreshToken: undefined,
+      userProfile: null,
+      isInitialized: false,
+      setAuth: (payload) => set((state) => ({ ...state, ...payload })),
+      setInitialized: (isInitialized) => set({ isInitialized }),
+      login: async (redirectUri) => login(redirectUri),
+      logout: async (redirectUri) => logout(redirectUri),
+    }),
+    { name: 'AuthStore' },
+  ),
+);
 import { authService } from '../api/auth.api';
 import { userService } from '../../users/api/user.api';
 
@@ -59,7 +74,8 @@ export const useRbacStore = create<AuthState>()(
       ...initialState,
 
       setUser: (user: UserMe | null) => set({ user }),
-      setPermissions: (permissions: Array<PermissionNode> | null) => set({ permissions }),
+      setPermissions: (permissions: Array<PermissionNode> | null) =>
+        set({ permissions }),
       setLoading: (isLoading: boolean) => set({ isLoading }),
       setError: (error: string | null) => set({ error }),
       setInitialized: (isInitialized: boolean) => set({ isInitialized }),
@@ -72,7 +88,13 @@ export const useRbacStore = create<AuthState>()(
         // Don't call backend if Keycloak is not authenticated
         const { isAuthenticated } = useAuthStore.getState();
         if (!isAuthenticated) {
-          set({ user: null, permissions: null, isInitialized: true, isLoading: false, error: null });
+          set({
+            user: null,
+            permissions: null,
+            isInitialized: true,
+            isLoading: false,
+            error: null,
+          });
           return;
         }
 
@@ -104,7 +126,8 @@ export const useRbacStore = create<AuthState>()(
 
           // If permissions fail: keep session, but deny access by redirecting to /403 via guards.
           set({
-            error: msg ?? (err instanceof Error ? err.message : 'RBAC init failed'),
+            error:
+              msg ?? (err instanceof Error ? err.message : 'RBAC init failed'),
             isInitialized: true,
           });
         } finally {
@@ -112,6 +135,6 @@ export const useRbacStore = create<AuthState>()(
         }
       },
     }),
-    { name: 'RbacStore' }
-  )
+    { name: 'RbacStore' },
+  ),
 );

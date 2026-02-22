@@ -10,7 +10,9 @@ export const keycloak = new Keycloak({
 
 let initPromise: Promise<boolean> | null = null;
 
-export const initKeycloak = async (options?: Parameters<Keycloak['init']>[0]): Promise<boolean> => {
+export const initKeycloak = async (
+  options?: Parameters<Keycloak['init']>[0],
+): Promise<boolean> => {
   if (initPromise) return initPromise;
 
   initPromise = keycloak
@@ -26,8 +28,8 @@ export const initKeycloak = async (options?: Parameters<Keycloak['init']>[0]): P
   return initPromise;
 };
 
-export const login = (redirectUri?: string) => 
+export const login = (redirectUri?: string) =>
   keycloak.login({ redirectUri: redirectUri || window.location.origin });
 
-export const logout = (redirectUri?: string) => 
+export const logout = (redirectUri?: string) =>
   keycloak.logout({ redirectUri: redirectUri || window.location.origin });

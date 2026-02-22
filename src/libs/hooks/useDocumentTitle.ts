@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 /**
  * Hook to update the document title.
  * Restores the previous title on unmount.
- * 
+ *
  * @param title - The title to set.
  * @param persistOnUnmount - If true, the title will not be restored on unmount.
  */

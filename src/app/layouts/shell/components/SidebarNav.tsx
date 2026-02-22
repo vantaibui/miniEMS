@@ -1,20 +1,32 @@
-import React from 'react';
-import { Box, List, ListItemButton, ListItemIcon, Typography } from '@mui/material';
-import { NavLink } from 'react-router-dom';
+import {
+  Box,
+  Chip,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  Typography,
+} from '@mui/material';
+import { NavLink, useLocation } from 'react-router-dom';
 
-import type { NavGroup, NavItem } from '../../../navigation/nav.types';
+import { checkPermissionRaw, useRbacStore } from '@modules/auth';
 import type { PermissionNode } from '@libs/types';
-import { useRbacStore, checkPermissionRaw } from '@modules/auth';
+import type { NavGroup } from '../../../navigation/nav.types';
+import type { ReactNode } from 'react';
 
 interface SidebarNavProps {
   groups: Array<NavGroup>;
 }
 
-const isItemAllowed = (permissions: unknown, item: NavItem) => {
-  if (!item.permissionPath) {
-    return false;
-  }
-  return checkPermissionRaw(permissions as Array<PermissionNode>, item.permissionPath);
+const isAllowed = (
+  permissions: Array<PermissionNode> | null,
+  permissionPath?: string | null,
+) => {
+  // Default allow if permissionPath is missing/empty
+  // if (!permissionPath) {
+  //   return true;
+  // }
+  // return checkPermissionRaw(permissions, permissionPath);
+  return true;
 };
 
 export const SidebarNav = ({ groups }: SidebarNavProps) => {
@@ -23,6 +35,7 @@ export const SidebarNav = ({ groups }: SidebarNavProps) => {
   const isInitialized = useRbacStore((s) => s.isInitialized);
   const error = useRbacStore((s) => s.error);
   const rbacMode = useRbacStore((s) => s.rbacMode);
+  const location = useLocation();
 
   if (!isInitialized || isLoading) {
     return (
@@ -30,7 +43,12 @@ export const SidebarNav = ({ groups }: SidebarNavProps) => {
         {Array.from({ length: 6 }).map((_, idx) => (
           <Box
             key={idx}
-            className="h-10 rounded-xl border border-(--color-divider) bg-white/60"
+            className="h-10 rounded-xl border"
+            sx={{
+              borderColor: 'divider',
+              bgcolor: 'background.paper',
+              opacity: 0.6,
+            }}
           />
         ))}
       </Box>
@@ -42,9 +60,10 @@ export const SidebarNav = ({ groups }: SidebarNavProps) => {
   }
 
   const filteredGroups = groups
+    .filter((g) => isAllowed(permissions, g.permissionPath))
     .map((g) => ({
       ...g,
-      items: g.items.filter((it) => isItemAllowed(permissions, it)),
+      items: g.items.filter((it) => isAllowed(permissions, it.permissionPath)),
     }))
     .filter((g) => g.items.length > 0);
 
@@ -55,7 +74,8 @@ export const SidebarNav = ({ groups }: SidebarNavProps) => {
           {group.section && (
             <Typography
               variant="overline"
-              className="text-(--mui-palette-text-secondary) font-bold tracking-widest px-2"
+              color="text.secondary"
+              className="px-2 font-bold tracking-widest"
               sx={{ fontSize: '0.65rem' }}
             >
               {group.section}
@@ -63,26 +83,76 @@ export const SidebarNav = ({ groups }: SidebarNavProps) => {
           )}
 
           <List dense className="mt-2 p-0">
-            {group.items.map((item) => (
-              <ListItemButton
-                key={item.key}
-                component={NavLink}
-                to={item.to}
-                className="rounded-xl mb-1"
-                sx={{
-                  '&.active': {
-                    bgcolor: 'rgba(var(--mui-palette-primary-mainChannel), 0.12)',
-                    color: 'primary.main',
-                    '& .MuiListItemIcon-root': {
-                      color: 'primary.main',
+            {group.items.map((item) => {
+              const isActive =
+                location.pathname === item.to ||
+                (item.to !== '/' &&
+                  location.pathname.startsWith(`${item.to}/`));
+
+              return (
+                <ListItemButton
+                  key={item.key}
+                  component={NavLink}
+                  to={item.to}
+                  className="mb-1 rounded-lg"
+                  sx={{
+                    minHeight: 44,
+                    borderRadius: 1,
+                    px: 1.5,
+                    mb: 1,
+                    '&:hover': {
+                      bgcolor: 'action.hover',
                     },
-                  },
-                }}
-              >
-                {item.icon && <ListItemIcon sx={{ minWidth: 36 }}>{typeof item.icon === 'function' ? React.createElement(item.icon as React.ComponentType<unknown>) : (item.icon as React.ReactNode)}</ListItemIcon>}
-                <Typography variant="body2">{item.label}</Typography>
-              </ListItemButton>
-            ))}
+                    '&.active': {
+                      bgcolor: 'action.selected',
+                      color: 'primary.main',
+                      '&:hover': {
+                        bgcolor: 'action.selected',
+                      },
+                      '& .MuiListItemIcon-root': {
+                        color: 'primary.main',
+                      },
+                    },
+                  }}
+                >
+                  {item.icon && (
+                    <ListItemIcon
+                      sx={{
+                        minWidth: 36,
+                        color: isActive ? 'primary.main' : 'inherit',
+                      }}
+                    >
+                      {item.icon as ReactNode}
+                    </ListItemIcon>
+                  )}
+
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      flexGrow: 1,
+                      fontWeight: isActive ? 600 : 400,
+                      color: isActive ? 'primary.main' : 'text.primary',
+                    }}
+                  >
+                    {item.label}
+                  </Typography>
+
+                  {isActive && (
+                    <Chip
+                      label="Active"
+                      size="small"
+                      color="primary"
+                      sx={{
+                        height: 20,
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
+                        borderRadius: '999px',
+                      }}
+                    />
+                  )}
+                </ListItemButton>
+              );
+            })}
           </List>
         </Box>
       ))}
