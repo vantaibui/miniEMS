@@ -7,8 +7,6 @@ const unwrap = async <T>(
 ): Promise<ApiResponse<T>> => {
   const res = await promise;
 
-  // If interceptor is correctly set up, any `success: false` payload should already be thrown.
-  // This guard keeps type safety and prevents runtime issues if interceptor is bypassed.
   if (!res.data.success) {
     throw new Error('Unexpected API structure');
   }
