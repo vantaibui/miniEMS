@@ -3,8 +3,8 @@ import axiosInstance from './axios.instance';
 import type { ApiResponse, RequestConfig } from './http.types';
 
 const unwrap = async <T>(
-  promise: Promise<AxiosResponse<ApiResponse<T>>>,
-): Promise<T> => {
+  promise: Promise<AxiosResponse<ApiResponse<T>>>
+): Promise<ApiResponse<T>> => {
   const res = await promise;
 
   // If interceptor is correctly set up, any `success: false` payload should already be thrown.
@@ -12,7 +12,8 @@ const unwrap = async <T>(
   if (!res.data.success) {
     throw new Error('Unexpected API structure');
   }
-  return res.data.data;
+
+  return res.data;
 };
 
 export const http = {

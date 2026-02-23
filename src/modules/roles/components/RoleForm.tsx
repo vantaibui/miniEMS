@@ -34,7 +34,7 @@ const schema = yup.object().shape({
 
 interface RoleFormProps {
   initialValues?: CreateRolePayload;
-  allPermissions: Array<PermissionNode>;
+  Permissions: Array<PermissionNode>;
   onSubmit: (data: CreateRolePayload) => void;
   onCancel: () => void;
   onDelete?: () => void;
@@ -45,7 +45,7 @@ interface RoleFormProps {
 
 export const RoleForm = ({
   initialValues,
-  allPermissions,
+  Permissions,
   onSubmit,
   onCancel,
   onDelete,
@@ -58,7 +58,7 @@ export const RoleForm = ({
     handleSubmit,
     formState: { errors },
   } = useForm<CreateRolePayload>({
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as never,
     defaultValues: initialValues || {
       name: '',
       description: '',
@@ -157,7 +157,7 @@ export const RoleForm = ({
               control={control}
               render={({ field }) => (
                 <RolePermissionMatrix
-                  permissions={allPermissions}
+                  permissions={Permissions}
                   selectedPermissions={field.value}
                   onChange={field.onChange}
                 />
@@ -207,8 +207,6 @@ export const RoleForm = ({
                 loading={isLoading}
                 sx={{
                   px: 3,
-                  fontWeight: 600,
-                  boxShadow: '0px 4px 12px rgba(11, 87, 208, 0.2)',
                 }}
               >
                 {submitLabel}

@@ -44,7 +44,7 @@ export const useAuthStore = create<KeycloakAuthState>()(
   ),
 );
 import { authService } from '../api/auth.api';
-import { userService } from '../../users/api/user.api';
+import { usersApi } from '../../users/api/users.api';
 
 const initialState: Pick<
   AuthState,
@@ -102,11 +102,11 @@ export const useRbacStore = create<AuthState>()(
 
         try {
           // 1) /users/me
-          const user = await userService.getMe();
-          set({ user });
+          const user = await usersApi.getMe();
+          set({ user: user as unknown as UserMe });
 
           // 2) /roles/{roleId}/permissions
-          const roleId = user.role_id;
+          const roleId = user.roleId;
           if (!roleId) {
             // Strict mode: if no role_id, user effectively has no permissions.
             set({ permissions: null, isInitialized: true });

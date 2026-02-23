@@ -30,9 +30,9 @@ export const queryKeys = {
     details: () => [...queryKeys.roles.all, 'detail'] as const,
     detail: (id: string | number) =>
       [...queryKeys.roles.details(), id] as const,
-    permissions: (id: string | number) =>
+    permissionsById: (id: string | number) =>
       [...queryKeys.roles.all, 'permissions', id] as const,
-    allPermissions: () => [...queryKeys.roles.all, 'all-permissions'] as const,
+    permissions: () => [...queryKeys.roles.all, 'all-permissions'] as const,
   },
   device: {
     all: ['device'] as const,

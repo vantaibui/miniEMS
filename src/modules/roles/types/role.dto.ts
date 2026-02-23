@@ -1,15 +1,17 @@
-export interface RoleDto {
+export type RoleStatus = 'ACTIVE' | 'INACTIVE';
+
+export interface Role {
   id: number;
   name: string;
   description: string;
-  status: 'ACTIVE' | 'INACTIVE';
+  status: RoleStatus;
   createdDate: string;
   createdById: number;
   lastModifiedDate: string;
   lastModifiedBy: number;
 }
 
-export interface RolePermissionModuleDto {
+export interface RolePermissionModule {
   module: string;
   actions: {
     create: boolean;
@@ -19,6 +21,6 @@ export interface RolePermissionModuleDto {
   };
 }
 
-export interface RoleDetailDto extends RoleDto {
-  permissions: Array<RolePermissionModuleDto>;
+export interface RoleDetails extends Role{
+  permissions: Array<RolePermissionModule>;
 }

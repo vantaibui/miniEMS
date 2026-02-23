@@ -62,7 +62,7 @@ export const RolePermissionMatrix = ({
     if (readOnly) return;
 
     const existingIndex = selectedPermissions.findIndex((p) => p.id === id);
-    let updated = [...selectedPermissions];
+    const updated = [...selectedPermissions];
 
     if (existingIndex > -1) {
       const current = updated[existingIndex];
@@ -87,9 +87,9 @@ export const RolePermissionMatrix = ({
     onChange(updated);
   };
 
-  const renderRows = (nodes: Array<PermissionNode>, depth = 0) => {
-    return nodes.map((node) => {
-      const selected = selectedPermissions.find((p) => p.id === node.id);
+  const renderRows = (modules: Array<PermissionNode>, depth = 0) => {
+    return modules.map((module) => {
+      const selected = selectedPermissions.find((p) => p.id === module.id);
       const actions = selected?.actions || {
         create: false,
         read: false,
@@ -98,14 +98,14 @@ export const RolePermissionMatrix = ({
       };
 
       return (
-        <React.Fragment key={node.id}>
+        <React.Fragment key={module.id}>
           <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
             <TableCell sx={{ pl: depth * 4 + 2 }}>
               <Typography
                 variant="body2"
                 sx={{ fontWeight: depth === 0 ? 600 : 400 }}
               >
-                {node.name}
+                {module.name}
               </Typography>
             </TableCell>
             <TableCell align="center">
@@ -113,7 +113,7 @@ export const RolePermissionMatrix = ({
                 size="small"
                 checked={actions.create}
                 disabled={readOnly}
-                onChange={() => handleToggle(node.id, 'create')}
+                onChange={() => handleToggle(module.id, 'create')}
               />
             </TableCell>
             <TableCell align="center">
@@ -121,7 +121,7 @@ export const RolePermissionMatrix = ({
                 size="small"
                 checked={actions.read}
                 disabled={readOnly}
-                onChange={() => handleToggle(node.id, 'read')}
+                onChange={() => handleToggle(module.id, 'read')}
               />
             </TableCell>
             <TableCell align="center">
@@ -129,7 +129,7 @@ export const RolePermissionMatrix = ({
                 size="small"
                 checked={actions.update}
                 disabled={readOnly}
-                onChange={() => handleToggle(node.id, 'update')}
+                onChange={() => handleToggle(module.id, 'update')}
               />
             </TableCell>
             <TableCell align="center">
@@ -137,13 +137,13 @@ export const RolePermissionMatrix = ({
                 size="small"
                 checked={actions.delete}
                 disabled={readOnly}
-                onChange={() => handleToggle(node.id, 'delete')}
+                onChange={() => handleToggle(module.id, 'delete')}
               />
             </TableCell>
           </TableRow>
-          {node.children &&
-            node.children.length > 0 &&
-            renderRows(node.children, depth + 1)}
+          {module.subModule &&
+            module.subModule.length > 0 &&
+            renderRows(module.subModule, depth + 1)}
         </React.Fragment>
       );
     });

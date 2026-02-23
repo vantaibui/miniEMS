@@ -1,18 +1,18 @@
-import type { PermissionActionsDto } from './permission.dto';
+import type { PermissionActions } from './permission.dto';
 
 export interface RolePermissionPayload {
   id: number;
-  actions: PermissionActionsDto;
+  actions: PermissionActions;
 }
 
-export interface CreateRolePayload {
+export interface BaseRolePayload {
   name: string;
   description: string;
   permissions: Array<RolePermissionPayload>;
 }
 
-export interface UpdateRolePayload {
-  name: string;
-  description: string;
-  permissions: Array<RolePermissionPayload>;
+export type CreateRolePayload = BaseRolePayload;
+
+export interface UpdateRolePayload extends BaseRolePayload {
+  id: number;
 }

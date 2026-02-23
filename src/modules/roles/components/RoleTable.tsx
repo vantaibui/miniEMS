@@ -1,65 +1,29 @@
-import { useMemo, useState } from 'react';
 import {
-  IconButton,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  Typography,
+  Avatar,
   Box,
   Card,
-  Tabs,
-  Tab,
+  IconButton,
+  ListItemIcon,
+  Menu,
+  MenuItem,
   Select,
-  Avatar,
+  Tab,
+  Tabs,
+  Typography,
 } from '@mui/material';
+import { useMemo, useState } from 'react';
 
-import { UiDataTable } from '@libs/ui';
-import { MoreVertIcon, EditOutlinedIcon, DeleteOutlineIcon } from '@libs/ui';
-import SecurityIcon from '@mui/icons-material/Security';
-import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
-import CodeIcon from '@mui/icons-material/Code';
-import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import { DeleteOutlineIcon, EditOutlinedIcon, MoreVertIcon, UiDataTable } from '@libs/ui';
 import FilterListIcon from '@mui/icons-material/FilterList';
 
-import type { RoleEntity } from '../types';
+import type { Role } from '../types';
 
 export interface RoleTableProps {
-  rows: Array<RoleEntity>;
+  rows: Array<Role>;
   loading?: boolean;
   onEdit: (id: number) => void;
   onDelete: (id: number) => void;
 }
-
-const getRoleIconAndColor = (name: string) => {
-  const lowerName = name.toLowerCase();
-  if (lowerName.includes('admin')) {
-    return {
-      icon: <SecurityIcon fontSize="small" />,
-      color: '#0b57d0',
-      bgcolor: '#e8f0fe',
-    };
-  }
-  if (lowerName.includes('manager')) {
-    return {
-      icon: <WorkOutlineIcon fontSize="small" />,
-      color: '#65558f',
-      bgcolor: '#f3e8fd',
-    };
-  }
-  if (lowerName.includes('developer')) {
-    return {
-      icon: <CodeIcon fontSize="small" />,
-      color: '#118a4a',
-      bgcolor: '#e6f4ea',
-    };
-  }
-  return {
-    icon: <PersonOutlineIcon fontSize="small" />,
-    color: '#0b57d0',
-    bgcolor: '#e8f0fe',
-  };
-};
-
 export const RoleTable = ({
   rows,
   loading,
@@ -91,27 +55,18 @@ export const RoleTable = ({
       {
         key: 'name',
         header: 'ROLE NAME',
-        render: (row: RoleEntity) => {
-          const { icon, color, bgcolor } = getRoleIconAndColor(row.name);
+        render: (role: Role) => {
           return (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
               <Avatar
-                variant="rounded"
-                sx={{
-                  width: 32,
-                  height: 32,
-                  bgcolor,
-                  color,
-                  borderRadius: 1.5,
-                }}
-              >
-                {icon}
-              </Avatar>
+                sx={{ width: 30, height: 30 }}
+                src={`https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(role.name)}`}
+              />
               <Typography
                 variant="body2"
                 sx={{ fontWeight: 600, color: 'text.primary' }}
               >
-                {row.name}
+                {role.name}
               </Typography>
             </Box>
           );
@@ -120,14 +75,14 @@ export const RoleTable = ({
       {
         key: 'description',
         header: 'DESCRIPTION',
-        render: (row: RoleEntity) => (
+        render: (role: Role) => (
           <Typography
             variant="body2"
             color="text.secondary"
             sx={{ maxWidth: 400 }}
             noWrap
           >
-            {row.description || 'No description available for this role.'}
+            {role.description || 'No description available for this role.'}
           </Typography>
         ),
       },
@@ -135,7 +90,7 @@ export const RoleTable = ({
         key: 'assignedUsers',
         header: 'ASSIGNED USERS',
         width: 150,
-        render: (_row: RoleEntity) => (
+        render: () => (
           <Typography
             variant="body2"
             sx={{ fontWeight: 600, color: 'text.primary' }}
@@ -156,8 +111,8 @@ export const RoleTable = ({
         header: 'ACTIONS',
         width: 80,
         align: 'right' as const,
-        render: (row: RoleEntity) => (
-          <IconButton size="small" onClick={(e) => openMenu(e, row.id)}>
+        render: (role: Role) => (
+          <IconButton size="small" onClick={(e) => openMenu(e, role.id)}>
             <MoreVertIcon fontSize="small" />
           </IconButton>
         ),
@@ -201,7 +156,7 @@ export const RoleTable = ({
               fontSize: '0.875rem',
             }}
             displayEmpty
-            renderValue={(value) => (
+            renderValue={() => (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <FilterListIcon
                   fontSize="small"
@@ -274,14 +229,14 @@ export const RoleTable = ({
               letterSpacing: '0.5px',
             },
           },
-          '& > div': { boxShadow: 'none', borderRadius: 0 }, // To remove UiCard styling if any
+          '& > div': { boxShadow: 'none', borderRadius: 0 },
         }}
       >
         <UiDataTable
           aria-label="Roles table"
           rows={paginatedRows}
           columns={columns}
-          getRowId={(row) => row.id}
+          getRowId={(role) => role.id}
           loading={loading}
           selectable={true}
           pagination={{

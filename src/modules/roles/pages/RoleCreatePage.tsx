@@ -1,36 +1,35 @@
 import { useNavigate } from 'react-router-dom';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useToast } from '@libs/hooks';
-import { Breadcrumb } from '@libs/ui';
+import { UiBreadcrumb } from '@libs/ui';
 
-import { useRoleCreate, useAllPermissions } from '../hooks';
+import { useRoleCreate, usePermissions } from '../hooks';
 import { RoleForm } from '../components/RoleForm';
 import type { CreateRolePayload } from '../types';
 
 export const RoleCreatePage = () => {
   const navigate = useNavigate();
   const toast = useToast();
-  const { data: allPermissions, isLoading: isLoadingPermissions } =
-    useAllPermissions();
+  const { data: Permissions, isLoading: isLoadingPermissions } =
+    usePermissions();
   const { mutate: createRole, isPending: isCreating } = useRoleCreate();
 
   const handleSubmit = (data: CreateRolePayload) => {
     createRole(data, {
-      onSuccess: () => {
-        toast.success('Role created successfully!');
+      onSuccess: (response) => {
+        toast.success(
+          response.success ? response?.message : 'Role created successfully!',
+        );
         navigate('/roles');
-      },
-      onError: (error) => {
-        toast.error(error.message || 'Failed to create role');
       },
     });
   };
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+    <Box>
       <Box sx={{ mb: 4 }}>
         <Box sx={{ mb: 2 }}>
-          <Breadcrumb
+          <UiBreadcrumb
             items={[
               { label: 'Dashboard', href: '/' },
               { label: 'Administration', href: '#' },
@@ -72,9 +71,9 @@ export const RoleCreatePage = () => {
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
             <CircularProgress />
           </Box>
-        ) : allPermissions ? (
+        ) : Permissions ? (
           <RoleForm
-            allPermissions={allPermissions}
+            Permissions={Permissions}
             onSubmit={handleSubmit}
             onCancel={() => navigate('/roles')}
             isLoading={isCreating}

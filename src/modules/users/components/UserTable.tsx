@@ -12,7 +12,6 @@ import {
   Tab,
   Tabs,
   Select,
-  MenuItem as SelectItem,
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
@@ -20,10 +19,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 import { FilterListIcon, UiDataTable } from '@libs/ui';
 import type { UiDataTableColumn } from '@libs/ui';
-import type { UserEntity } from '../types';
+import type { User } from '../types';
 
 interface UserTableProps {
-  rows: Array<UserEntity>;
+  rows: Array<User>;
   loading?: boolean;
   onEdit?: (id: number) => void;
   onDelete?: (id: number) => void;
@@ -42,7 +41,7 @@ export const UserTable = ({
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const paginatedRows = useMemo(() => {
-    return rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    return rows?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
   }, [rows, page, rowsPerPage]);
 
   const openMenu = (event: React.MouseEvent<HTMLElement>, userId: number) => {
@@ -65,29 +64,22 @@ export const UserTable = ({
     closeMenu();
   };
 
-  const getRoleBadgeColor = (role: string) => {
-    const r = role.toUpperCase();
-    if (r.includes('ADMIN')) return { bg: '#e8f0fe', color: '#1a73e8' };
-    if (r.includes('MANAGER')) return { bg: '#f3e8fd', color: '#9333ea' };
-    return { bg: '#f1f3f4', color: '#5f6368' };
-  };
-
-  const columns: Array<UiDataTableColumn<UserEntity>> = [
+  const columns: Array<UiDataTableColumn<User>> = [
     {
       key: 'userIdentity',
       header: 'USER IDENTITY',
-      render: (row: UserEntity) => (
+      render: (row: User) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Avatar
             sx={{ width: 40, height: 40 }}
-            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(row.fullName)}&background=random`}
+            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(row.firstName + row.lastName)}&background=random`}
           />
           <Box>
             <Typography
               variant="body2"
               sx={{ fontWeight: 600, color: 'text.primary' }}
             >
-              {row.fullName}
+              {row.firstName}
             </Typography>
             <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               {row.email}
@@ -97,38 +89,9 @@ export const UserTable = ({
       ),
     },
     {
-      key: 'securityRole',
-      header: 'SECURITY ROLE',
-      render: (row: UserEntity) => {
-        const primaryRole =
-          row.roles && row.roles.length > 0
-            ? row.roles[0].toUpperCase()
-            : 'VIEWER';
-        const colors = getRoleBadgeColor(primaryRole);
-        return (
-          <Box
-            component="span"
-            sx={{
-              bgcolor: colors.bg,
-              color: colors.color,
-              px: 1.5,
-              py: 0.5,
-              borderRadius: 4,
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              display: 'inline-block',
-              letterSpacing: '0.5px',
-            }}
-          >
-            {primaryRole}
-          </Box>
-        );
-      },
-    },
-    {
       key: 'status',
       header: 'STATUS',
-      render: (row: UserEntity) => (
+      render: (row: User) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Box
             component="span"
@@ -136,7 +99,7 @@ export const UserTable = ({
               width: 8,
               height: 8,
               borderRadius: '50%',
-              bgcolor: row.isActive ? '#10b981' : '#9ca3af',
+              bgcolor: row.status ? '#10b981' : '#9ca3af',
               display: 'inline-block',
             }}
           />
@@ -144,10 +107,10 @@ export const UserTable = ({
             variant="body2"
             sx={{
               fontWeight: 600,
-              color: row.isActive ? 'text.primary' : 'text.secondary',
+              color: row.status ? 'text.primary' : 'text.secondary',
             }}
           >
-            {row.isActive ? 'Active' : 'Inactive'}
+            {row.status ? 'Active' : 'Inactive'}
           </Typography>
         </Box>
       ),
@@ -165,7 +128,7 @@ export const UserTable = ({
       key: 'actions',
       header: 'ACTIONS',
       align: 'right',
-      render: (row: UserEntity) => (
+      render: (row: User) => (
         <IconButton size="small" onClick={(e) => openMenu(e, row.id)}>
           <MoreVertIcon fontSize="small" />
         </IconButton>
@@ -208,7 +171,7 @@ export const UserTable = ({
               fontSize: '0.875rem',
             }}
             displayEmpty
-            renderValue={(value) => (
+            renderValue={() => (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <FilterListIcon
                   fontSize="small"

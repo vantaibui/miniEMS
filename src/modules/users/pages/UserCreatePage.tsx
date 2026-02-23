@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
 import { useToast } from '@libs/hooks';
-import { Breadcrumb } from '@libs/ui';
+import { UiBreadcrumb } from '@libs/ui';
 
 import { useUserCreate } from '../hooks';
 import { UserForm } from '../components/UserForm';
@@ -25,10 +25,10 @@ export const UserCreatePage = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+    <Box>
       <Box sx={{ mb: 4 }}>
         <Box sx={{ mb: 2 }}>
-          <Breadcrumb
+          <UiBreadcrumb
             items={[
               { label: 'Dashboard', href: '/' },
               { label: 'Administration', href: '#' },

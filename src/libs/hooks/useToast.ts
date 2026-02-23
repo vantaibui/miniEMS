@@ -3,10 +3,9 @@ import { toast, type ToastOptions, type UpdateOptions } from 'react-toastify';
 export const useToast = () => {
   const defaultOptions: ToastOptions = {
     position: 'bottom-right',
-    autoClose: 4000,
+    autoClose: 2000,
     hideProgressBar: false,
     closeOnClick: true,
-    pauseOnHover: true,
     draggable: true,
     theme: 'light',
   };

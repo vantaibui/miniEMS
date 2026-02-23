@@ -3,7 +3,6 @@ export interface CreateUserPayload {
   lastName: string;
   username: string;
   email: string;
-  department?: string;
   roleId: number;
 }
 
@@ -12,7 +11,6 @@ export interface UpdateUserPayload {
   lastName?: string;
   username?: string;
   email?: string;
-  department?: string;
   roleId?: number;
-  isActive?: boolean;
+  status?: string;
 }

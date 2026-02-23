@@ -1,12 +1,11 @@
-import { useNavigate } from 'react-router-dom';
-import { Box, Typography } from '@mui/material';
 import { useToast } from '@libs/hooks';
-import { UiButton, Breadcrumb } from '@libs/ui';
+import { UiBreadcrumb, UiButton } from '@libs/ui';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import DownloadIcon from '@mui/icons-material/Download';
+import { Box, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-import { useUsers } from '../hooks';
 import { UserTable } from '../components/UserTable';
+import { useUsers } from '../hooks';
 
 export const UserListPage = () => {
   const navigate = useNavigate();
@@ -28,9 +27,9 @@ export const UserListPage = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+    <Box>
       <Box sx={{ mb: 4 }}>
-        <Breadcrumb
+        <UiBreadcrumb
           items={[
             { label: 'Dashboard', href: '/' },
             { label: 'Administration', href: '#' },
@@ -63,17 +62,9 @@ export const UserListPage = () => {
           </Box>
           <Box sx={{ display: 'flex', gap: 2 }}>
             <UiButton
-              variant="outlined"
-              startIcon={<DownloadIcon />}
-              sx={{ bgcolor: 'white' }}
-            >
-              Export
-            </UiButton>
-            <UiButton
               variant="contained"
               startIcon={<PersonAddIcon />}
               onClick={handleCreate}
-              sx={{ boxShadow: '0px 4px 12px rgba(11, 87, 208, 0.2)' }}
             >
               Add New User
             </UiButton>

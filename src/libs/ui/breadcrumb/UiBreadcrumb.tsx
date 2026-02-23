@@ -6,7 +6,7 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import HomeIcon from '@mui/icons-material/Home';
 import type { BreadcrumbProps } from './UiBreadcrumb.types';
 
-const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className = '' }) => {
+const UiBreadcrumb: React.FC<BreadcrumbProps> = ({ items, className = '' }) => {
   return (
     <MuiBreadcrumbs
       separator={
@@ -76,4 +76,4 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className = '' }) => {
   );
 };
 
-export { Breadcrumb };
+export { UiBreadcrumb };

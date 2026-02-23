@@ -1,27 +1,27 @@
-import { useForm, Controller } from 'react-hook-form';
-import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Typography, Stack, Card, Select, MenuItem } from '@mui/material';
+import { UiButton, UiFormField, UiInput } from '@libs/ui';
+import { Box, Card, MenuItem, Select, Stack, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { UiInput, UiFormField, UiButton } from '@libs/ui';
+import { Controller, useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
-import PersonIcon from '@mui/icons-material/Person';
-import SecurityIcon from '@mui/icons-material/Security';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import PersonOffIcon from '@mui/icons-material/PersonOff';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
-import BusinessIcon from '@mui/icons-material/Business';
+import PersonIcon from '@mui/icons-material/Person';
+import PersonOffIcon from '@mui/icons-material/PersonOff';
+import SecurityIcon from '@mui/icons-material/Security';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
+
 import ShieldIcon from '@mui/icons-material/Shield';
 
-import type { CreateUserPayload } from '../types';
 import { RolePermissionMatrix } from '../../roles/components/RolePermissionMatrix';
 import {
+  usePermissions,
+  usePermissionsById,
   useRoles,
-  useRolePermissions,
-  useAllPermissions,
 } from '../../roles/hooks';
 import type { PermissionNode } from '../../roles/types';
+import type { CreateUserPayload } from '../types';
 
 const schema = yup.object().shape({
   firstName: yup.string().required('First name is required').min(2).max(100),
@@ -68,24 +68,23 @@ export const UserForm = ({
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm({
-    resolver: yupResolver(schema) as any,
+  } = useForm<CreateUserPayload>({
+    resolver: yupResolver(schema) as never,
     defaultValues: initialValues || {
       firstName: '',
       lastName: '',
       username: '',
       email: '',
-      department: 'it',
       roleId: undefined,
     },
   });
 
   const selectedRoleId = watch('roleId');
-  const { data: allPermissions = [] } = useAllPermissions();
-  const { data: rolePermissions = [] } = useRolePermissions(selectedRoleId);
+  const { data: Permissions = [] } = usePermissions();
+  const { data: rolePermissions = [] } = usePermissionsById(selectedRoleId);
 
   const extractAllocatedPermissions = (
-    nodes: PermissionNode[],
+    modules: Array<PermissionNode>,
   ): Array<{
     id: number;
     actions: {
@@ -104,38 +103,39 @@ export const UserForm = ({
         delete: boolean;
       };
     }> = [];
-    nodes.forEach((node) => {
+    modules.forEach((module) => {
       if (
-        node.actions &&
-        (node.actions.canCreate ||
-          node.actions.canRead ||
-          node.actions.canUpdate ||
-          node.actions.canDelete)
+        module.actions &&
+        (module.actions.create ||
+          module.actions.read ||
+          module.actions.update ||
+          module.actions.delete)
       ) {
         result.push({
-          id: node.id,
+          id: module.id,
           actions: {
-            create: node.actions.canCreate,
-            read: node.actions.canRead,
-            update: node.actions.canUpdate,
-            delete: node.actions.canDelete,
+            create: module.actions.create,
+            read: module.actions.read,
+            update: module.actions.update,
+            delete: module.actions.delete,
           },
         });
       }
-      if (node.children && node.children.length > 0) {
-        result = [...result, ...extractAllocatedPermissions(node.children)];
+      if (module.subModule && module.subModule.length > 0) {
+        result = [...result, ...extractAllocatedPermissions(module.subModule)];
       }
     });
     return result;
   };
 
-  const handleFormSubmit = (data: any) => {
+  const handleFormSubmit = (
+    data: CreateUserPayload & { department?: string },
+  ) => {
     onSubmit({
       username: data.username,
       email: data.email,
       firstName: data.firstName,
       lastName: data.lastName,
-      department: data.department,
       roleId: data.roleId,
     });
   };
@@ -347,7 +347,7 @@ export const UserForm = ({
               </Box>
 
               <RolePermissionMatrix
-                permissions={allPermissions}
+                permissions={Permissions}
                 selectedPermissions={extractAllocatedPermissions(
                   rolePermissions,
                 )}
@@ -411,7 +411,6 @@ export const UserForm = ({
                 sx={{
                   px: 3,
                   fontWeight: 600,
-                  boxShadow: '0px 4px 12px rgba(11, 87, 208, 0.2)',
                 }}
               >
                 {submitLabel}

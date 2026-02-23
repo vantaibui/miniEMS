@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useToast } from '@libs/hooks';
-import { Breadcrumb } from '@libs/ui';
+import { UiBreadcrumb } from '@libs/ui';
 
 import { useUserDetail, useUserUpdate, useUserDelete } from '../hooks';
 import { UserForm } from '../components/UserForm';
@@ -16,7 +16,7 @@ export const UserEditPage = () => {
   const { mutate: updateUser, isPending: isUpdating } = useUserUpdate();
   const { mutate: deleteUser, isPending: isDeleting } = useUserDelete();
 
-  const handleSubmit = (data: any) => {
+  const handleSubmit = (data: import('../types').CreateUserPayload) => {
     if (!userId) return;
     updateUser(
       { id: userId, payload: data },
@@ -33,10 +33,10 @@ export const UserEditPage = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+    <Box>
       <Box sx={{ mb: 4 }}>
         <Box sx={{ mb: 2 }}>
-          <Breadcrumb
+          <UiBreadcrumb
             items={[
               { label: 'Dashboard', href: '/' },
               { label: 'User Management', href: '/users' },
@@ -64,7 +64,7 @@ export const UserEditPage = () => {
             },
           }}
         >
-          {user ? `Edit User: ${user.fullName}` : 'Edit User'}
+          {user ? `Edit User: ${user.firstName} ${user.lastName}` : 'Edit User'}
         </Typography>
         <Typography variant="body1" sx={{ color: 'text.secondary', mt: 2 }}>
           Modify account settings and permission levels for the selected user

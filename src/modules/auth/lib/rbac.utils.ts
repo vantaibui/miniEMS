@@ -1,19 +1,5 @@
 import type { Actions, PermissionNode, RBACMode } from '@libs/types';
 
-/**
- * Traverses the raw nested API structure to check for permissions.
- *
- * Path format: "MODULE_NAME.SUB_MODULE_NAME.ACTION"
- * Example: "MAIN_NAVIGATION.DASHBOARD.read"
- *
- * IMPORTANT:
- * - This is intentionally NOT normalized.
- * - Every check traverses the API response shape (module -> subModule -> actions).
- * - This keeps RBAC behavior strictly dependent on backend contract.
- *
- * TODO: Once backend permission schema is stable, consider adding optional memoization
- *       at the call-site level (not global caching) to reduce repeated traversal cost.
- */
 export const checkPermissionRaw = (
   permissions: Array<PermissionNode> | null,
   path: string,

@@ -1,20 +1,20 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useToast } from '@libs/hooks';
-import { Breadcrumb } from '@libs/ui';
+import { UiBreadcrumb } from '@libs/ui';
 
 import {
   useRoleDetail,
   useRoleUpdate,
-  useAllPermissions,
+  usePermissions,
   useRoleDelete,
-  useRolePermissions,
+  usePermissionsById,
 } from '../hooks';
 import { RoleForm } from '../components/RoleForm';
-import type { PermissionNode, UpdateRolePayload } from '../types';
+import type { PermissionNode, BaseRolePayload } from '../types';
 
 const extractAllocatedPermissions = (
-  nodes: PermissionNode[],
+  nodes: Array<PermissionNode>,
 ): Array<{
   id: number;
   actions: { create: boolean; read: boolean; update: boolean; delete: boolean };
@@ -30,26 +30,25 @@ const extractAllocatedPermissions = (
   }> = [];
 
   nodes.forEach((node) => {
-    // Only map if there are any granted actions
     if (
       node.actions &&
-      (node.actions.canCreate ||
-        node.actions.canRead ||
-        node.actions.canUpdate ||
-        node.actions.canDelete)
+      (node.actions.create ||
+        node.actions.read ||
+        node.actions.update ||
+        node.actions.delete)
     ) {
       result.push({
         id: node.id,
         actions: {
-          create: node.actions.canCreate,
-          read: node.actions.canRead,
-          update: node.actions.canUpdate,
-          delete: node.actions.canDelete,
+          create: node.actions.create,
+          read: node.actions.read,
+          update: node.actions.update,
+          delete: node.actions.delete,
         },
       });
     }
-    if (node.children && node.children.length > 0) {
-      result = [...result, ...extractAllocatedPermissions(node.children)];
+    if (node.subModule && node.subModule.length > 0) {
+      result = [...result, ...extractAllocatedPermissions(node.subModule)];
     }
   });
 
@@ -64,23 +63,20 @@ export const RoleEditPage = () => {
 
   const { data: role, isLoading: isLoadingRole } = useRoleDetail(roleId);
   const { data: rolePermissions, isLoading: isLoadingRolePerms } =
-    useRolePermissions(roleId);
-  const { data: allPermissions, isLoading: isLoadingPermissions } =
-    useAllPermissions();
+    usePermissionsById(roleId);
+  const { data: Permissions, isLoading: isLoadingPermissions } =
+    usePermissions();
   const { mutate: updateRole, isPending: isUpdating } = useRoleUpdate();
   const { mutate: deleteRole, isPending: isDeleting } = useRoleDelete();
 
-  const handleSubmit = (data: UpdateRolePayload) => {
+  const handleSubmit = (data: BaseRolePayload) => {
     if (!roleId) return;
     updateRole(
-      { id: roleId, payload: data },
+      { id: roleId, payload: { ...data, id: roleId } },
       {
-        onSuccess: () => {
-          toast.success('Role updated successfully!');
+        onSuccess: (response) => {
+          toast.success(response.success ? response?.message : 'Role updated successfully!');
           navigate('/roles');
-        },
-        onError: (error) => {
-          toast.error(error.message || 'Failed to update role');
         },
       },
     );
@@ -89,10 +85,10 @@ export const RoleEditPage = () => {
   const isLoading = isLoadingRole || isLoadingPermissions || isLoadingRolePerms;
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+    <Box>
       <Box sx={{ mb: 4 }}>
         <Box sx={{ mb: 2 }}>
-          <Breadcrumb
+          <UiBreadcrumb
             items={[
               { label: 'Dashboard', href: '/' },
               { label: 'Administration', href: '#' },
@@ -134,7 +130,7 @@ export const RoleEditPage = () => {
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
             <CircularProgress />
           </Box>
-        ) : role && allPermissions ? (
+        ) : role && Permissions ? (
           <RoleForm
             initialValues={{
               name: role.name,
@@ -143,7 +139,7 @@ export const RoleEditPage = () => {
                 ? extractAllocatedPermissions(rolePermissions)
                 : [],
             }}
-            allPermissions={allPermissions}
+            Permissions={Permissions}
             onSubmit={handleSubmit}
             onCancel={() => navigate('/roles')}
             onDelete={() => {

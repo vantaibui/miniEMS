@@ -1,16 +1,16 @@
+import { Box, CircularProgress } from '@mui/material';
 import { lazy, Suspense, type ComponentType } from 'react';
 import type { RouteObject } from 'react-router-dom';
 import { createBrowserRouter } from 'react-router-dom';
-import { Box, CircularProgress } from '@mui/material';
 
-import { AdminLayout, AuthLayout, RootLayout } from '../layouts';
+import { NotFoundPage } from '@libs/pages';
 import { authRoutes } from '@modules/auth';
 import { deviceRoutes } from '@modules/devices';
-import { usersRoutes } from '@modules/users';
 import { rolesRoutes } from '@modules/roles';
+import { usersRoutes } from '@modules/users';
+import { AuthLayout, RootLayout } from '../layouts';
 import { ProtectedRoute } from './ProtectedRoute';
-import { RouteGuard } from '@modules/auth';
-import { NotFoundPage } from '@libs/pages';
+const HomePage = lazy(() => import('@/modules/dashboard/pages/HomePage'));
 
 /**
  * Centrally managed route registry for the application shell.
@@ -36,8 +36,6 @@ const withSuspense = (Component: ComponentType<unknown>) => (
   </Suspense>
 );
 
-const HomePage = lazy(() => import('@/modules/dashboard/pages/HomePage'));
-
 const routes: Array<RouteObject> = [
   {
     path: '/login',
@@ -56,19 +54,10 @@ const routes: Array<RouteObject> = [
         index: true,
         element: withSuspense(HomePage),
       },
+      ...usersRoutes,
+      ...rolesRoutes,
       ...deviceRoutes,
     ],
-  },
-  {
-    path: '/admin',
-    element: (
-      <ProtectedRoute>
-        {/* <RouteGuard permissionPath="ACCESS_MANAGEMENT.USER_MANAGEMENT.read"> */}
-        <AdminLayout />
-        {/* </RouteGuard> */}
-      </ProtectedRoute>
-    ),
-    children: [...usersRoutes, ...rolesRoutes],
   },
   {
     path: '*',

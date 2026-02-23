@@ -1,14 +1,14 @@
-export interface PermissionActionsDto {
+export interface PermissionActions {
   create: boolean;
   read: boolean;
   update: boolean;
   delete: boolean;
 }
 
-export interface PermissionNodeDto {
+export interface PermissionNode {
   id: number;
   name: string;
   module: string;
-  subModule: Array<PermissionNodeDto> | null;
-  actions: PermissionActionsDto;
+  subModule: Array<PermissionNode> | null;
+  actions: PermissionActions;
 }

@@ -27,7 +27,6 @@ const ensureFreshToken = async (
 };
 
 export const attachInterceptors = (instance: AxiosInstance) => {
-  // REQUEST
   instance.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
       if (!keycloak.authenticated) return config;
@@ -42,7 +41,6 @@ export const attachInterceptors = (instance: AxiosInstance) => {
     (error) => Promise.reject(error),
   );
 
-  // RESPONSE
   instance.interceptors.response.use(
     (response: AxiosResponse<ApiResponse<unknown>>) => {
       const data = response.data;

@@ -5,16 +5,8 @@ import { attachInterceptors } from './http.interceptor';
 
 const DEFAULT_BASE_URL = 'http://localhost:3000/api';
 
-const getApiBaseUrl = (): string => {
-  const viteUrl = import.meta.env.VITE_API_BASE_URL;
-  if (viteUrl) return viteUrl;
-
-  // @ts-expect-error - process.env might exist in CRA environments
-  const craUrl =
-    typeof process !== 'undefined' ? process.env?.VITE_API_URL : undefined;
-  if (craUrl) return craUrl;
-
-  return envConfig.API_BASE_URL || DEFAULT_BASE_URL;
+const getApiBaseUrl = () => {
+  if (envConfig) return envConfig.API_BASE_URL ?? DEFAULT_BASE_URL;
 };
 
 export const API_BASE_URL = getApiBaseUrl();

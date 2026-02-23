@@ -1,31 +1,31 @@
 import { http } from './http.client';
 
-export interface CrudEndpoints {
+export interface Endpoints {
   base: string;
 }
 
-export const createCRUD = <
+export const createResourceApi = <
   TEntity,
   TCreateDto = Partial<TEntity>,
   TUpdateDto = Partial<TEntity>,
 >(
-  endpoints: CrudEndpoints,
+  endpoints: Endpoints,
 ) => ({
   getList: (params?: Record<string, unknown>) =>
-    http.get<Array<TEntity>>(endpoints.base, { params }),
+    http.get<TEntity>(endpoints.base, { params }),
 
   getById: (id: number | string) =>
     http.get<TEntity>(`${endpoints.base}/${id}`),
 
   create: (payload: TCreateDto) =>
-    http.post<TEntity, TCreateDto>(endpoints.base, payload),
+    http.post<TEntity>(endpoints.base, payload),
 
   update: (id: number | string, payload: TUpdateDto) =>
-    http.put<TEntity, TUpdateDto>(`${endpoints.base}/${id}`, payload),
+    http.put<TEntity>(`${endpoints.base}/${id}`, payload),
 
   delete: (id: number | string) => http.delete<void>(`${endpoints.base}/${id}`),
 });
 
-export type CrudApi<TEntity, TCreate, TUpdate> = ReturnType<
-  typeof createCRUD<TEntity, TCreate, TUpdate>
+export type ResourceApi<TEntity, TCreate, TUpdate> = ReturnType<
+  typeof createResourceApi<TEntity, TCreate, TUpdate>
 >;

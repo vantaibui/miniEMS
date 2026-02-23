@@ -1,18 +1,17 @@
-import { useNavigate } from 'react-router-dom';
-import { Box, Typography } from '@mui/material';
 import { useToast } from '@libs/hooks';
-import { UiButton, AddIcon, Breadcrumb } from '@libs/ui';
-// We might need an icon for Templates
-import TuneIcon from '@mui/icons-material/Tune';
+import { AddIcon, UiBreadcrumb, UiButton } from '@libs/ui';
+import { Box, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-import { useRoles, useRoleDelete } from '../hooks';
 import { RoleTable } from '../components/RoleTable';
+import { useRoleDelete, useRoles } from '../hooks';
 
 export const RoleListPage = () => {
   const navigate = useNavigate();
   const toast = useToast();
   const { data: roles = [], isLoading } = useRoles();
   const { mutate: deleteRole } = useRoleDelete();
+
 
   const handleEdit = (id: number) => {
     navigate(`${id}/edit`);
@@ -36,9 +35,9 @@ export const RoleListPage = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+    <Box>
       <Box sx={{ mb: 4 }}>
-        <Breadcrumb
+        <UiBreadcrumb
           items={[
             { label: 'Dashboard', href: '/' },
             { label: 'Administration', href: '#' },
@@ -71,17 +70,9 @@ export const RoleListPage = () => {
           </Box>
           <Box sx={{ display: 'flex', gap: 2 }}>
             <UiButton
-              variant="outlined"
-              startIcon={<TuneIcon />}
-              sx={{ bgcolor: 'white' }}
-            >
-              Templates
-            </UiButton>
-            <UiButton
               variant="primary"
               startIcon={<AddIcon />}
               onClick={handleCreate}
-              sx={{ boxShadow: '0px 4px 12px rgba(11, 87, 208, 0.2)' }}
             >
               Add New Role
             </UiButton>
