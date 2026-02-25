@@ -1,15 +1,16 @@
-import { useForm, Controller } from 'react-hook-form';
-import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Typography, Stack, Card, Grid } from '@mui/material';
-import { UiInput, UiFormField, UiButton } from '@libs/ui';
+import { UiButton, UiFormField, UiInput } from '@libs/ui';
+import { Box, Card, Divider, Grid, Stack, Typography } from '@mui/material';
+import { Controller, useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import DeleteIcon from '@mui/icons-material/Delete';
+import DescriptionIcon from '@mui/icons-material/Description';
 import SecurityIcon from '@mui/icons-material/Security';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
-import DescriptionIcon from '@mui/icons-material/Description';
-import DeleteIcon from '@mui/icons-material/Delete';
 
+import type { PaginationResult } from '@services/http';
 import type { CreateRolePayload, PermissionNode } from '../types';
 import { RolePermissionMatrix } from './RolePermissionMatrix';
 
@@ -41,6 +42,12 @@ interface RoleFormProps {
   isLoading?: boolean;
   submitLabel?: string;
   isEdit?: boolean;
+  permissionsPagination?: PaginationResult;
+  onPermissionsPaginationChange?: (next: {
+    page: number;
+    size: number;
+  }) => void;
+  isPermissionsLoading?: boolean;
 }
 
 export const RoleForm = ({
@@ -52,13 +59,17 @@ export const RoleForm = ({
   isLoading,
   submitLabel = 'Save Role',
   isEdit = false,
+  permissionsPagination,
+  onPermissionsPaginationChange,
+  isPermissionsLoading,
 }: RoleFormProps) => {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty, isValid },
   } = useForm<CreateRolePayload>({
     resolver: yupResolver(schema) as never,
+    mode: 'onChange',
     defaultValues: initialValues || {
       name: '',
       description: '',
@@ -160,11 +171,14 @@ export const RoleForm = ({
                   permissions={Permissions}
                   selectedPermissions={field.value}
                   onChange={field.onChange}
+                  pagination={permissionsPagination}
+                  onPaginationChange={onPermissionsPaginationChange}
+                  loading={isPermissionsLoading}
                 />
               )}
             />
           </Box>
-
+          <Divider />
           <Box
             sx={{
               display: 'flex',
@@ -176,11 +190,16 @@ export const RoleForm = ({
             <Box>
               {isEdit && onDelete && (
                 <UiButton
-                  variant="text"
+                  variant="outlined"
                   color="error"
                   startIcon={<DeleteIcon />}
                   onClick={onDelete}
-                  sx={{ fontWeight: 600, px: 2 }}
+                   sx={{
+                    fontWeight: 600,
+                    px: 2,
+                    borderColor: 'error.light',
+                    '&:hover': { bgcolor: 'error.50' },
+                  }}
                 >
                   Delete Role
                 </UiButton>
@@ -203,10 +222,15 @@ export const RoleForm = ({
               <UiButton
                 type="submit"
                 variant="contained"
-                disabled={isLoading}
+                disabled={isLoading || !isDirty || !isValid}
                 loading={isLoading}
                 sx={{
                   px: 3,
+                  '&.Mui-disabled': {
+                    bgcolor: 'primary.main',
+                    color: 'common.white',
+                    opacity: 0.5,
+                  },
                 }}
               >
                 {submitLabel}

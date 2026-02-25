@@ -1,69 +1,76 @@
-import { queryKeys } from '@libs/query';
-import { useQuery } from '@tanstack/react-query';
+import { useAppQuery } from '@libs/query';
+import type { ApiSuccessResponse, PaginationResult } from '@services/http';
 import { rolesApi, type RolesListParams } from '../api';
 import type { PermissionNode, Role, RoleDetails } from '../types';
 
-
+export type ListResult<T> = {
+  items: Array<T>;
+  pagination?: PaginationResult;
+};
 
 export const useRoles = (params: RolesListParams = {}) => {
-  return useQuery<Array<Role>, Error>({
-    queryKey: queryKeys.roles.list(params),
-    queryFn: () => rolesApi.getList(params).then((res) => {
-      if (!res.success) throw new Error(res.error?.message || 'Failed to fetch roles');
-
-      return res.data;
+  return useAppQuery<ApiSuccessResponse<Array<Role>>, ListResult<Role>>({
+    queryKey: ['roles', 'list', params],
+    queryFn: () =>
+      rolesApi.getList(params) as Promise<ApiSuccessResponse<Array<Role>>>,
+    select: (response) => ({
+      items: response?.data ?? [],
+      pagination: response?.meta?.pagination,
     }),
   });
 };
 
-
 export const useRoleDetail = (id: number | string | undefined) => {
-  return useQuery<RoleDetails, Error>({
-    queryKey: queryKeys.roles.detail?.(id as number) ?? ['roles', 'detail', id],
+  return useAppQuery<ApiSuccessResponse<RoleDetails>, RoleDetails>({
+    queryKey: ['roles', 'detail', id],
     queryFn: () => {
       if (id === undefined || id === null) {
-        return Promise.reject(new Error('Role id is required'));
+        throw new Error('Role id is required');
       }
-      return rolesApi.getById(id).then((res) => {
-        if (!res.success) throw new Error(res.error?.message || 'Failed to fetch role details');
-        
-        return res.data;
-      });
+      return rolesApi.getById(id) as Promise<ApiSuccessResponse<RoleDetails>>;
     },
+    select: (response) => response.data,
     enabled: id !== undefined && id !== null,
   });
 };
 
 export const usePermissions = (params: RolesListParams = {}) => {
-  return useQuery<Array<PermissionNode>, Error>({
-    queryKey: [...queryKeys.roles.permissions(), { params }],
-    queryFn: () => rolesApi.getAllPermissions(params).then((res) => {
-      if (!res.success) throw new Error(res.error?.message || 'Failed to fetch permissions');
-
-      return res.data;
+  return useAppQuery<
+    ApiSuccessResponse<Array<PermissionNode>>,
+    ListResult<PermissionNode>
+  >({
+    queryKey: ['roles', 'permissions', params],
+    queryFn: () =>
+      rolesApi.getAllPermissions(params) as Promise<
+        ApiSuccessResponse<Array<PermissionNode>>
+      >,
+    select: (response) => ({
+      items: response?.data ?? [],
+      pagination: response?.meta?.pagination,
     }),
   });
 };
-
 
 export const usePermissionsById = (
   roleId: number | string | undefined,
   params: RolesListParams = {},
 ) => {
-  return useQuery<Array<PermissionNode>, Error>({
-    queryKey:
-      roleId == null
-        ? [...queryKeys.roles.all, 'permissions', { roleId, params }]
-        : [...queryKeys.roles.permissionsById(roleId), { params }],
+  return useAppQuery<
+    ApiSuccessResponse<Array<PermissionNode>>,
+    ListResult<PermissionNode>
+  >({
+    queryKey: ['roles', 'permissions', roleId, params],
     queryFn: () => {
-      if (roleId === undefined) return Promise.resolve([]);
-      return rolesApi.getPermissions(roleId, params).then((res) => {
-        if (!res.success) throw new Error(res.error?.message || 'Failed to fetch role permissions');
+      if (!roleId) throw new Error('Role id is required');
 
-        return res.data;
-      });
+      return rolesApi.getPermissions(roleId, params) as Promise<
+        ApiSuccessResponse<Array<PermissionNode>>
+      >;
     },
+    select: (response) => ({
+      items: response?.data ?? [],
+      pagination: response?.meta?.pagination,
+    }),
     enabled: roleId !== undefined && roleId !== null,
   });
 };
-

@@ -1,15 +1,24 @@
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { useToast } from '@libs/hooks';
 import { UiBreadcrumb } from '@libs/ui';
 
 import { useUserCreate } from '../hooks';
 import { UserForm } from '../components/UserForm';
+import { usePermissions } from '../../roles/hooks';
 import type { CreateUserPayload } from '../types';
 
 export const UserCreatePage = () => {
   const navigate = useNavigate();
   const toast = useToast();
+  const [pagination, setPagination] = useState({ page: 0, size: 10 });
+
+  const { data: permissionsRes, isLoading: isLoadingPermissions } =
+    usePermissions(pagination);
+
+  const permissionsPagination = permissionsRes?.pagination;
+
   const { mutate: createUser, isPending: isCreating } = useUserCreate();
 
   const handleSubmit = (data: CreateUserPayload) => {
@@ -71,6 +80,9 @@ export const UserCreatePage = () => {
           onCancel={() => navigate('/users')}
           isLoading={isCreating}
           submitLabel="Save User"
+          permissionsPagination={permissionsPagination}
+          onPermissionsPaginationChange={setPagination}
+          isPermissionsLoading={isLoadingPermissions}
         />
       </Box>
     </Box>

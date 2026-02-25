@@ -119,14 +119,23 @@ const baseTheme = createTheme({
         root: {
           borderRadius: tokens.shape.borderRadius.lg,
           boxShadow: tokens.shadows.sm,
-          border: `1px solid ${tokens.colors.neutral[200]}`,
-          backgroundColor: tokens.colors.neutral[50],
+        },
+      },
+    },
+    MuiCardContent: {
+      styleOverrides: {
+        root: {
+          padding: 0,
+          '&:last-child': {
+            paddingBottom: 0,
+          }
         },
       },
     },
     MuiPaper: {
       styleOverrides: {
         root: {
+          border: 'none',
           backgroundImage: 'none',
         },
       },
@@ -150,6 +159,7 @@ const baseTheme = createTheme({
           borderBottom: `1px solid ${tokens.colors.neutral[200]}`,
         },
         body: {
+          padding: tokens.spacing.sm,
           borderBottom: `1px solid ${tokens.colors.neutral[200]}`,
         },
       },
@@ -160,6 +170,13 @@ const baseTheme = createTheme({
           '&:hover': {
             backgroundColor: tokens.colors.neutral[100],
           },
+        },
+      },
+    },
+    MuiTableHead: {
+      styleOverrides: {
+        root: {
+          backgroundColor: tokens.colors.neutral[100],
         },
       },
     },

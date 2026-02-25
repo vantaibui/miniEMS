@@ -342,7 +342,7 @@ const LoginPage = () => {
                 boxShadow: 3,
               },
             }}
-            onClick={() => login(window.location.href)}
+            onClick={() => login()}
           >
             Login with SSO
           </Button>

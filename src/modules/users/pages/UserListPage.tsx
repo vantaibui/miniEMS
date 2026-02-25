@@ -1,25 +1,50 @@
 import { useToast } from '@libs/hooks';
-import { UiBreadcrumb, UiButton } from '@libs/ui';
+import { UiBreadcrumb, UiButton, useDialogConfirm } from '@libs/ui';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { Box, Typography } from '@mui/material';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { UserTable } from '../components/UserTable';
-import { useUsers } from '../hooks';
+import { useUsers, useUserDelete } from '../hooks';
 
 export const UserListPage = () => {
   const navigate = useNavigate();
   const toast = useToast();
-  const { data: users = [], isLoading } = useUsers();
+  const confirm = useDialogConfirm();
+
+
+  const { mutate: deleteUser } = useUserDelete();
+
+  const [params, setParams] = useState({
+    page: 0,
+    size: 10,
+  });
+
+  const { data, isLoading } = useUsers(params);
+  const users = data?.items ?? [];
+  const pagination = data?.pagination;
 
   const handleEdit = (id: number) => {
     navigate(`${id}/edit`);
   };
 
-  const handleDelete = (id: number) => {
-    // Soft delete logic can be hooked here, but it's handled via the table 'Deactivate' action if needed
-    console.log('Delete/Deactivate user', id);
-    toast.info('Deactivate triggered (mock)');
+  const handleDelete = async (id: number) => {
+    const delDialog = await confirm({
+      type: 'delete',
+      title: 'Delete user',
+      description: 'Are you sure you want to delete this user?',
+      confirmText: 'Yes, Delete',
+      cancelText: 'Cancel',
+    });
+
+    if (!delDialog) return;
+
+    deleteUser(id, {
+      onSuccess: () => {
+        toast.success('Role deleted successfully!');
+      },
+    });
   };
 
   const handleCreate = () => {
@@ -28,7 +53,7 @@ export const UserListPage = () => {
 
   return (
     <Box>
-      <Box sx={{ mb: 4 }}>
+      <Box sx={{ mb: 2 }}>
         <UiBreadcrumb
           items={[
             { label: 'Dashboard', href: '/' },
@@ -48,16 +73,9 @@ export const UserListPage = () => {
           <Box>
             <Typography
               variant="h4"
-              sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}
+              sx={{ fontWeight: 700, color: 'text.primary' }}
             >
               RBAC User Management
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{ color: 'text.secondary', maxWidth: 640 }}
-            >
-              Control user access levels and maintain system security integrity
-              across all departments.
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: 2 }}>
@@ -77,6 +95,8 @@ export const UserListPage = () => {
         loading={isLoading}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        pagination={pagination}
+        onPaginationChange={setParams}
       />
     </Box>
   );

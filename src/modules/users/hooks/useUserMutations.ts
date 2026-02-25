@@ -1,10 +1,9 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { queryKeys } from '@/libs/query';
+import { queryKeys, useAppMutation } from '@/libs/query';
 import type { ApiResponse } from '@/services/http';
 import { usersApi } from '../api';
-import type { CreateUserPayload, User } from '../types';
-import type { UpdateUserPayload } from '../types';
+import type { CreateUserPayload, User, UpdateUserPayload } from '../types';
 
 export interface UpdateUserVariables {
   id: number | string;
@@ -14,7 +13,7 @@ export interface UpdateUserVariables {
 export const useUserCreate = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<ApiResponse<User>, Error, CreateUserPayload>({
+  return useAppMutation<ApiResponse<User>, CreateUserPayload>({
     mutationFn: (payload: CreateUserPayload) => usersApi.create(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
@@ -25,12 +24,12 @@ export const useUserCreate = () => {
 export const useUserUpdate = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<ApiResponse<User>, Error, UpdateUserVariables>({
+  return useAppMutation<ApiResponse<User>, UpdateUserVariables>({
     mutationFn: ({ id, payload }) => usersApi.update(id, payload),
-    onSuccess: (_data, user) => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
       queryClient.invalidateQueries({
-        queryKey: queryKeys.users.detail(user.id),
+        queryKey: queryKeys.users.detail(variables.id),
       });
     },
   });
@@ -39,7 +38,7 @@ export const useUserUpdate = () => {
 export const useUserDelete = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<void, Error, number | string>({
+  return useAppMutation<void, number | string>({
     mutationFn: (id) => usersApi.delete(id),
     onSuccess: (_data, id) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });

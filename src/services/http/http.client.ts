@@ -1,17 +1,25 @@
-import type { AxiosResponse } from 'axios';
+import type { AxiosResponse, AxiosError } from 'axios';
 import axiosInstance from './axios.instance';
-import type { ApiResponse, RequestConfig } from './http.types';
+import type { ApiResponse, RequestConfig, AppError, ApiErrorResponse } from './http.types';
+import { mapBackendErrorToAppError, mapUnknownToAppError } from './http.error';
 
 const unwrap = async <T>(
   promise: Promise<AxiosResponse<ApiResponse<T>>>
 ): Promise<ApiResponse<T>> => {
-  const res = await promise;
+  try {
+    const res = await promise;
 
-  if (!res.data.success) {
-    throw new Error('Unexpected API structure');
+    if (!res.data.success) {
+      throw mapBackendErrorToAppError(res.data as ApiErrorResponse, res.status);
+    }
+
+    return res.data;
+  } catch (error) {
+    if ((error as AppError).message && (error as AppError).status !== undefined) {
+      throw error;
+    }
+    throw mapUnknownToAppError(error as AxiosError<ApiErrorResponse>);
   }
-
-  return res.data;
 };
 
 export const http = {

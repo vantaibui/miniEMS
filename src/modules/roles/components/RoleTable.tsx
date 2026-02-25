@@ -1,4 +1,11 @@
 import {
+  DeleteIcon,
+  EditOutlinedIcon,
+  MoreVertIcon,
+  UiDataTable,
+} from '@libs/ui';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import {
   Avatar,
   Box,
   Card,
@@ -11,10 +18,8 @@ import {
   Tabs,
   Typography,
 } from '@mui/material';
+import type { PaginationResult } from '@services/http';
 import { useMemo, useState } from 'react';
-
-import { DeleteOutlineIcon, EditOutlinedIcon, MoreVertIcon, UiDataTable } from '@libs/ui';
-import FilterListIcon from '@mui/icons-material/FilterList';
 
 import type { Role } from '../types';
 
@@ -23,22 +28,21 @@ export interface RoleTableProps {
   loading?: boolean;
   onEdit: (id: number) => void;
   onDelete: (id: number) => void;
+  pagination?: PaginationResult;
+  onPaginationChange: (next: { page: number; size: number }) => void;
 }
+
 export const RoleTable = ({
   rows,
   loading,
   onEdit,
   onDelete,
+  pagination,
+  onPaginationChange,
 }: RoleTableProps) => {
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
   const [tabValue, setTabValue] = useState(0);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  const paginatedRows = useMemo(() => {
-    return rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-  }, [rows, page, rowsPerPage]);
 
   const openMenu = (event: React.MouseEvent<HTMLElement>, roleId: number) => {
     setMenuAnchor(event.currentTarget);
@@ -50,8 +54,23 @@ export const RoleTable = ({
     setSelectedRoleId(null);
   };
 
+  const total = pagination?.totalElements ?? 0;
+  const page = pagination?.page ?? 0;
+  const size = pagination?.size ?? 10;
+
   const columns = useMemo(() => {
     return [
+      {
+        key: '#',
+        header: '#',
+        width: 50,
+        align: 'center' as const,
+        render: (_: Role, index: number) => (
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            {page * size + index + 1}
+          </Typography>
+        ),
+      },
       {
         key: 'name',
         header: 'ROLE NAME',
@@ -59,7 +78,7 @@ export const RoleTable = ({
           return (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
               <Avatar
-                sx={{ width: 30, height: 30 }}
+                sx={{ width: 40, height: 40 }}
                 src={`https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(role.name)}`}
               />
               <Typography
@@ -87,23 +106,30 @@ export const RoleTable = ({
         ),
       },
       {
-        key: 'assignedUsers',
-        header: 'ASSIGNED USERS',
-        width: 150,
-        render: () => (
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: 600, color: 'text.primary' }}
-          >
-            {Math.floor(Math.random() * 300) + 12}{' '}
-            <Typography
+        key: 'status',
+        header: 'STATUS',
+        render: (row: Role) => (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box
               component="span"
+              sx={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                bgcolor: row.status ? '#10b981' : '#9ca3af',
+                display: 'inline-block',
+              }}
+            />
+            <Typography
               variant="body2"
-              sx={{ color: 'text.secondary', fontWeight: 400 }}
+              sx={{
+                fontWeight: 600,
+                color: row.status ? 'text.primary' : 'text.secondary',
+              }}
             >
-              Users
+              {row.status ? 'Active' : 'Inactive'}
             </Typography>
-          </Typography>
+          </Box>
         ),
       },
       {
@@ -118,15 +144,13 @@ export const RoleTable = ({
         ),
       },
     ];
-  }, []);
+  }, [page, size]);
 
   return (
     <Card
       sx={{
         borderRadius: 3,
         boxShadow: '0px 2px 10px rgba(0,0,0,0.05)',
-        mb: 4,
-        overflow: 'hidden',
       }}
     >
       <Box
@@ -212,9 +236,7 @@ export const RoleTable = ({
               display: 'inline-block',
             }}
           />
-          Showing {rows.length === 0 ? 0 : page * rowsPerPage + 1}-
-          {Math.min((page + 1) * rowsPerPage, rows.length)} of {rows.length}{' '}
-          Roles
+          Showing {page * size + 1}-{size} of {total} Roles
         </Typography>
       </Box>
 
@@ -234,21 +256,23 @@ export const RoleTable = ({
       >
         <UiDataTable
           aria-label="Roles table"
-          rows={paginatedRows}
+          rows={rows}
           columns={columns}
           getRowId={(role) => role.id}
           loading={loading}
-          selectable={true}
-          pagination={{
-            page,
-            rowsPerPage,
-            total: rows.length,
-            onPageChange: (newPage) => setPage(newPage),
-            onRowsPerPageChange: (newRowsPerPage) => {
-              setRowsPerPage(newRowsPerPage);
-              setPage(0);
-            },
-          }}
+          pagination={
+            pagination
+              ? {
+                  page,
+                  rowsPerPage: size,
+                  total,
+                  onPageChange: (newPage) =>
+                    onPaginationChange({ page: newPage, size }),
+                  onRowsPerPageChange: (newSize) =>
+                    onPaginationChange({ page: 0, size: newSize }),
+                }
+              : undefined
+          }
           emptyState={
             <div className="py-10 text-center">
               <Typography variant="body2" color="text.secondary">
@@ -291,7 +315,7 @@ export const RoleTable = ({
           }}
         >
           <ListItemIcon>
-            <DeleteOutlineIcon fontSize="small" />
+            <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
           Delete
         </MenuItem>

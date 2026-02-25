@@ -18,15 +18,27 @@ function mapSize(size: UiPaginationSize): 'small' | 'medium' | 'large' {
   }
 }
 
-export function UiPagination({
-  page,
-  count,
-  onChange,
-  disabled,
-  size = 'md',
-  className,
-  'aria-label': ariaLabel,
-}: UiPaginationProps) {
+export function UiPagination(props: UiPaginationProps) {
+  const { disabled, size = 'md', className, 'aria-label': ariaLabel } = props;
+
+  if ('pagination' in props) {
+    const { pagination, onChange } = props;
+    return (
+      <Pagination
+        page={pagination.page + 1} // MUI is 1-based, BE is 0-based
+        count={pagination.totalPages}
+        onChange={(_e, nextPage) =>
+          onChange({ page: nextPage - 1, size: pagination.size })
+        }
+        disabled={disabled}
+        size={mapSize(size)}
+        className={cn(className)}
+        aria-label={ariaLabel}
+      />
+    );
+  }
+
+  const { page, count, onChange } = props;
   return (
     <Pagination
       page={page}

@@ -1,9 +1,11 @@
 import { useNavigate, useParams } from 'react-router-dom';
+import { useState } from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useToast } from '@libs/hooks';
 import { UiBreadcrumb } from '@libs/ui';
 
 import { useUserDetail, useUserUpdate, useUserDelete } from '../hooks';
+import { usePermissions } from '../../roles/hooks';
 import { UserForm } from '../components/UserForm';
 
 export const UserEditPage = () => {
@@ -12,9 +14,15 @@ export const UserEditPage = () => {
   const { id } = useParams();
   const userId = id ? Number(id) : undefined;
 
+  const [pagination, setPagination] = useState({ page: 0, size: 10 });
+
   const { data: user, isLoading: isLoadingUser } = useUserDetail(userId || '');
   const { mutate: updateUser, isPending: isUpdating } = useUserUpdate();
   const { mutate: deleteUser, isPending: isDeleting } = useUserDelete();
+
+  const { data: permissions, isLoading: isLoadingPermissions } =
+    usePermissions(pagination);
+  const permissionsPagination = permissions?.pagination;
 
   const handleSubmit = (data: import('../types').CreateUserPayload) => {
     if (!userId) return;
@@ -24,9 +32,6 @@ export const UserEditPage = () => {
         onSuccess: () => {
           toast.success('User updated successfully!');
           navigate('/users');
-        },
-        onError: (error) => {
-          toast.error(error.message || 'Failed to update user');
         },
       },
     );
@@ -89,24 +94,13 @@ export const UserEditPage = () => {
             }}
             onSubmit={handleSubmit}
             onCancel={() => navigate('/users')}
-            onDeactivate={() => {
-              if (
-                window.confirm('Are you sure you want to deactivate this user?')
-              ) {
-                deleteUser(userId!, {
-                  onSuccess: () => {
-                    toast.success('User deactivated successfully!');
-                    navigate('/users');
-                  },
-                  onError: (error) => {
-                    toast.error(error.message || 'Failed to deactivate user');
-                  },
-                });
-              }
-            }}
+            onDelete={() => deleteUser(user.id)}
             isLoading={isUpdating || isDeleting}
             submitLabel="Update User"
             isEdit
+            pagination={permissionsPagination}
+            onPaginationChange={setPagination}
+            isPermissionsLoading={isLoadingPermissions}
           />
         ) : (
           <Typography color="error">Failed to load user details.</Typography>

@@ -1,7 +1,8 @@
 import { useNavigate, useParams } from 'react-router-dom';
+import { useState } from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useToast } from '@libs/hooks';
-import { UiBreadcrumb } from '@libs/ui';
+import { UiBreadcrumb, useDialogConfirm } from '@libs/ui';
 
 import {
   useRoleDetail,
@@ -60,12 +61,19 @@ export const RoleEditPage = () => {
   const toast = useToast();
   const { id } = useParams();
   const roleId = id ? Number(id) : undefined;
+  const [pagination, setPagination] = useState({ page: 0, size: 10 });
+  const confirm = useDialogConfirm();
 
   const { data: role, isLoading: isLoadingRole } = useRoleDetail(roleId);
-  const { data: rolePermissions, isLoading: isLoadingRolePerms } =
+  const { data: rolePermissionsRes, isLoading: isLoadingRolePerms } =
     usePermissionsById(roleId);
-  const { data: Permissions, isLoading: isLoadingPermissions } =
-    usePermissions();
+  const { data: permissionsRes, isLoading: isLoadingPermissions } =
+    usePermissions(pagination);
+
+  const permissions = permissionsRes?.items ?? [];
+  const permissionsPagination = permissionsRes?.pagination;
+  const rolePermissions = rolePermissionsRes?.items;
+
   const { mutate: updateRole, isPending: isUpdating } = useRoleUpdate();
   const { mutate: deleteRole, isPending: isDeleting } = useRoleDelete();
 
@@ -75,14 +83,37 @@ export const RoleEditPage = () => {
       { id: roleId, payload: { ...data, id: roleId } },
       {
         onSuccess: (response) => {
-          toast.success(response.success ? response?.message : 'Role updated successfully!');
+          toast.success(
+            response.success ? response?.message : 'Role updated successfully!',
+          );
           navigate('/roles');
         },
       },
     );
   };
 
-  const isLoading = isLoadingRole || isLoadingPermissions || isLoadingRolePerms;
+  const handleDelete = async (id: number) => {
+    const delDialog = await confirm({
+      type: 'delete',
+      title: 'Delete role',
+      description: 'Are you sure you want to delete this role?',
+      confirmText: 'Yes, Delete',
+      cancelText: 'Cancel',
+    });
+
+    if (!delDialog) return;
+
+    deleteRole(id, {
+      onSuccess: (res) => {
+        toast.success(res.message || 'Role deleted successfully!');
+      },
+    });
+  };
+
+  const isLoading =
+    isLoadingRole ||
+    (isLoadingPermissions && !permissions.length) ||
+    isLoadingRolePerms;
 
   return (
     <Box>
@@ -130,7 +161,7 @@ export const RoleEditPage = () => {
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
             <CircularProgress />
           </Box>
-        ) : role && Permissions ? (
+        ) : role && permissions.length > 0 ? (
           <RoleForm
             initialValues={{
               name: role.name,
@@ -139,27 +170,16 @@ export const RoleEditPage = () => {
                 ? extractAllocatedPermissions(rolePermissions)
                 : [],
             }}
-            Permissions={Permissions}
+            Permissions={permissions}
             onSubmit={handleSubmit}
             onCancel={() => navigate('/roles')}
-            onDelete={() => {
-              if (
-                window.confirm('Are you sure you want to delete this role?')
-              ) {
-                deleteRole(roleId!, {
-                  onSuccess: () => {
-                    toast.success('Role deleted successfully!');
-                    navigate('/roles');
-                  },
-                  onError: (error) => {
-                    toast.error(error.message || 'Failed to delete role');
-                  },
-                });
-              }
-            }}
+            onDelete={() => handleDelete(role.id)}
             isLoading={isUpdating || isDeleting}
             submitLabel="Update Role"
             isEdit
+            permissionsPagination={permissionsPagination}
+            onPermissionsPaginationChange={setPagination}
+            isPermissionsLoading={isLoadingPermissions}
           />
         ) : (
           <Typography color="error">

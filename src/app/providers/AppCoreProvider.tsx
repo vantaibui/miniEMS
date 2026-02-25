@@ -4,6 +4,7 @@ import { type ReactNode } from 'react';
 import { ToastContainer } from 'react-toastify';
 
 import { GlobalErrorBoundary, theme } from '@libs/ui';
+import { ConfirmDialogProvider } from '@libs/ui';
 import { AuthProvider } from '@modules/auth'; // provides auth context and initializes RBAC
 import { QueryProvider } from './QueryProvider';
 
@@ -14,8 +15,10 @@ export const AppCoreProvider = ({ children }: { children: ReactNode }) => {
         <CssBaseline />
         <QueryProvider>
           <AuthProvider>
+            <ConfirmDialogProvider>
             <ToastContainer />
             {children}
+            </ConfirmDialogProvider>
           </AuthProvider>
         </QueryProvider>
       </ThemeProvider>

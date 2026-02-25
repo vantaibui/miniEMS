@@ -9,7 +9,7 @@ export interface UiDataTableColumn<TData> {
   header: ReactNode;
   width?: number | string;
   align?: UiDataTableAlign;
-  render: (row: TData) => ReactNode;
+  render: (row: TData, index: number) => ReactNode;
 }
 
 export interface UiDataTablePagination {
@@ -27,10 +27,6 @@ export interface UiDataTableProps<TData> {
 
   loading?: boolean;
   emptyState?: ReactNode;
-
-  selectable?: boolean;
-  selectedIds?: Array<UiDataTableId>;
-  onSelectedIdsChange?: (ids: Array<UiDataTableId>) => void;
 
   pagination?: UiDataTablePagination;
 

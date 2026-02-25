@@ -1,18 +1,31 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   Checkbox,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
   Box,
-  TablePagination,
 } from '@mui/material';
 
+import { UiDataTable } from '@libs/ui';
+import type { PaginationResult } from '@services/http';
 import type { PermissionNode } from '../types';
+
+interface FlatPermissionNode extends PermissionNode {
+  depth: number;
+}
+
+const flattenPermissions = (
+  nodes: Array<PermissionNode>,
+  depth = 0,
+): Array<FlatPermissionNode> => {
+  let result: Array<FlatPermissionNode> = [];
+  nodes.forEach((node) => {
+    result.push({ ...node, depth });
+    if (node.subModule && node.subModule.length > 0) {
+      result = [...result, ...flattenPermissions(node.subModule, depth + 1)];
+    }
+  });
+  return result;
+};
 
 interface RolePermissionMatrixProps {
   permissions: Array<PermissionNode>;
@@ -37,6 +50,9 @@ interface RolePermissionMatrixProps {
     }>,
   ) => void;
   readOnly?: boolean;
+  pagination?: PaginationResult;
+  onPaginationChange?: (next: { page: number; size: number }) => void;
+  loading?: boolean;
 }
 
 export const RolePermissionMatrix = ({
@@ -44,16 +60,11 @@ export const RolePermissionMatrix = ({
   selectedPermissions,
   onChange,
   readOnly = false,
+  pagination,
+  onPaginationChange,
+  loading,
 }: RolePermissionMatrixProps) => {
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  const paginatedPermissions = useMemo(() => {
-    return permissions.slice(
-      page * rowsPerPage,
-      page * rowsPerPage + rowsPerPage,
-    );
-  }, [permissions, page, rowsPerPage]);
+  const flattenedData = useMemo(() => flattenPermissions(permissions), [permissions]);
 
   const handleToggle = (
     id: number,
@@ -87,154 +98,201 @@ export const RolePermissionMatrix = ({
     onChange(updated);
   };
 
-  const renderRows = (modules: Array<PermissionNode>, depth = 0) => {
-    return modules.map((module) => {
-      const selected = selectedPermissions.find((p) => p.id === module.id);
-      const actions = selected?.actions || {
-        create: false,
-        read: false,
-        update: false,
-        delete: false,
-      };
+  const columns = useMemo(() => {
+    return [
+      {
+        key: 'name',
+        header: 'MODULE NAME',
+        render: (module: FlatPermissionNode) => (
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: module.depth === 0 ? 600 : 400,
+              pl: module.depth * 4 + 2,
+              color: module.depth === 0 ? 'text.primary' : 'text.secondary',
+            }}
+          >
+            {module.name}
+          </Typography>
+        ),
+      },
+      {
+        key: 'create',
+        header: 'CREATE',
+        width: 100,
+        align: 'center' as const,
+        render: (module: FlatPermissionNode) => {
+          const selected = selectedPermissions.find((p) => p.id === module.id);
+          const actions = selected?.actions || { create: false };
+          return (
+            <Checkbox
+              size="small"
+              checked={actions.create}
+              onChange={() => handleToggle(module.id, 'create')}
+              sx={
+                readOnly
+                  ? {
+                      cursor: 'default',
+                      pointerEvents: 'none',
+                      '&.Mui-checked': {
+                        color: 'primary.main',
+                      },
+                      '& .MuiSvgIcon-root': {
+                        opacity: actions.create ? 1 : 0.38,
+                      },
+                    }
+                  : {}
+              }
+            />
+          );
+        },
+      },
+      {
+        key: 'read',
+        header: 'READ',
+        width: 100,
+        align: 'center' as const,
+        render: (module: FlatPermissionNode) => {
+          const selected = selectedPermissions.find((p) => p.id === module.id);
+          const actions = selected?.actions || { read: false };
+          return (
+            <Checkbox
+              size="small"
+              checked={actions.read}
+              onChange={() => handleToggle(module.id, 'read')}
+              sx={
+                readOnly
+                  ? {
+                      cursor: 'default',
+                      pointerEvents: 'none',
+                      '&.Mui-checked': {
+                        color: 'primary.main',
+                      },
+                      '& .MuiSvgIcon-root': {
+                        opacity: actions.read ? 1 : 0.38,
+                      },
+                    }
+                  : {}
+              }
+            />
+          );
+        },
+      },
+      {
+        key: 'update',
+        header: 'UPDATE',
+        width: 100,
+        align: 'center' as const,
+        render: (module: FlatPermissionNode) => {
+          const selected = selectedPermissions.find((p) => p.id === module.id);
+          const actions = selected?.actions || { update: false };
+          return (
+            <Checkbox
+              size="small"
+              checked={actions.update}
+              onChange={() => handleToggle(module.id, 'update')}
+              sx={
+                readOnly
+                  ? {
+                      cursor: 'default',
+                      pointerEvents: 'none',
+                      '&.Mui-checked': {
+                        color: 'primary.main',
+                      },
+                      '& .MuiSvgIcon-root': {
+                        opacity: actions.update ? 1 : 0.38,
+                      },
+                    }
+                  : {}
+              }
+            />
+          );
+        },
+      },
+      {
+        key: 'delete',
+        header: 'DELETE',
+        width: 100,
+        align: 'center' as const,
+        render: (module: FlatPermissionNode) => {
+          const selected = selectedPermissions.find((p) => p.id === module.id);
+          const actions = selected?.actions || { delete: false };
+          return (
+            <Checkbox
+              size="small"
+              checked={actions.delete}
+              onChange={() => handleToggle(module.id, 'delete')}
+              sx={
+                readOnly
+                  ? {
+                      cursor: 'default',
+                      pointerEvents: 'none',
+                      '&.Mui-checked': {
+                        color: 'primary.main',
+                      },
+                      '& .MuiSvgIcon-root': {
+                        opacity: actions.delete ? 1 : 0.38,
+                      },
+                    }
+                  : {}
+              }
+            />
+          );
+        },
+      },
+    ];
+  }, [selectedPermissions, readOnly]);
 
-      return (
-        <React.Fragment key={module.id}>
-          <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-            <TableCell sx={{ pl: depth * 4 + 2 }}>
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: depth === 0 ? 600 : 400 }}
-              >
-                {module.name}
-              </Typography>
-            </TableCell>
-            <TableCell align="center">
-              <Checkbox
-                size="small"
-                checked={actions.create}
-                disabled={readOnly}
-                onChange={() => handleToggle(module.id, 'create')}
-              />
-            </TableCell>
-            <TableCell align="center">
-              <Checkbox
-                size="small"
-                checked={actions.read}
-                disabled={readOnly}
-                onChange={() => handleToggle(module.id, 'read')}
-              />
-            </TableCell>
-            <TableCell align="center">
-              <Checkbox
-                size="small"
-                checked={actions.update}
-                disabled={readOnly}
-                onChange={() => handleToggle(module.id, 'update')}
-              />
-            </TableCell>
-            <TableCell align="center">
-              <Checkbox
-                size="small"
-                checked={actions.delete}
-                disabled={readOnly}
-                onChange={() => handleToggle(module.id, 'delete')}
-              />
-            </TableCell>
-          </TableRow>
-          {module.subModule &&
-            module.subModule.length > 0 &&
-            renderRows(module.subModule, depth + 1)}
-        </React.Fragment>
-      );
-    });
-  };
+  const total = pagination?.totalElements ?? flattenedData.length;
+  const page = pagination?.page ?? 0;
+  const size = pagination?.size ?? 10;
 
   return (
-    <TableContainer
-      component={Box}
-      sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}
+    <Box
+      sx={{
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 2,
+        overflow: 'hidden',
+        '& .MuiTableHead-root': {
+          '& .MuiTableCell-root': {
+            color: 'text.secondary',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            bgcolor: 'background.paper',
+            letterSpacing: '0.5px',
+          },
+        },
+        '& > div': { boxShadow: 'none', borderRadius: 0 },
+      }}
     >
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell
-              sx={{
-                fontWeight: 600,
-                color: 'text.secondary',
-                fontSize: '0.75rem',
-                letterSpacing: '0.5px',
-              }}
-            >
-              MODULE NAME
-            </TableCell>
-            <TableCell
-              align="center"
-              sx={{
-                fontWeight: 600,
-                color: 'text.secondary',
-                width: 100,
-                fontSize: '0.75rem',
-                letterSpacing: '0.5px',
-              }}
-            >
-              CREATE
-            </TableCell>
-            <TableCell
-              align="center"
-              sx={{
-                fontWeight: 600,
-                color: 'text.secondary',
-                width: 100,
-                fontSize: '0.75rem',
-                letterSpacing: '0.5px',
-              }}
-            >
-              READ
-            </TableCell>
-            <TableCell
-              align="center"
-              sx={{
-                fontWeight: 600,
-                color: 'text.secondary',
-                width: 100,
-                fontSize: '0.75rem',
-                letterSpacing: '0.5px',
-              }}
-            >
-              UPDATE
-            </TableCell>
-            <TableCell
-              align="center"
-              sx={{
-                fontWeight: 600,
-                color: 'text.secondary',
-                width: 100,
-                fontSize: '0.75rem',
-                letterSpacing: '0.5px',
-              }}
-            >
-              DELETE
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>{renderRows(paginatedPermissions)}</TableBody>
-      </Table>
-      <TablePagination
-        component="div"
-        count={permissions.length}
-        page={page}
-        onPageChange={(_, newPage) => setPage(newPage)}
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={(e) => {
-          setRowsPerPage(parseInt(e.target.value, 10));
-          setPage(0);
-        }}
-        rowsPerPageOptions={[5, 10, 25]}
-        sx={{
-          borderTop: '1px solid',
-          borderColor: 'divider',
-        }}
+      <UiDataTable
+        aria-label="Permissions matrix"
+        rows={flattenedData}
+        columns={columns}
+        getRowId={(module) => module.id}
+        loading={loading}
+        pagination={
+          pagination && onPaginationChange
+            ? {
+                page,
+                rowsPerPage: size,
+                total,
+                onPageChange: (newPage) =>
+                  onPaginationChange({ page: newPage, size }),
+                onRowsPerPageChange: (newSize) =>
+                  onPaginationChange({ page: 0, size: newSize }),
+              }
+            : undefined
+        }
+        emptyState={
+          <div className="py-10 text-center">
+            <Typography variant="body2" color="text.secondary">
+              No permissions found.
+            </Typography>
+          </div>
+        }
       />
-    </TableContainer>
+    </Box>
   );
 };

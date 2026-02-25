@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useToast } from '@libs/hooks';
 import { UiBreadcrumb } from '@libs/ui';
@@ -10,8 +11,14 @@ import type { CreateRolePayload } from '../types';
 export const RoleCreatePage = () => {
   const navigate = useNavigate();
   const toast = useToast();
-  const { data: Permissions, isLoading: isLoadingPermissions } =
-    usePermissions();
+  const [pagination, setPagination] = useState({ page: 0, size: 10 });
+
+  const { data: permissionsRes, isLoading: isLoadingPermissions } =
+    usePermissions(pagination);
+  
+  const permissions = permissionsRes?.items ?? [];
+  const permissionsPagination = permissionsRes?.pagination;
+
   const { mutate: createRole, isPending: isCreating } = useRoleCreate();
 
   const handleSubmit = (data: CreateRolePayload) => {
@@ -67,17 +74,20 @@ export const RoleCreatePage = () => {
       </Box>
 
       <Box sx={{ mt: 4 }}>
-        {isLoadingPermissions ? (
+        {isLoadingPermissions && !permissions.length ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
             <CircularProgress />
           </Box>
-        ) : Permissions ? (
+        ) : permissions.length > 0 ? (
           <RoleForm
-            Permissions={Permissions}
+            Permissions={permissions}
             onSubmit={handleSubmit}
             onCancel={() => navigate('/roles')}
             isLoading={isCreating}
             submitLabel="Create Role"
+            permissionsPagination={permissionsPagination}
+            onPermissionsPaginationChange={setPagination}
+            isPermissionsLoading={isLoadingPermissions}
           />
         ) : (
           <Typography color="error">Failed to load permissions.</Typography>

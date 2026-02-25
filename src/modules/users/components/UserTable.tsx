@@ -1,31 +1,33 @@
-import React, { useMemo, useState } from 'react';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
+  Avatar,
   Box,
   Card,
-  Typography,
   IconButton,
-  Menu,
-  MenuItem,
   ListItemIcon,
   ListItemText,
-  Avatar,
+  Menu,
+  MenuItem,
+  Select,
   Tab,
   Tabs,
-  Select,
+  Typography,
 } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import React, { useMemo, useState } from 'react';
 
+import type { PaginationResult } from '@/services/http';
 import { FilterListIcon, UiDataTable } from '@libs/ui';
-import type { UiDataTableColumn } from '@libs/ui';
 import type { User } from '../types';
 
 interface UserTableProps {
   rows: Array<User>;
   loading?: boolean;
-  onEdit?: (id: number) => void;
-  onDelete?: (id: number) => void;
+  onEdit: (id: number) => void;
+  onDelete: (id: number) => void;
+  pagination?: PaginationResult;
+  onPaginationChange: (next: { page: number; size: number }) => void;
 }
 
 export const UserTable = ({
@@ -33,16 +35,12 @@ export const UserTable = ({
   loading,
   onEdit,
   onDelete,
+  pagination,
+  onPaginationChange,
 }: UserTableProps) => {
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [tabValue, setTabValue] = useState(0);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  const paginatedRows = useMemo(() => {
-    return rows?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-  }, [rows, page, rowsPerPage]);
 
   const openMenu = (event: React.MouseEvent<HTMLElement>, userId: number) => {
     setMenuAnchor(event.currentTarget);
@@ -64,84 +62,101 @@ export const UserTable = ({
     closeMenu();
   };
 
-  const columns: Array<UiDataTableColumn<User>> = [
-    {
-      key: 'userIdentity',
-      header: 'USER IDENTITY',
-      render: (row: User) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Avatar
-            sx={{ width: 40, height: 40 }}
-            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(row.firstName + row.lastName)}&background=random`}
-          />
-          <Box>
+  const total = pagination?.totalElements ?? 0;
+  const page = pagination?.page ?? 0;
+  const size = pagination?.size ?? 10;
+
+  const columns = useMemo(() => {
+    return [
+      {
+        key: '#',
+        header: '#',
+        width: 50,
+        align: 'center' as const,
+        render: (_: User, index: number) => (
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            {page * size + index + 1}
+          </Typography>
+        ),
+      },
+      {
+        key: 'userIdentity',
+        header: 'USER IDENTITY',
+        render: (row: User) => (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Avatar
+              sx={{ width: 40, height: 40 }}
+              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(row.firstName + row.lastName)}&background=random`}
+            />
+            <Box>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 600, color: 'text.primary' }}
+              >
+                {row.firstName}
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                {row.email}
+              </Typography>
+            </Box>
+          </Box>
+        ),
+      },
+      {
+        key: 'status',
+        header: 'STATUS',
+        render: (row: User) => (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box
+              component="span"
+              sx={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                bgcolor: row.status ? '#10b981' : '#9ca3af',
+                display: 'inline-block',
+              }}
+            />
             <Typography
               variant="body2"
-              sx={{ fontWeight: 600, color: 'text.primary' }}
+              sx={{
+                fontWeight: 600,
+                color: row.status ? 'text.primary' : 'text.secondary',
+              }}
             >
-              {row.firstName}
-            </Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              {row.email}
+              {row.status ? 'Active' : 'Inactive'}
             </Typography>
           </Box>
-        </Box>
-      ),
-    },
-    {
-      key: 'status',
-      header: 'STATUS',
-      render: (row: User) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Box
-            component="span"
-            sx={{
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              bgcolor: row.status ? '#10b981' : '#9ca3af',
-              display: 'inline-block',
-            }}
-          />
-          <Typography
-            variant="body2"
-            sx={{
-              fontWeight: 600,
-              color: row.status ? 'text.primary' : 'text.secondary',
-            }}
-          >
-            {row.status ? 'Active' : 'Inactive'}
+        ),
+      },
+      {
+        key: 'lastActivity',
+        header: 'LAST ACTIVITY',
+        render: () => (
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            Just now
           </Typography>
-        </Box>
-      ),
-    },
-    {
-      key: 'lastActivity',
-      header: 'LAST ACTIVITY',
-      render: () => (
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          Just now
-        </Typography>
-      ),
-    },
-    {
-      key: 'actions',
-      header: 'ACTIONS',
-      align: 'right',
-      render: (row: User) => (
-        <IconButton size="small" onClick={(e) => openMenu(e, row.id)}>
-          <MoreVertIcon fontSize="small" />
-        </IconButton>
-      ),
-    },
-  ];
+        ),
+      },
+      {
+        key: 'actions',
+        header: 'ACTIONS',
+        align: 'right' as const,
+        render: (row: User) => (
+          <IconButton size="small" onClick={(e) => openMenu(e, row.id)}>
+            <MoreVertIcon fontSize="small" />
+          </IconButton>
+        ),
+      },
+    ];
+  }, [page, size]);
 
   return (
     <Card
       sx={{
         borderRadius: 3,
         boxShadow: '0px 2px 10px rgba(0,0,0,0.05)',
-        overflow: 'hidden',
+
       }}
     >
       <Box
@@ -227,9 +242,7 @@ export const UserTable = ({
               display: 'inline-block',
             }}
           />
-          Showing {rows.length === 0 ? 0 : page * rowsPerPage + 1}-
-          {Math.min((page + 1) * rowsPerPage, rows.length)} of {rows.length}{' '}
-          Users
+          Showing {page * size + 1}-{size} of {total} Users
         </Typography>
       </Box>
 
@@ -249,21 +262,23 @@ export const UserTable = ({
       >
         <UiDataTable
           aria-label="Users table"
-          rows={paginatedRows}
+          rows={rows}
           columns={columns}
           getRowId={(row) => row.id}
           loading={loading}
-          selectable={true}
-          pagination={{
-            page,
-            rowsPerPage,
-            total: rows.length,
-            onPageChange: (newPage) => setPage(newPage),
-            onRowsPerPageChange: (newRowsPerPage) => {
-              setRowsPerPage(newRowsPerPage);
-              setPage(0);
-            },
-          }}
+          pagination={
+            pagination
+              ? {
+                  page,
+                  rowsPerPage: size,
+                  total,
+                  onPageChange: (newPage) =>
+                    onPaginationChange({ page: newPage, size }),
+                  onRowsPerPageChange: (newSize) =>
+                    onPaginationChange({ page: 0, size: newSize }),
+                }
+              : undefined
+          }
           emptyState={
             <div className="py-10 text-center">
               <Typography variant="body2" color="text.secondary">
@@ -297,7 +312,7 @@ export const UserTable = ({
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
-          <ListItemText>Deactivate</ListItemText>
+          <ListItemText>Delete</ListItemText>
         </MenuItem>
       </Menu>
     </Card>

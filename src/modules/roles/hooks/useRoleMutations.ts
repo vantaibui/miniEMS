@@ -1,6 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@libs/query';
-import type { ApiResponse } from '@/services/http';
+import { useQueryClient } from '@tanstack/react-query';
+
+import { queryKeys, useAppMutation } from '@libs/query';
+import type { ApiSuccessResponse } from '@services/http';
+
 import { rolesApi } from '../api';
 import type { CreateRolePayload, RoleDetails, UpdateRolePayload } from '../types';
 
@@ -12,8 +14,8 @@ export interface UpdateRoleVariables {
 export const useRoleCreate = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<ApiResponse<RoleDetails>, Error, CreateRolePayload>({
-    mutationFn: (payload: CreateRolePayload) => rolesApi.create(payload),
+  return useAppMutation<ApiSuccessResponse<RoleDetails>, CreateRolePayload>({
+    mutationFn: (payload) => rolesApi.create(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.roles.lists() });
     },
@@ -23,7 +25,7 @@ export const useRoleCreate = () => {
 export const useRoleUpdate = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<ApiResponse<RoleDetails>, Error, UpdateRoleVariables>({
+  return useAppMutation<ApiSuccessResponse<RoleDetails>, UpdateRoleVariables>({
     mutationFn: ({ id, payload }) => rolesApi.update(id, payload),
     onSuccess: (_data, role) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.roles.lists() });
@@ -39,7 +41,7 @@ export const useRoleUpdate = () => {
 export const useRoleDelete = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<void, Error, number | string>({
+  return useAppMutation<ApiSuccessResponse<void>, number | string>({
     mutationFn: (id) => rolesApi.delete(id),
     onSuccess: (_data, id) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.roles.lists() });

@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { UiButton, UiFormField, UiInput } from '@libs/ui';
+import { DeleteIcon, UiButton, UiFormField, UiInput } from '@libs/ui';
 import { Box, Card, MenuItem, Select, Stack, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { Controller, useForm } from 'react-hook-form';
@@ -8,12 +8,12 @@ import * as yup from 'yup';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import PersonIcon from '@mui/icons-material/Person';
-import PersonOffIcon from '@mui/icons-material/PersonOff';
 import SecurityIcon from '@mui/icons-material/Security';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 
 import ShieldIcon from '@mui/icons-material/Shield';
 
+import type { PaginationResult } from '@services/http';
 import { RolePermissionMatrix } from '../../roles/components/RolePermissionMatrix';
 import {
   usePermissions,
@@ -46,30 +46,38 @@ interface UserFormProps {
   };
   onSubmit: (data: CreateUserPayload) => void;
   onCancel: () => void;
-  onDeactivate?: () => void;
+  onDelete?: () => void;
   isLoading?: boolean;
   submitLabel?: string;
   isEdit?: boolean;
+  pagination?: PaginationResult;
+  onPaginationChange?: (next: { page: number; size: number }) => void;
+  isPermissionsLoading?: boolean;
 }
 
 export const UserForm = ({
   initialValues,
   onSubmit,
   onCancel,
-  onDeactivate,
+  onDelete,
   isLoading,
   submitLabel = 'Save User',
   isEdit = false,
+  pagination,
+  onPaginationChange,
+  isPermissionsLoading,
 }: UserFormProps) => {
-  const { data: roles = [] } = useRoles();
+  const { data: rolesResponse } = useRoles();
+  const roles = rolesResponse?.items || [];
 
   const {
     control,
     handleSubmit,
     watch,
-    formState: { errors },
+    formState: { errors, isDirty, isValid },
   } = useForm<CreateUserPayload>({
     resolver: yupResolver(schema) as never,
+    mode: 'onChange',
     defaultValues: initialValues || {
       firstName: '',
       lastName: '',
@@ -80,8 +88,14 @@ export const UserForm = ({
   });
 
   const selectedRoleId = watch('roleId');
-  const { data: Permissions = [] } = usePermissions();
-  const { data: rolePermissions = [] } = usePermissionsById(selectedRoleId);
+  const { data: permissionsRes } = usePermissions({
+    page: pagination?.page,
+    size: pagination?.size,
+  });
+  const Permissions = permissionsRes?.items || [];
+
+  const { data: rolePermissionsRes } = usePermissionsById(selectedRoleId);
+  const rolePermissions = rolePermissionsRes?.items || [];
 
   const extractAllocatedPermissions = (
     modules: Array<PermissionNode>,
@@ -353,6 +367,9 @@ export const UserForm = ({
                 )}
                 onChange={() => {}} // Read-only via readOnly prop
                 readOnly={true}
+                pagination={pagination}
+                onPaginationChange={onPaginationChange}
+                loading={isPermissionsLoading}
               />
             </Box>
           )}
@@ -369,22 +386,20 @@ export const UserForm = ({
             }}
           >
             <Box>
-              {isEdit && onDeactivate && (
+              {isEdit && onDelete && (
                 <UiButton
-                  type="button"
                   variant="outlined"
                   color="error"
-                  startIcon={<PersonOffIcon />}
-                  onClick={onDeactivate}
+                  startIcon={<DeleteIcon />}
+                  onClick={onDelete}
                   sx={{
                     fontWeight: 600,
                     px: 2,
-                    color: 'error.main',
                     borderColor: 'error.light',
                     '&:hover': { bgcolor: 'error.50' },
                   }}
                 >
-                  Deactivate User
+                  Delete Role
                 </UiButton>
               )}
             </Box>
@@ -406,11 +421,16 @@ export const UserForm = ({
               <UiButton
                 type="submit"
                 variant="contained"
-                disabled={isLoading}
+                disabled={isLoading || !isDirty || !isValid}
                 loading={isLoading}
                 sx={{
                   px: 3,
                   fontWeight: 600,
+                  '&.Mui-disabled': {
+                    bgcolor: 'primary.main',
+                    color: 'common.white',
+                    opacity: 0.5,
+                  },
                 }}
               >
                 {submitLabel}

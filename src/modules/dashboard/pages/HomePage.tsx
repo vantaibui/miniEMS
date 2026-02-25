@@ -1,21 +1,22 @@
-import { useState } from 'react';
+import type { UiDataTableColumn, UiDataTableId } from '@libs/ui';
 import {
-  Box,
-  Stack,
   AddIcon,
+  Box,
   DownloadIcon,
+  Stack,
   UiBadge,
   UiButton,
   UiCard,
+  UiConfirmDialog,
   UiDataTable,
   UiFormField,
   UiInput,
   UiModal,
   UiSelect,
   UiTableFilters,
-  UiText,
+  UiText
 } from '@libs/ui';
-import type { UiDataTableColumn, UiDataTableId } from '@libs/ui';
+import { useState } from 'react';
 
 // --- Mock Data ---
 interface UserRow {
@@ -84,6 +85,19 @@ export default function HomePage() {
   const [statusTab, setStatusTab] = useState('all');
   const [selectedIds, setSelectedIds] = useState<Array<UiDataTableId>>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    type: 'delete' | 'warning' | 'success';
+    title: string;
+    description: string;
+    confirmOnly?: boolean;
+    confirmText?: string;
+  }>({
+    isOpen: false,
+    type: 'success',
+    title: '',
+    description: '',
+  });
   const [isLoading, setIsLoading] = useState(false);
 
   const userColumns: Array<UiDataTableColumn<UserRow>> = [
@@ -244,10 +258,79 @@ export default function HomePage() {
             </section>
 
             <section className="space-y-4">
-              <UiText variant="subheading">Modals</UiText>
-              <UiButton onClick={() => setIsModalOpen(true)}>
-                Open Showcase Modal
-              </UiButton>
+              <UiText variant="subheading">Modals & Confirm Dialogs</UiText>
+              <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
+                <UiButton onClick={() => setIsModalOpen(true)}>
+                  Open Standard Modal
+                </UiButton>
+
+                <UiButton
+                  variant="danger"
+                  onClick={() =>
+                    setConfirmDialog({
+                      isOpen: true,
+                      type: 'delete',
+                      title: 'Delete User',
+                      description:
+                        'Are you sure you want to delete this user? This action cannot be undone.',
+                    })
+                  }
+                >
+                  Delete Confirm
+                </UiButton>
+
+                <UiButton
+                  sx={{
+                    backgroundColor: '#ED6C02',
+                    '&:hover': { backgroundColor: '#E65100' },
+                  }}
+                  onClick={() =>
+                    setConfirmDialog({
+                      isOpen: true,
+                      type: 'warning',
+                      title: 'Warning',
+                      description: 'Are you sure about this action?',
+                    })
+                  }
+                >
+                  Warning Confirm
+                </UiButton>
+
+                <UiButton
+                  sx={{
+                    backgroundColor: '#4CAF50',
+                    '&:hover': { backgroundColor: '#2E7D32' },
+                  }}
+                  onClick={() =>
+                    setConfirmDialog({
+                      isOpen: true,
+                      type: 'success',
+                      title: 'Success',
+                      description: 'Action is done successfully!',
+                    })
+                  }
+                >
+                  Success Confirm
+                </UiButton>
+
+                <UiButton
+                  variant="secondary"
+                  onClick={() =>
+                    setConfirmDialog({
+                      isOpen: true,
+                      type: 'warning',
+                      title: 'Something went wrong?',
+                      description:
+                        "We couldn't complete your request due to a server error. Please try again.",
+                      confirmOnly: true,
+                      confirmText: 'Retry',
+                    })
+                  }
+                >
+                  Retry (Confirm Only)
+                </UiButton>
+              </Stack>
+
               <UiModal
                 open={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
@@ -285,6 +368,22 @@ export default function HomePage() {
                   </UiFormField>
                 </Stack>
               </UiModal>
+
+              <UiConfirmDialog
+                isOpen={confirmDialog.isOpen}
+                type={confirmDialog.type}
+                title={confirmDialog.title}
+                description={confirmDialog.description}
+                confirmOnly={confirmDialog.confirmOnly}
+                confirmText={confirmDialog.confirmText}
+                onClose={() =>
+                  setConfirmDialog((prev) => ({ ...prev, isOpen: false }))
+                }
+                onConfirm={() => {
+                  console.log('Confirmed!');
+                  setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
+                }}
+              />
             </section>
           </Stack>
         )}
