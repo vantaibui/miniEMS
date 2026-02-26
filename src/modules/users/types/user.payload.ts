@@ -3,6 +3,7 @@ export interface CreateUserPayload {
   lastName: string;
   username: string;
   email: string;
+  password: string;
   roleId: number;
 }
 

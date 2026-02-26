@@ -12,7 +12,4 @@ export interface BaseRolePayload {
 }
 
 export type CreateRolePayload = BaseRolePayload;
-
-export interface UpdateRolePayload extends BaseRolePayload {
-  id: number;
-}
+export type UpdateRolePayload = BaseRolePayload;

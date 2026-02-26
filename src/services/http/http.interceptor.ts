@@ -1,4 +1,4 @@
-import { keycloak, login, refreshToken } from '@modules/auth/api/keycloak';
+import { keycloak, login, refreshToken } from '@modules/auth';
 import type {
   AxiosInstance,
   AxiosResponse,

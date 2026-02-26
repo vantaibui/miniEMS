@@ -1,8 +1,9 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { DeleteIcon, UiButton, UiFormField, UiInput } from '@libs/ui';
-import { Box, Card, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Box, Card, IconButton, MenuItem, Select, Stack, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import { useState } from 'react';
 import * as yup from 'yup';
 
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
@@ -10,6 +11,8 @@ import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import PersonIcon from '@mui/icons-material/Person';
 import SecurityIcon from '@mui/icons-material/Security';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 import ShieldIcon from '@mui/icons-material/Shield';
 
@@ -23,17 +26,23 @@ import {
 import type { PermissionNode } from '../../roles/types';
 import type { CreateUserPayload } from '../types';
 
-const schema = yup.object().shape({
-  firstName: yup.string().required('First name is required').min(2).max(100),
-  lastName: yup.string().required('Last name is required').min(2).max(100),
-  username: yup.string().required('Username is required').min(2).max(100),
-  email: yup
-    .string()
-    .email('Invalid email address')
-    .required('Email is required'),
-  department: yup.string(),
-  roleId: yup.number().required('Security role is required'),
-});
+const createSchema = (isEdit: boolean) =>
+  yup.object().shape({
+    firstName: yup.string().required('First name is required').min(2).max(100),
+    lastName: yup.string().required('Last name is required').min(2).max(100),
+    username: yup.string().required('Username is required').min(2).max(100),
+    email: yup
+      .string()
+      .email('Invalid email address')
+      .required('Email is required'),
+    password: isEdit
+      ? yup.string()
+      : yup
+          .string()
+          .required('Password is required')
+          .min(6, 'Password must be at least 6 characters'),
+    roleId: yup.number().required('Security role is required'),
+  });
 
 interface UserFormProps {
   initialValues?: {
@@ -41,7 +50,6 @@ interface UserFormProps {
     lastName?: string;
     username?: string;
     email: string;
-    department?: string;
     roleId?: number;
   };
   onSubmit: (data: CreateUserPayload) => void;
@@ -67,27 +75,31 @@ export const UserForm = ({
   onPaginationChange,
   isPermissionsLoading,
 }: UserFormProps) => {
+  const [showPassword, setShowPassword] = useState(false);
   const { data: rolesResponse } = useRoles();
   const roles = rolesResponse?.items || [];
 
   const {
     control,
     handleSubmit,
-    watch,
     formState: { errors, isDirty, isValid },
   } = useForm<CreateUserPayload>({
-    resolver: yupResolver(schema) as never,
+    resolver: yupResolver(createSchema(isEdit)) as never,
     mode: 'onChange',
     defaultValues: initialValues || {
       firstName: '',
       lastName: '',
       username: '',
       email: '',
+      password: 'Passw0rd!',
       roleId: undefined,
     },
   });
 
-  const selectedRoleId = watch('roleId');
+  const selectedRoleId = useWatch({
+    control,
+    name: 'roleId',
+  });
   const { data: permissionsRes } = usePermissions({
     page: pagination?.page,
     size: pagination?.size,
@@ -129,15 +141,18 @@ export const UserForm = ({
   };
 
   const handleFormSubmit = (
-    data: CreateUserPayload & { department?: string },
+    data: CreateUserPayload,
   ) => {
-    onSubmit({
+    const payload: CreateUserPayload = {
       username: data.username,
       email: data.email,
       firstName: data.firstName,
       lastName: data.lastName,
       roleId: data.roleId,
-    });
+      password: isEdit ? '' : (data.password || ''),
+    };
+
+    onSubmit(payload);
   };
 
   return (
@@ -257,6 +272,45 @@ export const UserForm = ({
                   )}
                 />
               </Grid>
+              {!isEdit && (
+                <Grid size={{ xs: 6 }}>
+                  <Controller
+                    name="password"
+                    control={control}
+                    render={({ field }) => (
+                      <UiFormField
+                        label="PASSWORD"
+                        errorText={errors.password?.message}
+                        required
+                      >
+                        <UiInput
+                          {...field}
+                          placeholder="Enter password"
+                          type={showPassword ? 'text' : 'password'}
+                          startAdornment={
+                            <VpnKeyIcon
+                              sx={{ color: 'text.secondary', fontSize: 20 }}
+                            />
+                          }
+                          endAdornment={
+                            <IconButton
+                              onClick={() => setShowPassword(!showPassword)}
+                              edge="end"
+                              sx={{ color: 'text.secondary' }}
+                            >
+                              {showPassword ? (
+                                <VisibilityOffIcon fontSize="small" />
+                              ) : (
+                                <VisibilityIcon fontSize="small" />
+                              )}
+                            </IconButton>
+                          }
+                        />
+                      </UiFormField>
+                    )}
+                  />
+                </Grid>
+              )}
             </Grid>
           </Box>
 

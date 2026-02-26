@@ -21,6 +21,7 @@ import {
 import type { PaginationResult } from '@services/http';
 import { useMemo, useState } from 'react';
 
+import { useRolePermissions } from '../hooks/useRolePermissions';
 import type { Role } from '../types';
 
 export interface RoleTableProps {
@@ -43,6 +44,8 @@ export const RoleTable = ({
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
   const [tabValue, setTabValue] = useState(0);
+
+  const { canEdit: canEditRole, canDelete: canDeleteRole } = useRolePermissions();
 
   const openMenu = (event: React.MouseEvent<HTMLElement>, roleId: number) => {
     setMenuAnchor(event.currentTarget);
@@ -137,14 +140,15 @@ export const RoleTable = ({
         header: 'ACTIONS',
         width: 80,
         align: 'right' as const,
-        render: (role: Role) => (
-          <IconButton size="small" onClick={(e) => openMenu(e, role.id)}>
-            <MoreVertIcon fontSize="small" />
-          </IconButton>
-        ),
+        render: (role: Role) =>
+          canEditRole || canDeleteRole ? (
+            <IconButton size="small" onClick={(e) => openMenu(e, role.id)}>
+              <MoreVertIcon fontSize="small" />
+            </IconButton>
+          ) : null,
       },
     ];
-  }, [page, size]);
+  }, [page, size, canEditRole, canDeleteRole]);
 
   return (
     <Card
@@ -296,29 +300,33 @@ export const RoleTable = ({
           },
         }}
       >
-        <MenuItem
-          onClick={() => {
-            if (selectedRoleId != null) onEdit(selectedRoleId);
-            closeMenu();
-          }}
-        >
-          <ListItemIcon>
-            <EditOutlinedIcon fontSize="small" />
-          </ListItemIcon>
-          Edit
-        </MenuItem>
+        {canEditRole && (
+          <MenuItem
+            onClick={() => {
+              if (selectedRoleId != null) onEdit(selectedRoleId);
+              closeMenu();
+            }}
+          >
+            <ListItemIcon>
+              <EditOutlinedIcon fontSize="small" />
+            </ListItemIcon>
+            Edit
+          </MenuItem>
+        )}
 
-        <MenuItem
-          onClick={() => {
-            if (selectedRoleId != null) onDelete(selectedRoleId);
-            closeMenu();
-          }}
-        >
-          <ListItemIcon>
-            <DeleteIcon fontSize="small" color="error" />
-          </ListItemIcon>
-          Delete
-        </MenuItem>
+        {canDeleteRole && (
+          <MenuItem
+            onClick={() => {
+              if (selectedRoleId != null) onDelete(selectedRoleId);
+              closeMenu();
+            }}
+          >
+            <ListItemIcon>
+              <DeleteIcon fontSize="small" color="error" />
+            </ListItemIcon>
+            Delete
+          </MenuItem>
+        )}
       </Menu>
     </Card>
   );

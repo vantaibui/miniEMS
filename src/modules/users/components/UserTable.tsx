@@ -19,6 +19,7 @@ import React, { useMemo, useState } from 'react';
 
 import type { PaginationResult } from '@/services/http';
 import { FilterListIcon, UiDataTable } from '@libs/ui';
+import { useUserPermissions } from '../hooks';
 import type { User } from '../types';
 
 interface UserTableProps {
@@ -41,6 +42,8 @@ export const UserTable = ({
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [tabValue, setTabValue] = useState(0);
+
+  const { canEdit: canEditUser, canDelete: canDeleteUser } = useUserPermissions();
 
   const openMenu = (event: React.MouseEvent<HTMLElement>, userId: number) => {
     setMenuAnchor(event.currentTarget);
@@ -142,14 +145,15 @@ export const UserTable = ({
         key: 'actions',
         header: 'ACTIONS',
         align: 'right' as const,
-        render: (row: User) => (
-          <IconButton size="small" onClick={(e) => openMenu(e, row.id)}>
-            <MoreVertIcon fontSize="small" />
-          </IconButton>
-        ),
+        render: (row: User) =>
+          canEditUser || canDeleteUser ? (
+            <IconButton size="small" onClick={(e) => openMenu(e, row.id)}>
+              <MoreVertIcon fontSize="small" />
+            </IconButton>
+          ) : null,
       },
     ];
-  }, [page, size]);
+  }, [page, size, canEditUser, canDeleteUser]);
 
   return (
     <Card
@@ -302,18 +306,22 @@ export const UserTable = ({
           },
         }}
       >
-        <MenuItem onClick={handleEditClick}>
-          <ListItemIcon>
-            <EditIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Edit User</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={handleDeleteClick} sx={{ color: 'error.main' }}>
-          <ListItemIcon>
-            <DeleteIcon fontSize="small" color="error" />
-          </ListItemIcon>
-          <ListItemText>Delete</ListItemText>
-        </MenuItem>
+        {canEditUser && (
+          <MenuItem onClick={handleEditClick}>
+            <ListItemIcon>
+              <EditIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Edit User</ListItemText>
+          </MenuItem>
+        )}
+        {canDeleteUser && (
+          <MenuItem onClick={handleDeleteClick} sx={{ color: 'error.main' }}>
+            <ListItemIcon>
+              <DeleteIcon fontSize="small" color="error" />
+            </ListItemIcon>
+            <ListItemText>Delete</ListItemText>
+          </MenuItem>
+        )}
       </Menu>
     </Card>
   );

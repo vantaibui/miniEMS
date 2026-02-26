@@ -10,7 +10,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 
 import { checkPermissionRaw, useRbacStore } from '@modules/auth';
 import type { PermissionNode } from '@libs/types';
-import type { NavGroup } from '../../../navigation/nav.types';
+import type { NavGroup, NavPermission } from '../../../navigation/nav.types';
 import type { ReactNode } from 'react';
 
 interface SidebarNavProps {
@@ -19,15 +19,17 @@ interface SidebarNavProps {
 
 const isAllowed = (
   permissions: Array<PermissionNode> | null,
-  permissionPath?: string | null,
+  permission?: NavPermission,
 ) => {
-  // Default allow if permissionPath is missing/empty
-  // if (!permissionPath) {
-  //   return true;
-  // }
-  // console.log(checkPermissionRaw(permissions, permissionPath))
-  // return checkPermissionRaw(permissions, permissionPath);
-  return true;
+  // Default to allow when no permission is configured
+  if (!permission) {
+    return true;
+  }
+
+  const action = permission.action ?? 'read';
+  const path = `${permission.subModule}.${action}`;
+
+  return checkPermissionRaw(permissions, path);
 };
 
 export const SidebarNav = ({ groups }: SidebarNavProps) => {
@@ -60,10 +62,10 @@ export const SidebarNav = ({ groups }: SidebarNavProps) => {
   }
 
   const filteredGroups = groups
-    .filter((g) => isAllowed(permissions, g.permissionPath))
+    .filter((g) => isAllowed(permissions, g.permission))
     .map((g) => ({
       ...g,
-      items: g.items.filter((it) => isAllowed(permissions, it.permissionPath)),
+      items: g.items.filter((it) => isAllowed(permissions, it.permission)),
     }))
     .filter((g) => g.items.length > 0);
 

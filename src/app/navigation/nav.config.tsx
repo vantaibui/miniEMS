@@ -2,6 +2,7 @@ import AnalyticsOutlinedIcon from '@mui/icons-material/AnalyticsOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined';
+import { PERMISSION_SUBMODULES } from '@modules/auth';
 import type { NavGroup } from './nav.types';
 
 export const NAV_MAIN: Array<NavGroup> = [
@@ -29,21 +30,30 @@ export const NAV_ACCESS: Array<NavGroup> = [
   {
     key: 'access',
     section: 'ACCESS MANAGEMENT',
-    permissionPath: 'ACCESS_MANAGEMENT.read',
+    permission: {
+      subModule: PERMISSION_SUBMODULES.ACCESS_MANAGEMENT,
+      action: 'read',
+    },
     items: [
       {
         key: 'users',
         label: 'User Management',
         to: '/users',
         icon: <PeopleAltOutlinedIcon fontSize="small" />,
-        permissionPath: 'ACCESS_MANAGEMENT.USER_MANAGEMENT.read',
+        permission: {
+          subModule: PERMISSION_SUBMODULES.USER_MANAGEMENT,
+          action: 'read',
+        },
       },
       {
         key: 'roles',
         label: 'Roles & Permissions',
         to: '/roles',
         icon: <SecurityOutlinedIcon fontSize="small" />,
-        permissionPath: 'ACCESS_MANAGEMENT.ROLE_MANAGEMENT.read',
+        permission: {
+          subModule: PERMISSION_SUBMODULES.ROLE_MANAGEMENT,
+          action: 'read',
+        },
       },
     ],
   },
@@ -53,21 +63,30 @@ export const NAV_ASSET: Array<NavGroup> = [
   {
     key: 'asset',
     section: 'ASSET MANAGEMENT',
-    permissionPath: 'ASSET_MANAGEMENT.read',
+    permission: {
+      subModule: PERMISSION_SUBMODULES.ASSET_MANAGEMENT,
+      action: 'read',
+    },
     items: [
       {
         key: 'device_inventory',
         label: 'Device Inventory',
         to: '/device-inventory',
         icon: <PeopleAltOutlinedIcon fontSize="small" />,
-        permissionPath: 'ASSET_MANAGEMENT.DEVICE_INVENTORY.read',
+        permission: {
+          subModule: PERMISSION_SUBMODULES.DEVICE_INVENTORY,
+          action: 'read',
+        },
       },
       {
         key: 'device_configuration',
         label: 'Device Configuration',
         to: '/device-configuration',
         icon: <SecurityOutlinedIcon fontSize="small" />,
-        permissionPath: 'ASSET_MANAGEMENT.DEVICE_CONFIGURATION.read',
+        permission: {
+          subModule: PERMISSION_SUBMODULES.DEVICE_CONFIGURATION,
+          action: 'read',
+        },
       },
     ],
   },

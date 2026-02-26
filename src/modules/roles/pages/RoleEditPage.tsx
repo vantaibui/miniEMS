@@ -7,7 +7,6 @@ import { UiBreadcrumb, useDialogConfirm } from '@libs/ui';
 import {
   useRoleDetail,
   useRoleUpdate,
-  usePermissions,
   useRoleDelete,
   usePermissionsById,
 } from '../hooks';
@@ -49,14 +48,11 @@ export const RoleEditPage = () => {
   const confirm = useDialogConfirm();
 
   const { data: role, isLoading: isLoadingRole } = useRoleDetail(roleId);
-  const { data: rolePermissionsRes, isLoading: isLoadingRolePerms } =
-    usePermissionsById(roleId);
   const { data: permissionsRes, isLoading: isLoadingPermissions } =
-    usePermissions(pagination);
+    usePermissionsById(roleId, pagination);
 
   const permissions = permissionsRes?.items ?? [];
   const permissionsPagination = permissionsRes?.pagination;
-  const rolePermissions = rolePermissionsRes?.items;
 
   const { mutate: updateRole, isPending: isUpdating } = useRoleUpdate();
   const { mutate: deleteRole, isPending: isDeleting } = useRoleDelete();
@@ -64,7 +60,7 @@ export const RoleEditPage = () => {
   const handleSubmit = (data: BaseRolePayload) => {
     if (!roleId) return;
     updateRole(
-      { id: roleId, payload: { ...data, id: roleId } },
+      { id: roleId, payload: data },
       {
         onSuccess: (response) => {
           toast.success(
@@ -95,9 +91,7 @@ export const RoleEditPage = () => {
   };
 
   const isLoading =
-    isLoadingRole ||
-    (isLoadingPermissions && !permissions.length) ||
-    isLoadingRolePerms;
+    isLoadingRole || (isLoadingPermissions && !permissions.length);
 
   return (
     <Box>
@@ -150,9 +144,7 @@ export const RoleEditPage = () => {
             initialValues={{
               name: role.name,
               description: role.description,
-              permissions: rolePermissions
-                ? extractAllocatedPermissions(rolePermissions)
-                : [],
+              permissions: extractAllocatedPermissions(permissions),
             }}
             Permissions={permissions}
             onSubmit={handleSubmit}

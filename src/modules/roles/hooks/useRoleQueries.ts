@@ -45,7 +45,15 @@ export const usePermissions = (params: RolesListParams = {}) => {
         ApiSuccessResponse<Array<PermissionNode>>
       >,
     select: (response) => ({
-      items: response?.data ?? [],
+      items: (response?.data ?? []).map((permission) => ({
+        ...permission,
+        actions: {
+          create: false,
+          read: false,
+          update: false,
+          delete: false,
+        },
+      })),
       pagination: response?.meta?.pagination,
     }),
   });
