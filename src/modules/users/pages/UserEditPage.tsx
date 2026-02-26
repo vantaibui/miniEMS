@@ -89,7 +89,6 @@ export const UserEditPage = () => {
               lastName: user.lastName || '',
               username: user.username,
               email: user.email,
-              department: 'it', // Not present in the entity, using default mock value
               roleId: user.roleId,
             }}
             onSubmit={handleSubmit}

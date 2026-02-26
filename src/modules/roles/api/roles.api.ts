@@ -28,7 +28,7 @@ export const rolesApi = {
     return await http.get<Array<Role>>(
       ROLES_ENDPOINTS.LIST,
       { params: params as Record<string, unknown> }
-    );
+    ) as ApiSuccessResponse<Array<Role>>;
   },
 
   async getById(id: number | string): Promise<ApiSuccessResponse<RoleDetails>> {
@@ -44,7 +44,7 @@ export const rolesApi = {
       {
         params,
       },
-    );
+    ) as ApiSuccessResponse<Array<PermissionNode>>;
   },
 
   async getAllPermissions(
@@ -53,7 +53,7 @@ export const rolesApi = {
     return await http.get<Array<PermissionNode>>(
       ROLES_ENDPOINTS.ALL_PERMISSIONS,
       { params: params as Record<string, unknown> }
-    );
+    ) as ApiSuccessResponse<Array<PermissionNode>>;
   },
 
   async create(payload: CreateRolePayload): Promise<ApiSuccessResponse<RoleDetails>> {

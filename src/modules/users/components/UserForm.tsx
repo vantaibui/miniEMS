@@ -108,38 +108,24 @@ export const UserForm = ({
       delete: boolean;
     };
   }> => {
-    let result: Array<{
-      id: number;
-      actions: {
-        create: boolean;
-        read: boolean;
-        update: boolean;
-        delete: boolean;
-      };
-    }> = [];
-    modules.forEach((module) => {
-      if (
-        module.actions &&
-        (module.actions.create ||
-          module.actions.read ||
-          module.actions.update ||
-          module.actions.delete)
-      ) {
-        result.push({
-          id: module.id,
-          actions: {
-            create: module.actions.create,
-            read: module.actions.read,
-            update: module.actions.update,
-            delete: module.actions.delete,
-          },
-        });
-      }
-      if (module.subModule && module.subModule.length > 0) {
-        result = [...result, ...extractAllocatedPermissions(module.subModule)];
-      }
-    });
-    return result;
+    return modules
+      .filter(
+        (module) =>
+          module.actions &&
+          (module.actions.create ||
+            module.actions.read ||
+            module.actions.update ||
+            module.actions.delete),
+      )
+      .map((module) => ({
+        id: module.id,
+        actions: {
+          create: module.actions.create,
+          read: module.actions.read,
+          update: module.actions.update,
+          delete: module.actions.delete,
+        },
+      }));
   };
 
   const handleFormSubmit = (

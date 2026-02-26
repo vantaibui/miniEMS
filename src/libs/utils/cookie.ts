@@ -14,7 +14,6 @@ export function setCookie<T>(
       expires = `; expires=${date.toUTCString()}`;
     }
 
-    // Handle objects/arrays by stringifying
     const stringValue =
       typeof value === 'object' ? JSON.stringify(value) : String(value);
 

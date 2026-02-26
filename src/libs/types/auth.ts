@@ -1,7 +1,5 @@
 import type { KeycloakTokenParsed } from 'keycloak-js';
 
-export type RBACMode = 'strict' | 'soft';
-
 export interface Actions {
   create: boolean;
   read: boolean;
@@ -13,7 +11,7 @@ export interface PermissionNode {
   id: number;
   name: string;
   module: string;
-  subModule: Array<PermissionNode> | null;
+  subModule: string;
   actions: Actions;
 }
 
@@ -27,11 +25,10 @@ export interface UserMe {
   id: number;
   username: string;
   email: string;
-  fullName: string;
-  role_id: number;
+  firstName: string;
+  lastName: string;
   status: string;
-  createdAt: string;
-  updatedAt: string;
+  roleId: number;
 }
 
 export interface TokenPayload extends KeycloakTokenParsed {
@@ -62,7 +59,6 @@ export interface AuthState {
   isLoading: boolean;
   isInitialized: boolean;
   error: string | null;
-  rbacMode: RBACMode;
 
   // Actions
   setUser: (user: UserMe | null) => void;

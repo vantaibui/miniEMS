@@ -9,7 +9,7 @@ export const rolesRoutes: Array<RouteObject> = [
   {
     path: 'roles',
     element: (
-      <RouteGuard permissionPath="ACCESS_MANAGEMENT.ROLE_MANAGEMENT.read">
+      <RouteGuard permissionPath="ROLE_MANAGEMENT.read">
         <RoleListPage />
       </RouteGuard>
     ),
@@ -17,7 +17,7 @@ export const rolesRoutes: Array<RouteObject> = [
   {
     path: 'roles/create',
     element: (
-      <RouteGuard permissionPath="ACCESS_MANAGEMENT.ROLE_MANAGEMENT.create">
+      <RouteGuard permissionPath="ROLE_MANAGEMENT.create">
         <RoleCreatePage />
       </RouteGuard>
     ),
@@ -25,7 +25,7 @@ export const rolesRoutes: Array<RouteObject> = [
   {
     path: 'roles/:id/edit',
     element: (
-      <RouteGuard permissionPath="ACCESS_MANAGEMENT.ROLE_MANAGEMENT.update">
+      <RouteGuard permissionPath="ROLE_MANAGEMENT.update">
         <RoleEditPage />
       </RouteGuard>
     ),

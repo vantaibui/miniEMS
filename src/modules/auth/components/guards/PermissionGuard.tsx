@@ -1,9 +1,9 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { Box, CircularProgress } from '@mui/material';
-import { useRbacStore } from '../../store/auth.store';
-import { usePermission } from '../../hooks/usePermission';
 import type { AuthState } from '@libs/types';
+import { Box, CircularProgress } from '@mui/material';
+import React from 'react';
+import { useLocation } from 'react-router-dom';
+import { usePermission } from '../../hooks/usePermission';
+import { useRbacStore } from '../../store/auth.store';
 
 interface GuardProps {
   permissionPath: string;
@@ -24,19 +24,12 @@ const FullPageLoader = () => (
   </Box>
 );
 
-/**
- * RouteGuard
- * - Protects entire route segments.
- * - Redirects to /403 if unauthorized.
- * - Shows loader if RBAC not initialized.
- */
 export const RouteGuard: React.FC<GuardProps> = ({
   permissionPath,
   children,
 }) => {
   const isInitialized = useRbacStore((state: AuthState) => state.isInitialized);
   const isLoading = useRbacStore((state: AuthState) => state.isLoading);
-  const rbacMode = useRbacStore((state: AuthState) => state.rbacMode);
   const hasPermission = usePermission(permissionPath);
   const location = useLocation();
 
@@ -44,18 +37,13 @@ export const RouteGuard: React.FC<GuardProps> = ({
     return <FullPageLoader />;
   }
 
-  // if (!hasPermission && rbacMode === 'strict') {
+  // if (!hasPermission) {
   //   return <Navigate to="/403" state={{ from: location }} replace />;
   // }
 
   return <>{children}</>;
 };
 
-/**
- * ComponentGuard
- * - Toggles UI fragments (buttons, tabs).
- * - STRICT: returns fallback (default null) if unauthorized.
- */
 export const ComponentGuard: React.FC<GuardProps> = ({
   permissionPath,
   children,

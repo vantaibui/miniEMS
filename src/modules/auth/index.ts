@@ -1,4 +1,5 @@
 export * from './hooks/useAuth';
+export * from './hooks/useAuthQueries';
 export * from './hooks/usePermission';
 export * from './components/guards/PermissionGuard';
 export * from './providers/AuthProvider';

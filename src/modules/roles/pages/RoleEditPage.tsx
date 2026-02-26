@@ -19,41 +19,25 @@ const extractAllocatedPermissions = (
 ): Array<{
   id: number;
   actions: { create: boolean; read: boolean; update: boolean; delete: boolean };
-}> => {
-  let result: Array<{
-    id: number;
-    actions: {
-      create: boolean;
-      read: boolean;
-      update: boolean;
-      delete: boolean;
-    };
-  }> = [];
-
-  nodes.forEach((node) => {
-    if (
-      node.actions &&
-      (node.actions.create ||
-        node.actions.read ||
-        node.actions.update ||
-        node.actions.delete)
-    ) {
-      result.push({
-        id: node.id,
-        actions: {
-          create: node.actions.create,
-          read: node.actions.read,
-          update: node.actions.update,
-          delete: node.actions.delete,
-        },
-      });
-    }
-    if (node.subModule && node.subModule.length > 0) {
-      result = [...result, ...extractAllocatedPermissions(node.subModule)];
-    }
-  });
-
-  return result;
+  }> => {
+  return nodes
+    .filter(
+      (node) =>
+        node.actions &&
+        (node.actions.create ||
+          node.actions.read ||
+          node.actions.update ||
+          node.actions.delete),
+    )
+    .map((node) => ({
+      id: node.id,
+      actions: {
+        create: node.actions.create,
+        read: node.actions.read,
+        update: node.actions.update,
+        delete: node.actions.delete,
+      },
+    }));
 };
 
 export const RoleEditPage = () => {

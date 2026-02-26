@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { AxiosError } from 'axios';
 
 import type {
   AuthState,
@@ -8,6 +7,7 @@ import type {
   UserMe,
   UserProfile,
 } from '@libs/types';
+import type { AppError, ApiSuccessResponse } from '@services/http';
 import { login, logout } from '../api/keycloak';
 
 export interface KeycloakAuthState {
@@ -44,28 +44,26 @@ export const useAuthStore = create<KeycloakAuthState>()(
   ),
 );
 import { authService } from '../api/auth.api';
-import { usersApi } from '../../users/api/users.api';
 
 const initialState: Pick<
   AuthState,
-  'user' | 'permissions' | 'isLoading' | 'isInitialized' | 'error' | 'rbacMode'
+  'user' | 'permissions' | 'isLoading' | 'isInitialized' | 'error'
 > = {
   user: null,
   permissions: null,
   isLoading: false,
   isInitialized: false,
   error: null,
-  rbacMode: 'strict',
 };
 
-const getAxiosStatus = (err: unknown): number | undefined => {
-  const axiosErr = err as AxiosError;
-  return axiosErr?.response?.status;
+const getErrorStatus = (err: unknown): number | undefined => {
+  const appError = err as AppError | undefined;
+  return appError?.status;
 };
 
-const getAxiosMessage = (err: unknown): string | undefined => {
-  const axiosErr = err as AxiosError<{ message?: string }>;
-  return axiosErr?.response?.data?.message;
+const getErrorMessage = (err: unknown): string | undefined => {
+  const appError = err as AppError | undefined;
+  return appError?.message;
 };
 
 export const useRbacStore = create<AuthState>()(
@@ -101,23 +99,27 @@ export const useRbacStore = create<AuthState>()(
         set({ isLoading: true, error: null });
 
         try {
-          // 1) /users/me
-          const user = await usersApi.getMe();
-          set({ user: user as unknown as UserMe });
+          const userResponse = await authService.getMe();
+          const user = (userResponse as ApiSuccessResponse<UserMe>).data;
+          set({ user });
 
-          // 2) /roles/{roleId}/permissions
           const roleId = user.roleId;
           if (!roleId) {
-            // Strict mode: if no role_id, user effectively has no permissions.
             set({ permissions: null, isInitialized: true });
             return;
           }
 
-          const permissionTree = await authService.getPermissions(roleId);
-          set({ permissions: permissionTree, isInitialized: true });
+          const permissionsResponse =
+            await authService.getPermissions(roleId);
+          set({
+            permissions: (
+              permissionsResponse as ApiSuccessResponse<Array<PermissionNode>>
+            ).data,
+            isInitialized: true,
+          });
         } catch (err: unknown) {
-          const status = getAxiosStatus(err);
-          const msg = getAxiosMessage(err);
+          const status = getErrorStatus(err);
+          const msg = getErrorMessage(err);
 
           // If /me fails: logout (per spec)
           if (status === 401 || status === 403) {

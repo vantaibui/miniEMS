@@ -1,6 +1,5 @@
 import type { AxiosRequestConfig, AxiosResponse } from 'axios';
 
-// --- Pagination ---
 export interface PaginationResult {
   page: number;
   size: number;
@@ -8,7 +7,6 @@ export interface PaginationResult {
   totalPages: number;
 }
 
-// --- Backend Contracts (Raw Response) ---
 export interface ErrorDetails {
   field: string;
   message: string;
@@ -42,7 +40,6 @@ export interface ApiErrorResponse extends BaseApiResponse {
 
 export type ApiResponse<T = unknown> = ApiSuccessResponse<T> | ApiErrorResponse;
 
-// --- Frontend Normalized Error (UI use) ---
 export interface AppError {
   message: string;
   code?: string;
@@ -51,6 +48,5 @@ export interface AppError {
   status?: number;
 }
 
-// --- Axios / Http Utils ---
 export type RequestConfig<D = unknown> = AxiosRequestConfig<D>;
 export type Response<T = unknown> = AxiosResponse<ApiResponse<T>>;

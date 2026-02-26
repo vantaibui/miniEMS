@@ -213,7 +213,7 @@ export const UserTable = ({
                 color: 'text.secondary',
               },
               '& .Mui-selected': { color: 'text.primary', fontWeight: 600 },
-              '& .MuiTabs-indicator': { display: 'none' }, // Using background indicator conceptually or simply hidden for tabs
+              '& .MuiTabs-indicator': { display: 'none' },
               bgcolor: 'transparent',
             }}
           >

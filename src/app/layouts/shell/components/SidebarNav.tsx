@@ -25,6 +25,7 @@ const isAllowed = (
   // if (!permissionPath) {
   //   return true;
   // }
+  // console.log(checkPermissionRaw(permissions, permissionPath))
   // return checkPermissionRaw(permissions, permissionPath);
   return true;
 };
@@ -34,7 +35,6 @@ export const SidebarNav = ({ groups }: SidebarNavProps) => {
   const isLoading = useRbacStore((s) => s.isLoading);
   const isInitialized = useRbacStore((s) => s.isInitialized);
   const error = useRbacStore((s) => s.error);
-  const rbacMode = useRbacStore((s) => s.rbacMode);
   const location = useLocation();
 
   if (!isInitialized || isLoading) {
@@ -55,7 +55,7 @@ export const SidebarNav = ({ groups }: SidebarNavProps) => {
     );
   }
 
-  if (error && rbacMode === 'strict') {
+  if (error) {
     return null;
   }
 

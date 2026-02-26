@@ -8,7 +8,7 @@ export const usersRoutes: Array<RouteObject> = [
   {
     path: 'users',
     element: (
-      <RouteGuard permissionPath="ACCESS_MANAGEMENT.USER_MANAGEMENT.read">
+      <RouteGuard permissionPath="USER_MANAGEMENT.read">
         <UserListPage />
       </RouteGuard>
     ),
@@ -16,7 +16,7 @@ export const usersRoutes: Array<RouteObject> = [
   {
     path: 'users/create',
     element: (
-      <RouteGuard permissionPath="ACCESS_MANAGEMENT.USER_MANAGEMENT.create">
+      <RouteGuard permissionPath="USER_MANAGEMENT.create">
         <UserCreatePage />
       </RouteGuard>
     ),
@@ -24,7 +24,7 @@ export const usersRoutes: Array<RouteObject> = [
   {
     path: 'users/:id/edit',
     element: (
-      <RouteGuard permissionPath="ACCESS_MANAGEMENT.USER_MANAGEMENT.update">
+      <RouteGuard permissionPath="USER_MANAGEMENT.update">
         <UserEditPage />
       </RouteGuard>
     ),

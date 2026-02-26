@@ -1,33 +1,34 @@
-import { useRbacStore } from '../store/auth.store';
+import { PERMISSION_ACTIONS, type PermissionAction } from '../constants/permissions.constants';
 import { checkPermissionRaw } from '../lib/rbac.utils';
-import type { Actions } from '@libs/types';
-
-/**
- * Hook to check if a user has a specific permission.
- * path format: "MODULE_NAME.SUB_MODULE_NAME.ACTION"
- * Example: "MAIN_NAVIGATION.DASHBOARD.read"
- */
-export const usePermission = (path: string): boolean => {
-  const permissions = useRbacStore((state) => state.permissions);
-  const rbacMode = useRbacStore((state) => state.rbacMode);
-
-  return checkPermissionRaw(permissions, path, rbacMode);
-};
+import { useRbacStore } from '../store/auth.store';
 
 /**
  * Granular hook for checking specific submodule actions.
  */
 export const useHasAction = (
-  moduleKey: string,
   subModuleKey: string,
-  actionKey: keyof Actions,
+  actionKey: PermissionAction,
 ): boolean => {
   const permissions = useRbacStore((state) => state.permissions);
-  const rbacMode = useRbacStore((state) => state.rbacMode);
 
   return checkPermissionRaw(
     permissions,
-    `${moduleKey}.${subModuleKey}.${actionKey}`,
-    rbacMode,
+    `${subModuleKey}.${actionKey}`,
+  );
+};
+
+/**
+ * Convenience hook: check permission by subModule only.
+ * Example: usePermissionBySubModule('user_list', 'read')
+ */
+export const usePermission = (
+  subModuleKey: string,
+  actionKey: PermissionAction = PERMISSION_ACTIONS.READ,
+): boolean => {
+  const permissions = useRbacStore((state) => state.permissions);
+
+  return checkPermissionRaw(
+    permissions,
+    `${subModuleKey}.${actionKey}`,
   );
 };

@@ -9,6 +9,6 @@ export interface PermissionNode {
   id: number;
   name: string;
   module: string;
-  subModule: Array<PermissionNode> | null;
+  subModule: string;
   actions: PermissionActions;
 }

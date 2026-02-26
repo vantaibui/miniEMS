@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
 import {
+  Box,
   Checkbox,
   Typography,
-  Box,
 } from '@mui/material';
+import { useMemo } from 'react';
 
 import { UiDataTable } from '@libs/ui';
 import type { PaginationResult } from '@services/http';
@@ -15,16 +15,8 @@ interface FlatPermissionNode extends PermissionNode {
 
 const flattenPermissions = (
   nodes: Array<PermissionNode>,
-  depth = 0,
 ): Array<FlatPermissionNode> => {
-  let result: Array<FlatPermissionNode> = [];
-  nodes.forEach((node) => {
-    result.push({ ...node, depth });
-    if (node.subModule && node.subModule.length > 0) {
-      result = [...result, ...flattenPermissions(node.subModule, depth + 1)];
-    }
-  });
-  return result;
+  return nodes.map((node) => ({ ...node, depth: 0 }));
 };
 
 interface RolePermissionMatrixProps {
@@ -259,7 +251,6 @@ export const RolePermissionMatrix = ({
             color: 'text.secondary',
             fontSize: '0.75rem',
             fontWeight: 600,
-            bgcolor: 'background.paper',
             letterSpacing: '0.5px',
           },
         },
