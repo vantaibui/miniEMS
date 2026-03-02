@@ -3,7 +3,7 @@ import {
   Checkbox,
   Typography,
 } from '@mui/material';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { UiDataTable } from '@libs/ui';
 import type { PaginationResult } from '@services/http';
@@ -58,37 +58,40 @@ export const RolePermissionMatrix = ({
 }: RolePermissionMatrixProps) => {
   const flattenedData = useMemo(() => flattenPermissions(permissions), [permissions]);
 
-  const handleToggle = (
-    id: number,
-    action: 'create' | 'read' | 'update' | 'delete',
-  ) => {
-    if (readOnly) return;
+  const handleToggle = useCallback(
+    (
+      id: number,
+      action: 'create' | 'read' | 'update' | 'delete',
+    ) => {
+      if (readOnly) return;
 
-    const existingIndex = selectedPermissions.findIndex((p) => p.id === id);
-    const updated = [...selectedPermissions];
+      const existingIndex = selectedPermissions.findIndex((p) => p.id === id);
+      const updated = [...selectedPermissions];
 
-    if (existingIndex > -1) {
-      const current = updated[existingIndex];
-      updated[existingIndex] = {
-        ...current,
-        actions: {
-          ...current.actions,
-          [action]: !current.actions[action],
-        },
-      };
-    } else {
-      updated.push({
-        id,
-        actions: {
-          create: action === 'create',
-          read: action === 'read',
-          update: action === 'update',
-          delete: action === 'delete',
-        },
-      });
-    }
-    onChange(updated);
-  };
+      if (existingIndex > -1) {
+        const current = updated[existingIndex];
+        updated[existingIndex] = {
+          ...current,
+          actions: {
+            ...current.actions,
+            [action]: !current.actions[action],
+          },
+        };
+      } else {
+        updated.push({
+          id,
+          actions: {
+            create: action === 'create',
+            read: action === 'read',
+            update: action === 'update',
+            delete: action === 'delete',
+          },
+        });
+      }
+      onChange(updated);
+    },
+    [onChange, readOnly, selectedPermissions],
+  );
 
   const columns = useMemo(() => {
     return [
@@ -233,7 +236,7 @@ export const RolePermissionMatrix = ({
         },
       },
     ];
-  }, [selectedPermissions, readOnly]);
+  }, [handleToggle, readOnly, selectedPermissions]);
 
   const total = pagination?.totalElements ?? flattenedData.length;
   const page = pagination?.page ?? 0;

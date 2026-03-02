@@ -1,52 +1,24 @@
+import type {
+  ApiResponse,
+  NormalizedApiError
+} from '@libs/types';
 import type { AxiosRequestConfig, AxiosResponse } from 'axios';
 
-export interface PaginationResult {
-  page: number;
-  size: number;
-  totalElements: number;
-  totalPages: number;
-}
+export type {
+  ApiError,
+  ApiErrorResponse,
+  ApiResponse,
+  ApiSuccessResponse,
+  NormalizedApiError,
+  PaginationResult
+} from '@libs/types';
 
-export interface ErrorDetails {
-  field: string;
-  message: string;
-}
-
-export interface ErrorData {
-  message: string;
-  details?: Array<ErrorDetails>;
-  code?: string;
-}
-
-export interface BaseApiResponse {
-  success: boolean;
-  timestamp: number;
-}
-
-export interface ApiSuccessResponse<T> extends BaseApiResponse {
-  success: true;
-  message: string;
-  data: T;
-  meta?: {
-    pagination?: PaginationResult;
-    [key: string]: unknown;
-  };
-}
-
-export interface ApiErrorResponse extends BaseApiResponse {
-  success: false;
-  error: ErrorData;
-}
-
-export type ApiResponse<T = unknown> = ApiSuccessResponse<T> | ApiErrorResponse;
-
-export interface AppError {
-  message: string;
-  code?: string;
-  fieldErrors?: Record<string, string>;
-  raw?: ApiErrorResponse;
-  status?: number;
-}
+/**
+ * AppError
+ * - Standard error shape thrown by `http.*` methods.
+ * - Alias to `NormalizedApiError` (shared in @libs/types).
+ */
+export type AppError = NormalizedApiError;
 
 export type RequestConfig<D = unknown> = AxiosRequestConfig<D>;
 export type Response<T = unknown> = AxiosResponse<ApiResponse<T>>;

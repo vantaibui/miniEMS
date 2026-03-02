@@ -1,3 +1,3 @@
-export * from './role.dto';
-export * from './permission.dto';
+export * from './role.types';
+export * from './permission.types';
 export * from './role.payload';

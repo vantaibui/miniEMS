@@ -3,7 +3,7 @@ import { lazy, Suspense, type ComponentType } from 'react';
 import type { RouteObject } from 'react-router-dom';
 import { createBrowserRouter } from 'react-router-dom';
 
-import { NotFoundPage } from '@libs/pages';
+import { ForbiddenPage, NotFoundPage } from '@libs/pages';
 import { authRoutes } from '@modules/auth';
 import { deviceRoutes } from '@modules/devices';
 import { rolesRoutes } from '@modules/roles';
@@ -57,6 +57,10 @@ const routes: Array<RouteObject> = [
       ...usersRoutes,
       ...rolesRoutes,
       ...deviceRoutes,
+      {
+        path: '403',
+        element: withSuspense(ForbiddenPage),
+      },
     ],
   },
   {

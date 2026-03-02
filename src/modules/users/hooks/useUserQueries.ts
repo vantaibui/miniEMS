@@ -11,7 +11,7 @@ export type ListResult<T> = {
 export const useUsers = (params: UsersListParams = {}) => {
   return useAppQuery<ApiSuccessResponse<Array<User>>, ListResult<User>>({
     queryKey: queryKeys.users.list(params),
-    queryFn: () => usersApi.getList(params) as Promise<ApiSuccessResponse<Array<User>>>,
+    queryFn: () => usersApi.getList(params),
     select: (response) => ({
       items: response?.data ?? [],
       pagination: response?.meta?.pagination,
@@ -22,7 +22,7 @@ export const useUsers = (params: UsersListParams = {}) => {
 export const useUserDetail = (id: number | string, enabled = true) => {
   return useAppQuery<ApiSuccessResponse<User>, User>({
     queryKey: ['users', 'detail', id],
-    queryFn: () => usersApi.getById(id) as Promise<ApiSuccessResponse<User>>,
+    queryFn: () => usersApi.getById(id),
     select: (response) => response.data,
     enabled,
   });

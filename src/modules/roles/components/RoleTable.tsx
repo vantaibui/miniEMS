@@ -1,21 +1,11 @@
-import {
-  DeleteIcon,
-  EditOutlinedIcon,
-  MoreVertIcon,
-  UiDataTable,
-} from '@libs/ui';
-import FilterListIcon from '@mui/icons-material/FilterList';
+import { DeleteIcon, EditOutlinedIcon, MoreVertIcon, UiDataTable, UiEntityTableCard } from '@libs/ui';
 import {
   Avatar,
   Box,
-  Card,
   IconButton,
   ListItemIcon,
   Menu,
   MenuItem,
-  Select,
-  Tab,
-  Tabs,
   Typography,
 } from '@mui/material';
 import type { PaginationResult } from '@services/http';
@@ -43,7 +33,6 @@ export const RoleTable = ({
 }: RoleTableProps) => {
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
-  const [tabValue, setTabValue] = useState(0);
 
   const { canEdit: canEditRole, canDelete: canDeleteRole } = useRolePermissions();
 
@@ -151,141 +140,44 @@ export const RoleTable = ({
   }, [page, size, canEditRole, canDeleteRole]);
 
   return (
-    <Card
-      sx={{
-        borderRadius: 3,
-        boxShadow: '0px 2px 10px rgba(0,0,0,0.05)',
-      }}
-    >
-      <Box
-        sx={{
-          p: 2,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-        }}
+    <>
+      <UiEntityTableCard
+        total={total}
+        page={page}
+        size={size}
+        entityLabelPlural="Roles"
+        filterLabel="All Role Types"
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Select
-            value="All"
-            size="small"
-            sx={{
-              minWidth: 160,
-              bgcolor: 'transparent',
-              '& .MuiOutlinedInput-notchedOutline': { borderColor: 'divider' },
-              '& .MuiSelect-select': {
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-              },
-              fontWeight: 600,
-              fontSize: '0.875rem',
-            }}
-            displayEmpty
-            renderValue={() => (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <FilterListIcon
-                  fontSize="small"
-                  sx={{ color: 'text.secondary' }}
-                />
-                All Role Types
-              </Box>
-            )}
-          >
-            <MenuItem value="All">All Role Types</MenuItem>
-          </Select>
-
-          <Tabs
-            value={tabValue}
-            onChange={(_, val) => setTabValue(val)}
-            sx={{
-              minHeight: 36,
-              '& .MuiTab-root': {
-                minHeight: 36,
-                py: 0.5,
-                px: 2,
-                textTransform: 'none',
-                fontWeight: 500,
-                color: 'text.secondary',
-              },
-              '& .Mui-selected': { color: 'text.primary', fontWeight: 600 },
-              '& .MuiTabs-indicator': { display: 'none' }, // Using background indicator conceptually or simply hidden for tabs
-              bgcolor: 'transparent',
-            }}
-          >
-            <Tab label="All" />
-            <Tab label="Active" />
-            <Tab label="Draft" />
-          </Tabs>
-        </Box>
-        <Typography
-          variant="body2"
-          sx={{
-            color: 'text.secondary',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            fontWeight: 500,
-          }}
-        >
-          <Box
-            component="span"
-            sx={{
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              bgcolor: 'primary.main',
-              display: 'inline-block',
-            }}
+        <Box>
+          <UiDataTable
+            aria-label="Roles table"
+            rows={rows}
+            columns={columns}
+            getRowId={(role) => role.id}
+            loading={loading}
+            pagination={
+              pagination
+                ? {
+                    page,
+                    rowsPerPage: size,
+                    total,
+                    onPageChange: (newPage) =>
+                      onPaginationChange({ page: newPage, size }),
+                    onRowsPerPageChange: (newSize) =>
+                      onPaginationChange({ page: 0, size: newSize }),
+                  }
+                : undefined
+            }
+            emptyState={
+              <div className="py-10 text-center">
+                <Typography variant="body2" color="text.secondary">
+                  No roles found.
+                </Typography>
+              </div>
+            }
           />
-          Showing {page * size + 1}-{size} of {total} Roles
-        </Typography>
-      </Box>
-
-      <Box
-        sx={{
-          '& .MuiTableHead-root': {
-            '& .MuiTableCell-root': {
-              color: 'text.secondary',
-              fontSize: '0.75rem',
-              fontWeight: 600,
-              bgcolor: 'transparent',
-              letterSpacing: '0.5px',
-            },
-          },
-          '& > div': { boxShadow: 'none', borderRadius: 0 },
-        }}
-      >
-        <UiDataTable
-          aria-label="Roles table"
-          rows={rows}
-          columns={columns}
-          getRowId={(role) => role.id}
-          loading={loading}
-          pagination={
-            pagination
-              ? {
-                  page,
-                  rowsPerPage: size,
-                  total,
-                  onPageChange: (newPage) =>
-                    onPaginationChange({ page: newPage, size }),
-                  onRowsPerPageChange: (newSize) =>
-                    onPaginationChange({ page: 0, size: newSize }),
-                }
-              : undefined
-          }
-          emptyState={
-            <div className="py-10 text-center">
-              <Typography variant="body2" color="text.secondary">
-                No roles found.
-              </Typography>
-            </div>
-          }
-        />
-      </Box>
+        </Box>
+      </UiEntityTableCard>
 
       <Menu
         anchorEl={menuAnchor}
@@ -328,6 +220,6 @@ export const RoleTable = ({
           </MenuItem>
         )}
       </Menu>
-    </Card>
+    </>
   );
 };

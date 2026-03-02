@@ -1,11 +1,9 @@
 import { keycloak, login, refreshToken } from '@modules/auth';
 import type {
   AxiosInstance,
-  AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios';
-import { mapBackendErrorToAppError, mapUnknownToAppError } from './http.error';
-import type { ApiErrorResponse, ApiResponse } from './http.types';
+import { mapUnknownToAppError } from './http.error';
 
 interface RetryableRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
@@ -42,16 +40,7 @@ export const attachInterceptors = (instance: AxiosInstance) => {
   );
 
   instance.interceptors.response.use(
-    (response: AxiosResponse<ApiResponse<unknown>>) => {
-      const data = response.data;
-      if (data && !data.success) {
-        throw mapBackendErrorToAppError(
-          data as ApiErrorResponse,
-          response.status,
-        );
-      }
-      return response;
-    },
+    (response) => response,
     async (error) => {
       const config = error.config as RetryableRequestConfig | undefined;
       const status = error.response?.status;

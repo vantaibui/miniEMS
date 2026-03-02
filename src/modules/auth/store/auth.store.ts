@@ -3,11 +3,12 @@ import { devtools } from 'zustand/middleware';
 
 import type {
   AuthState,
+  CurrentUser,
   PermissionNode,
-  UserMe,
   UserProfile,
 } from '@libs/types';
-import type { AppError, ApiSuccessResponse } from '@services/http';
+import type { AppError } from '@services/http';
+import { authService } from '../api/auth.api';
 import { login, logout } from '../api/keycloak';
 
 export interface KeycloakAuthState {
@@ -43,7 +44,6 @@ export const useAuthStore = create<KeycloakAuthState>()(
     { name: 'AuthStore' },
   ),
 );
-import { authService } from '../api/auth.api';
 
 const initialState: Pick<
   AuthState,
@@ -71,7 +71,7 @@ export const useRbacStore = create<AuthState>()(
     (set, get) => ({
       ...initialState,
 
-      setUser: (user: UserMe | null) => set({ user }),
+      setUser: (user: CurrentUser | null) => set({ user }),
       setPermissions: (permissions: Array<PermissionNode> | null) =>
         set({ permissions }),
       setLoading: (isLoading: boolean) => set({ isLoading }),
@@ -100,7 +100,7 @@ export const useRbacStore = create<AuthState>()(
 
         try {
           const userResponse = await authService.getMe();
-          const user = (userResponse as ApiSuccessResponse<UserMe>).data;
+          const user = userResponse.data;
           set({ user });
 
           const roleId = user.roleId;
@@ -112,9 +112,7 @@ export const useRbacStore = create<AuthState>()(
           const permissionsResponse =
             await authService.getPermissions(roleId);
           set({
-            permissions: (
-              permissionsResponse as ApiSuccessResponse<Array<PermissionNode>>
-            ).data,
+            permissions: permissionsResponse.data,
             isInitialized: true,
           });
         } catch (err: unknown) {

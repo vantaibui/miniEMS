@@ -5,11 +5,9 @@ import { PERMISSION_ACTIONS, type PermissionAction } from './permissions.constan
  * These values must match `PermissionNode.subModule` returned by the backend.
  */
 export const PERMISSION_SUBMODULES = {
-  ACCESS_MANAGEMENT: 'ACCESS_MANAGEMENT',
   USER_MANAGEMENT: 'USER_MANAGEMENT',
   ROLE_MANAGEMENT: 'ROLE_MANAGEMENT',
 
-  ASSET_MANAGEMENT: 'ASSET_MANAGEMENT',
   DEVICE_INVENTORY: 'DEVICE_INVENTORY',
   DEVICE_CONFIGURATION: 'DEVICE_CONFIGURATION',
 } as const;

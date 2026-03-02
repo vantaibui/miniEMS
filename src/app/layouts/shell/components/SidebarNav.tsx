@@ -22,13 +22,13 @@ const isAllowed = (
   permission?: NavPermission,
 ) => {
   // Default to allow when no permission is configured
+  
   if (!permission) {
     return true;
   }
 
   const action = permission.action ?? 'read';
   const path = `${permission.subModule}.${action}`;
-
   return checkPermissionRaw(permissions, path);
 };
 

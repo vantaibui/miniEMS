@@ -2,6 +2,7 @@ export * from './hooks/useAuth';
 export * from './hooks/useAuthQueries';
 export * from './hooks/usePermission';
 export * from './components/guards/PermissionGuard';
+export * from './lib/route-helpers';
 export * from './providers/AuthProvider';
 export * from './providers/AuthContext';
 export * from '@libs/types';

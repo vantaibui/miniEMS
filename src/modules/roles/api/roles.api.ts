@@ -27,12 +27,12 @@ export const rolesApi = {
   async getList(params?: RolesListParams): Promise<ApiSuccessResponse<Array<Role>>> {
     return await http.get<Array<Role>>(
       ROLES_ENDPOINTS.LIST,
-      { params: params as Record<string, unknown> }
-    ) as ApiSuccessResponse<Array<Role>>;
+      { params: params as Record<string, unknown> },
+    );
   },
 
   async getById(id: number | string): Promise<ApiSuccessResponse<RoleDetails>> {
-    return await crud.getById(id) as ApiSuccessResponse<RoleDetails>;
+    return await crud.getById(id);
   },
 
   async getPermissions(
@@ -44,7 +44,7 @@ export const rolesApi = {
       {
         params,
       },
-    ) as ApiSuccessResponse<Array<PermissionNode>>;
+    );
   },
 
   async getAllPermissions(
@@ -53,21 +53,21 @@ export const rolesApi = {
     return await http.get<Array<PermissionNode>>(
       ROLES_ENDPOINTS.ALL_PERMISSIONS,
       { params: params as Record<string, unknown> }
-    ) as ApiSuccessResponse<Array<PermissionNode>>;
+    );
   },
 
   async create(payload: CreateRolePayload): Promise<ApiSuccessResponse<RoleDetails>> {
-    return await crud.create(payload) as ApiSuccessResponse<RoleDetails>;
+    return await crud.create(payload);
   },
 
   async update(
     id: number | string,
     payload: UpdateRolePayload,
   ): Promise<ApiSuccessResponse<RoleDetails>> {
-    return await crud.update(id, payload) as ApiSuccessResponse<RoleDetails>;
+    return await crud.update(id, payload);
   },
 
   async delete(id: number | string): Promise<ApiSuccessResponse<void>> {
-    return await (crud.delete(id) as unknown as Promise<ApiSuccessResponse<void>>);
+    return await crud.delete(id);
   },
 };

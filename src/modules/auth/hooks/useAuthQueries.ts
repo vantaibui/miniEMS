@@ -1,5 +1,5 @@
 import { queryKeys, useAppQuery } from '@libs/query';
-import type { PermissionNode, UserMe } from '@libs/types';
+import type { PermissionNode, CurrentUser } from '@libs/types';
 import type { ApiSuccessResponse } from '@services/http';
 
 import { authService, type PaginationParams } from '../api/auth.api';
@@ -8,10 +8,10 @@ import { useAuthStore } from '../store/auth.store';
 export const useAuthMe = () => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
-  return useAppQuery<ApiSuccessResponse<UserMe>, UserMe>({
+  return useAppQuery<ApiSuccessResponse<CurrentUser>, CurrentUser>({
     queryKey: queryKeys.auth.me(),
     queryFn: () =>
-      authService.getMe() as Promise<ApiSuccessResponse<UserMe>>,
+      authService.getMe() as Promise<ApiSuccessResponse<CurrentUser>>,
     select: (response) => response.data,
     enabled: isAuthenticated,
   });

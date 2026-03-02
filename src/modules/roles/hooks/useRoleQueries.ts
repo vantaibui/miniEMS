@@ -11,8 +11,7 @@ export type ListResult<T> = {
 export const useRoles = (params: RolesListParams = {}) => {
   return useAppQuery<ApiSuccessResponse<Array<Role>>, ListResult<Role>>({
     queryKey: ['roles', 'list', params],
-    queryFn: () =>
-      rolesApi.getList(params) as Promise<ApiSuccessResponse<Array<Role>>>,
+    queryFn: () => rolesApi.getList(params),
     select: (response) => ({
       items: response?.data ?? [],
       pagination: response?.meta?.pagination,
@@ -27,7 +26,7 @@ export const useRoleDetail = (id: number | string | undefined) => {
       if (id === undefined || id === null) {
         throw new Error('Role id is required');
       }
-      return rolesApi.getById(id) as Promise<ApiSuccessResponse<RoleDetails>>;
+      return rolesApi.getById(id);
     },
     select: (response) => response.data,
     enabled: id !== undefined && id !== null,
@@ -40,10 +39,7 @@ export const usePermissions = (params: RolesListParams = {}) => {
     ListResult<PermissionNode>
   >({
     queryKey: ['roles', 'permissions', params],
-    queryFn: () =>
-      rolesApi.getAllPermissions(params) as Promise<
-        ApiSuccessResponse<Array<PermissionNode>>
-      >,
+    queryFn: () => rolesApi.getAllPermissions(params),
     select: (response) => ({
       items: (response?.data ?? []).map((permission) => ({
         ...permission,
@@ -71,9 +67,7 @@ export const usePermissionsById = (
     queryFn: () => {
       if (!roleId) throw new Error('Role id is required');
 
-      return rolesApi.getPermissions(roleId, params) as Promise<
-        ApiSuccessResponse<Array<PermissionNode>>
-      >;
+      return rolesApi.getPermissions(roleId, params);
     },
     select: (response) => ({
       items: response?.data ?? [],

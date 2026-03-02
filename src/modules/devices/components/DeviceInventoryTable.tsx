@@ -1,8 +1,5 @@
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
-  Avatar,
   Box,
   IconButton,
   ListItemIcon,
@@ -13,13 +10,14 @@ import {
 } from '@mui/material';
 import React, { useMemo, useState } from 'react';
 
-import type { PaginationResult } from '@/services/http';
-import { UiEntityTableCard, UiDataTable } from '@libs/ui';
-import { useUserPermissions } from '../hooks';
-import type { User } from '../types';
+import type { PaginationResult } from '@services/http';
+import { UiDataTable, UiEntityTableCard } from '@libs/ui';
 
-interface UserTableProps {
-  rows: Array<User>;
+import type { Device } from '../types';
+import { useDeviceInventoryPermissions } from '../hooks/useDeviceInventoryPermissions';
+
+interface DeviceInventoryTableProps {
+  rows: Array<Device>;
   loading?: boolean;
   onEdit: (id: number) => void;
   onDelete: (id: number) => void;
@@ -27,35 +25,36 @@ interface UserTableProps {
   onPaginationChange: (next: { page: number; size: number }) => void;
 }
 
-export const UserTable = ({
+export const DeviceInventoryTable = ({
   rows,
   loading,
   onEdit,
   onDelete,
   pagination,
   onPaginationChange,
-}: UserTableProps) => {
+}: DeviceInventoryTableProps) => {
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-  const { canEdit: canEditUser, canDelete: canDeleteUser } = useUserPermissions();
+  const [selectedDeviceId, setSelectedDeviceId] = useState<number | null>(null);
 
-  const openMenu = (event: React.MouseEvent<HTMLElement>, userId: number) => {
+  const { canEdit, canDelete } = useDeviceInventoryPermissions();
+
+  const openMenu = (event: React.MouseEvent<HTMLElement>, deviceId: number) => {
     setMenuAnchor(event.currentTarget);
-    setSelectedUserId(userId);
+    setSelectedDeviceId(deviceId);
   };
 
   const closeMenu = () => {
     setMenuAnchor(null);
-    setSelectedUserId(null);
+    setSelectedDeviceId(null);
   };
 
   const handleEditClick = () => {
-    if (onEdit && selectedUserId) onEdit(selectedUserId);
+    if (onEdit && selectedDeviceId != null) onEdit(selectedDeviceId);
     closeMenu();
   };
 
   const handleDeleteClick = () => {
-    if (onDelete && selectedUserId) onDelete(selectedUserId);
+    if (onDelete && selectedDeviceId != null) onDelete(selectedDeviceId);
     closeMenu();
   };
 
@@ -70,39 +69,34 @@ export const UserTable = ({
         header: '#',
         width: 50,
         align: 'center' as const,
-        render: (_: User, index: number) => (
+        render: (_: Device, index: number) => (
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             {page * size + index + 1}
           </Typography>
         ),
       },
       {
-        key: 'userIdentity',
-        header: 'USER IDENTITY',
-        render: (row: User) => (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Avatar
-              sx={{ width: 40, height: 40 }}
-              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(row.firstName + row.lastName)}&background=random`}
-            />
-            <Box>
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: 600, color: 'text.primary' }}
-              >
-                {row.firstName}
-              </Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                {row.email}
-              </Typography>
-            </Box>
+        key: 'name',
+        header: 'DEVICE',
+        render: (device: Device) => (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 600, color: 'text.primary' }}
+            >
+              {device.name}
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{ color: 'text.secondary' }}
+            >{`SN: ${device.serialNumber}`}</Typography>
           </Box>
         ),
       },
       {
         key: 'status',
         header: 'STATUS',
-        render: (row: User) => (
+        render: (device: Device) => (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Box
               component="span"
@@ -110,7 +104,7 @@ export const UserTable = ({
                 width: 8,
                 height: 8,
                 borderRadius: '50%',
-                bgcolor: row.status ? '#10b981' : '#9ca3af',
+                bgcolor: device.status === 'ACTIVE' ? '#10b981' : '#9ca3af',
                 display: 'inline-block',
               }}
             />
@@ -118,20 +112,30 @@ export const UserTable = ({
               variant="body2"
               sx={{
                 fontWeight: 600,
-                color: row.status ? 'text.primary' : 'text.secondary',
+                color:
+                  device.status === 'ACTIVE' ? 'text.primary' : 'text.secondary',
               }}
             >
-              {row.status ? 'Active' : 'Inactive'}
+              {device.status === 'ACTIVE' ? 'Active' : 'Inactive'}
             </Typography>
           </Box>
         ),
       },
       {
-        key: 'lastActivity',
-        header: 'LAST ACTIVITY',
-        render: () => (
+        key: 'location',
+        header: 'LOCATION',
+        render: (device: Device) => (
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Just now
+            {device.location || 'N/A'}
+          </Typography>
+        ),
+      },
+      {
+        key: 'lastSeenAt',
+        header: 'LAST SEEN',
+        render: (device: Device) => (
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            {device.lastSeenAt || '—'}
           </Typography>
         ),
       },
@@ -139,15 +143,19 @@ export const UserTable = ({
         key: 'actions',
         header: 'ACTIONS',
         align: 'right' as const,
-        render: (row: User) =>
-          canEditUser || canDeleteUser ? (
-            <IconButton size="small" onClick={(e) => openMenu(e, row.id)}>
+        render: (device: Device) =>
+          canEdit || canDelete ? (
+            <IconButton
+              size="small"
+              onClick={(e) => openMenu(e, device.id)}
+              aria-label="Device actions"
+            >
               <MoreVertIcon fontSize="small" />
             </IconButton>
           ) : null,
       },
     ];
-  }, [page, size, canEditUser, canDeleteUser]);
+  }, [page, size, canEdit, canDelete]);
 
   return (
     <>
@@ -155,12 +163,12 @@ export const UserTable = ({
         total={total}
         page={page}
         size={size}
-        entityLabelPlural="Users"
-        filterLabel="All Departments"
+        entityLabelPlural="Devices"
+        filterLabel="All Device Types"
       >
         <Box>
           <UiDataTable
-            aria-label="Users table"
+            aria-label="Devices table"
             rows={rows}
             columns={columns}
             getRowId={(row) => row.id}
@@ -181,7 +189,7 @@ export const UserTable = ({
             emptyState={
               <div className="py-10 text-center">
                 <Typography variant="body2" color="text.secondary">
-                  No users found.
+                  No devices found.
                 </Typography>
               </div>
             }
@@ -202,18 +210,19 @@ export const UserTable = ({
           },
         }}
       >
-        {canEditUser && (
+        {canEdit && (
           <MenuItem onClick={handleEditClick}>
             <ListItemIcon>
-              <EditIcon fontSize="small" />
+              {/* Reuse generic edit icon from MUI to keep component local */}
+              <MoreVertIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText>Edit User</ListItemText>
+            <ListItemText>Edit Device</ListItemText>
           </MenuItem>
         )}
-        {canDeleteUser && (
+        {canDelete && (
           <MenuItem onClick={handleDeleteClick} sx={{ color: 'error.main' }}>
             <ListItemIcon>
-              <DeleteIcon fontSize="small" color="error" />
+              <MoreVertIcon fontSize="small" color="error" />
             </ListItemIcon>
             <ListItemText>Delete</ListItemText>
           </MenuItem>
@@ -222,3 +231,4 @@ export const UserTable = ({
     </>
   );
 };
+

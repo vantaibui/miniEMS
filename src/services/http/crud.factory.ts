@@ -12,7 +12,7 @@ export const createResourceApi = <
   endpoints: Endpoints,
 ) => ({
   getList: (params?: Record<string, unknown>) =>
-    http.get<TEntity>(endpoints.base, { params }),
+    http.get<Array<TEntity>>(endpoints.base, { params }),
 
   getById: (id: number | string) =>
     http.get<TEntity>(`${endpoints.base}/${id}`),

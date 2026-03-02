@@ -30,10 +30,6 @@ export const NAV_ACCESS: Array<NavGroup> = [
   {
     key: 'access',
     section: 'ACCESS MANAGEMENT',
-    permission: {
-      subModule: PERMISSION_SUBMODULES.ACCESS_MANAGEMENT,
-      action: 'read',
-    },
     items: [
       {
         key: 'users',
@@ -63,10 +59,6 @@ export const NAV_ASSET: Array<NavGroup> = [
   {
     key: 'asset',
     section: 'ASSET MANAGEMENT',
-    permission: {
-      subModule: PERMISSION_SUBMODULES.ASSET_MANAGEMENT,
-      action: 'read',
-    },
     items: [
       {
         key: 'device_inventory',
