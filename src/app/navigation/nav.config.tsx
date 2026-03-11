@@ -66,7 +66,7 @@ export const NAV_ASSET: Array<NavGroup> = [
         to: '/device-inventory',
         icon: <PeopleAltOutlinedIcon fontSize="small" />,
         permission: {
-          subModule: PERMISSION_SUBMODULES.DEVICE_INVENTORY,
+          subModule: PERMISSION_SUBMODULES.DEVICE_MANAGEMENT,
           action: 'read',
         },
       },
@@ -85,7 +85,7 @@ export const NAV_ASSET: Array<NavGroup> = [
 ];
 
 export const NAV_MANAGEMENT: Array<NavGroup> = [
-  ...NAV_MAIN,
+  // ...NAV_MAIN,
   ...NAV_ACCESS,
   ...NAV_ASSET,
 ];

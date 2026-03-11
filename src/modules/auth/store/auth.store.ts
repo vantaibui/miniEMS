@@ -1,12 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
-import type {
-  AuthState,
-  CurrentUser,
-  PermissionNode,
-  UserProfile,
-} from '@libs/types';
+import type { AuthState, PermissionNode, User } from '@libs/types';
 import type { AppError } from '@services/http';
 import { authService } from '../api/auth.api';
 import { login, logout } from '../api/keycloak';
@@ -15,13 +10,11 @@ export interface KeycloakAuthState {
   isAuthenticated: boolean;
   token?: string;
   refreshToken?: string;
-  userProfile: UserProfile | null;
   isInitialized: boolean;
   setAuth: (payload: {
     isAuthenticated: boolean;
     token?: string;
     refreshToken?: string;
-    userProfile: UserProfile | null;
   }) => void;
   setInitialized: (isInitialized: boolean) => void;
   login: (redirectUri?: string) => Promise<void>;
@@ -34,7 +27,6 @@ export const useAuthStore = create<KeycloakAuthState>()(
       isAuthenticated: false,
       token: undefined,
       refreshToken: undefined,
-      userProfile: null,
       isInitialized: false,
       setAuth: (payload) => set((state) => ({ ...state, ...payload })),
       setInitialized: (isInitialized) => set({ isInitialized }),
@@ -71,7 +63,7 @@ export const useRbacStore = create<AuthState>()(
     (set, get) => ({
       ...initialState,
 
-      setUser: (user: CurrentUser | null) => set({ user }),
+      setUser: (user: User | null) => set({ user }),
       setPermissions: (permissions: Array<PermissionNode> | null) =>
         set({ permissions }),
       setLoading: (isLoading: boolean) => set({ isLoading }),
@@ -109,8 +101,7 @@ export const useRbacStore = create<AuthState>()(
             return;
           }
 
-          const permissionsResponse =
-            await authService.getPermissions(roleId);
+          const permissionsResponse = await authService.getPermissions(roleId);
           set({
             permissions: permissionsResponse.data,
             isInitialized: true,

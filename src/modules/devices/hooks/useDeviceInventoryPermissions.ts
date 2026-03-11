@@ -1,15 +1,16 @@
-import { PERMISSION_ACTIONS } from '@modules/auth/constants/permissions.constants';
-import { PERMISSION_SUBMODULES } from '@modules/auth/constants/permission.keys';
-import { useHasAction } from '@modules/auth';
+import {
+  PERMISSION_ACTIONS,
+  PERMISSION_SUBMODULES,
+  usePermission,
+} from '@modules/auth';
 
 export const useDeviceInventoryPermissions = () => {
-  const subModule = PERMISSION_SUBMODULES.DEVICE_INVENTORY;
+  const subModuleKey = PERMISSION_SUBMODULES.DEVICE_MANAGEMENT;
 
   return {
-    canView: useHasAction(subModule, PERMISSION_ACTIONS.READ),
-    canCreate: useHasAction(subModule, PERMISSION_ACTIONS.CREATE),
-    canEdit: useHasAction(subModule, PERMISSION_ACTIONS.UPDATE),
-    canDelete: useHasAction(subModule, PERMISSION_ACTIONS.DELETE),
+    canView: usePermission(subModuleKey, PERMISSION_ACTIONS.READ),
+    canCreate: usePermission(subModuleKey, PERMISSION_ACTIONS.CREATE),
+    canEdit: usePermission(subModuleKey, PERMISSION_ACTIONS.UPDATE),
+    canDelete: usePermission(subModuleKey, PERMISSION_ACTIONS.DELETE),
   };
 };
-

@@ -1,6 +1,6 @@
+import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Box } from '@mui/material';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 
@@ -16,38 +16,15 @@ export const AppShellLayout = ({
   sidebarContent,
 }: AppShellLayoutProps) => {
   return (
-    <Box
-      sx={{
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        bgcolor: 'background.default',
-      }}
-    >
+    <Box className="flex h-screen flex-col overflow-hidden bg-surface-page">
       <Header height={headerHeight} sidebarWidth={sidebarWidth} />
 
-      <Box
-        sx={{
-          display: 'flex',
-          flex: 1,
-          minHeight: 0,
-          borderTop: 1,
-          borderColor: 'divider',
-        }}
-      >
+      <Box className="flex min-h-0 flex-1 border-t border-divider">
         <Sidebar width={sidebarWidth}>{sidebarContent}</Sidebar>
 
         <Box
           component="main"
-          sx={{
-            flexGrow: 1,
-            minWidth: 0,
-            minHeight: 0,
-            overflow: 'auto',
-            bgcolor: '#F7FAFC',
-            p: { xs: 2, md: 3 },
-          }}
+          className="min-h-0 min-w-0 flex-1 overflow-auto bg-surface-page p-2 md:p-3"
         >
           <Outlet />
         </Box>

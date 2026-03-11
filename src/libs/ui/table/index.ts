@@ -1,4 +1,3 @@
 export * from './UiDataTable';
+export * from './UiEntityTable';
 export type * from './UiDataTable.types';
-export * from './UiEntityTableCard';
-

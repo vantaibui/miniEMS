@@ -1,9 +1,7 @@
 import { createContext } from 'react';
-import type { UserProfile } from '@libs/types';
 
 export interface AuthContextType {
   isAuthenticated: boolean;
-  user: UserProfile | null;
   token: string | null;
   loading: boolean;
   login: (redirectUri?: string) => Promise<void>;

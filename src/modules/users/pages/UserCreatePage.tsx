@@ -80,8 +80,8 @@ export const UserCreatePage = () => {
           onCancel={() => navigate('/users')}
           isLoading={isCreating}
           submitLabel="Save User"
-          permissionsPagination={permissionsPagination}
-          onPermissionsPaginationChange={setPagination}
+          pagination={permissionsPagination}
+          onPaginationChange={setPagination}
           isPermissionsLoading={isLoadingPermissions}
         />
       </Box>

@@ -1,12 +1,5 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import type { TokenPayload, UserProfile } from '@libs/types';
 import { useAuthStore } from '@/modules/auth/store/auth.store';
 import {
   initKeycloak,
@@ -25,7 +18,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const setInitializedZustand = useAuthStore((s) => s.setInitialized);
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [user, setUser] = useState<UserProfile | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -36,37 +28,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsAuthenticated(authenticated);
     setToken(keycloak.token || null);
 
-    if (authenticated && keycloak.tokenParsed) {
-      const profile = keycloak.tokenParsed as TokenPayload;
-
-      const userProfile: UserProfile = {
-        id: profile.sub,
-        username: profile.preferred_username,
-        email: profile.email,
-        firstName: profile.given_name,
-        lastName: profile.family_name,
-        fullName: profile.name,
-        roles: profile.realm_access?.roles || keycloak.realmAccess?.roles || [],
-      };
-
-      setUser(userProfile);
-
-      // Sync to Zustand (used by ProtectedRoute)
+    if (authenticated) {
       setAuth({
         isAuthenticated: true,
         token: keycloak.token,
         refreshToken: keycloak.refreshToken,
-        userProfile,
       });
     } else {
-      setUser(null);
-
-      // Sync to Zustand
       setAuth({
         isAuthenticated: false,
         token: undefined,
         refreshToken: undefined,
-        userProfile: null,
       });
     }
   }, [setAuth]);
@@ -85,7 +57,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     let stopWatcher: (() => void) | undefined;
 
-    // 1. Set up handlers BEFORE init to catch early events
     keycloak.onTokenExpired = () => {
       refreshToken(30).catch(() => {
         console.error('Token refresh failed, redirecting to login');
@@ -98,14 +69,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     keycloak.onAuthLogout = () => {
       setIsAuthenticated(false);
       setToken(null);
-      setUser(null);
 
-      // Sync to Zustand
       setAuth({
         isAuthenticated: false,
         token: undefined,
         refreshToken: undefined,
-        userProfile: null,
       });
     };
 
@@ -125,12 +93,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       } catch (error) {
         console.error('Failed to initialize Keycloak', error);
       } finally {
-        setInitializedZustand(true); // Unblock ProtectedRoute
+        setInitializedZustand(true);
         setLoading(false);
       }
     };
 
-    init();
+    void init();
 
     return () => {
       if (stopWatcher) stopWatcher();
@@ -144,13 +112,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const value = useMemo(
     () => ({
       isAuthenticated,
-      user,
       token,
       loading,
       login: handleLogin,
       logout: handleLogout,
     }),
-    [isAuthenticated, user, token, loading, handleLogin, handleLogout],
+    [isAuthenticated, token, loading, handleLogin, handleLogout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

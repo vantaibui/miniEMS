@@ -89,6 +89,10 @@
   --color-background-default: rgb(var(--mui-palette-background-defaultChannel));
   --color-background-paper: rgb(var(--mui-palette-background-paperChannel));
 
+  /* Semantic surface aliases for Tailwind utilities */
+  --color-surface-page: rgb(var(--mui-palette-background-defaultChannel));
+  --color-surface-card: rgb(var(--mui-palette-background-paperChannel));
+
   /* -----------------------------
    * Layout Tokens
    * ----------------------------- */

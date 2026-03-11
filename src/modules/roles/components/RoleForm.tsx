@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { UiButton, UiFormField, UiInput } from '@libs/ui';
+import { UiButton, UiFormActions, UiFormField, UiInput } from '@libs/ui';
 import { Box, Card, Divider, Grid, Stack, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -179,64 +179,26 @@ export const RoleForm = ({
             />
           </Box>
           <Divider />
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              mt: 4,
-            }}
-          >
-            <Box>
-              {isEdit && onDelete && (
+          <UiFormActions
+            onCancel={onCancel}
+            cancelDisabled={isLoading}
+            submitDisabled={isLoading || !isDirty || !isValid}
+            loading={isLoading}
+            submitLabel={submitLabel}
+            leadingActions={
+              isEdit && onDelete ? (
                 <UiButton
+                  type="button"
                   variant="outlined"
                   color="error"
                   startIcon={<DeleteIcon />}
                   onClick={onDelete}
-                   sx={{
-                    fontWeight: 600,
-                    px: 2,
-                    borderColor: 'error.light',
-                    '&:hover': { bgcolor: 'error.50' },
-                  }}
                 >
                   Delete Role
                 </UiButton>
-              )}
-            </Box>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <UiButton
-                variant="outlined"
-                onClick={onCancel}
-                disabled={isLoading}
-                sx={{
-                  px: 3,
-                  fontWeight: 600,
-                  color: 'text.primary',
-                  borderColor: 'divider',
-                }}
-              >
-                Cancel
-              </UiButton>
-              <UiButton
-                type="submit"
-                variant="contained"
-                disabled={isLoading || !isDirty || !isValid}
-                loading={isLoading}
-                sx={{
-                  px: 3,
-                  '&.Mui-disabled': {
-                    bgcolor: 'primary.main',
-                    color: 'common.white',
-                    opacity: 0.5,
-                  },
-                }}
-              >
-                {submitLabel}
-              </UiButton>
-            </Box>
-          </Box>
+              ) : undefined
+            }
+          />
         </Stack>
       </Card>
     </Box>

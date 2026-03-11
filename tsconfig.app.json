@@ -28,6 +28,7 @@
       "@/*": ["./src/*"],
       "@modules/*": ["./src/modules/*"],
       "@app/*": ["./src/app/*"],
+      "@libs/*": ["./src/libs/*"],
       "@libs/ui": ["./src/libs/ui/index.ts"],
       "@libs/utils": ["./src/libs/utils/index.ts"],
       "@libs/types": ["./src/libs/types/index.ts"],
@@ -40,6 +41,5 @@
       "@services/*": ["./src/services/*"]
     }
   },
-  "include": ["src"],
-  "exclude": ["src/**/__tests__/**", "src/**/*.test.ts", "src/**/*.test.tsx"]
+  "include": ["src"]
 }

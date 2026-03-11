@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { cn } from '../utils/cn';
+import { Box } from '@mui/material';
 
 export interface UiToolbarProps {
   left?: ReactNode;
@@ -16,7 +17,7 @@ export function UiToolbar({
   className,
 }: UiToolbarProps) {
   return (
-    <div
+    <Box
       className={cn(
         'flex min-w-0 items-center justify-between gap-3',
         className,
@@ -26,10 +27,10 @@ export function UiToolbar({
         children
       ) : (
         <>
-          <div className="flex min-w-0 items-center gap-3">{left}</div>
-          <div className="flex min-w-0 items-center gap-3">{right}</div>
+          <Box className="flex min-w-0 items-center gap-3">{left}</Box>
+          <Box className="flex min-w-0 items-center gap-3">{right}</Box>
         </>
       )}
-    </div>
+    </Box>
   );
 }

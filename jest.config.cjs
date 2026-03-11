@@ -1,0 +1,21 @@
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'jsdom',
+  roots: ['<rootDir>/src'],
+  testMatch: ['**/*.test.ts', '**/*.test.tsx'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '^@modules/(.*)$': '<rootDir>/src/modules/$1',
+    '^@app/(.*)$': '<rootDir>/src/app/$1',
+    '^@libs/ui$': '<rootDir>/src/libs/ui/index.ts',
+    '^@libs/utils$': '<rootDir>/src/libs/utils/index.ts',
+    '^@libs/types$': '<rootDir>/src/libs/types/index.ts',
+    '^@libs/store$': '<rootDir>/src/libs/store/index.ts',
+    '^@libs/constants$': '<rootDir>/src/libs/constants/index.ts',
+    '^@libs/query$': '<rootDir>/src/libs/query/index.ts',
+    '^@libs/hooks$': '<rootDir>/src/libs/hooks/index.ts',
+    '^@libs/configs$': '<rootDir>/src/libs/configs/index.ts',
+    '^@libs/pages$': '<rootDir>/src/libs/pages/index.ts',
+    '^@services/(.*)$': '<rootDir>/src/services/$1',
+  },
+};

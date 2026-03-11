@@ -1,16 +1,15 @@
 import { Box, CircularProgress } from '@mui/material';
-import { lazy, Suspense, type ComponentType } from 'react';
+import { Suspense, type ComponentType } from 'react';
 import type { RouteObject } from 'react-router-dom';
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 
-import { ForbiddenPage, NotFoundPage } from '@libs/pages';
+import { deviceRoutes } from '@/modules/devices';
+import { NotFoundPage } from '@libs/pages';
 import { authRoutes } from '@modules/auth';
-import { deviceRoutes } from '@modules/devices';
 import { rolesRoutes } from '@modules/roles';
 import { usersRoutes } from '@modules/users';
 import { AuthLayout, RootLayout } from '../layouts';
 import { ProtectedRoute } from './ProtectedRoute';
-const HomePage = lazy(() => import('@/modules/dashboard/pages/HomePage'));
 
 /**
  * Centrally managed route registry for the application shell.
@@ -52,15 +51,11 @@ const routes: Array<RouteObject> = [
     children: [
       {
         index: true,
-        element: withSuspense(HomePage),
+        element: <Navigate to="/users" replace />,
       },
       ...usersRoutes,
       ...rolesRoutes,
       ...deviceRoutes,
-      {
-        path: '403',
-        element: withSuspense(ForbiddenPage),
-      },
     ],
   },
   {

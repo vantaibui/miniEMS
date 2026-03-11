@@ -1,10 +1,11 @@
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 
-import { cn } from '../utils/cn';
+import { Box } from '@mui/material';
 import { UiSearchInput } from '../search-input';
 import { UiSelect } from '../select';
 import { UiToolbar } from '../toolbar';
+import { cn } from '../utils/cn';
 import type { UiTableFiltersProps } from './UiTableFilters.types';
 
 export function UiTableFilters({
@@ -30,12 +31,12 @@ export function UiTableFilters({
   );
 
   return (
-    <div className={cn('flex min-w-0 flex-col gap-3', className)}>
+    <Box className={cn('flex min-w-0 flex-col gap-3', className)}>
       <UiToolbar
         left={
           <>
             {hasSearch ? (
-              <div className="w-full min-w-0 sm:w-[320px]">
+              <Box className="w-full min-w-0 sm:w-[320px]">
                 <UiSearchInput
                   value={searchValue ?? ''}
                   onChange={onSearchChange!}
@@ -43,11 +44,11 @@ export function UiTableFilters({
                   placeholder={searchPlaceholder}
                   aria-label={searchPlaceholder ?? 'Search'}
                 />
-              </div>
+              </Box>
             ) : null}
 
             {hasSelect ? (
-              <div className="w-full min-w-0 sm:w-[240px]">
+              <Box className="w-full min-w-0 sm:w-[240px]">
                 <UiSelect
                   label={selectLabel}
                   value={selectValue}
@@ -56,7 +57,7 @@ export function UiTableFilters({
                   placeholder={selectPlaceholder}
                   aria-label={selectLabel ?? 'Filter'}
                 />
-              </div>
+              </Box>
             ) : null}
           </>
         }
@@ -74,6 +75,6 @@ export function UiTableFilters({
           ))}
         </Tabs>
       ) : null}
-    </div>
+    </Box>
   );
 }

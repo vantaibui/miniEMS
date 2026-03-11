@@ -1,4 +1,4 @@
-import type { PermissionNode, CurrentUser } from '@libs/types';
+import type { PermissionNode, User } from '@libs/types';
 import { http, type ApiSuccessResponse } from '@services/http';
 import { AUTH_ENDPOINTS } from './auth.endpoint';
 
@@ -8,8 +8,8 @@ export interface PaginationParams {
 }
 
 export const authService = {
-  async getMe(): Promise<ApiSuccessResponse<CurrentUser>> {
-    return await http.get<CurrentUser>(AUTH_ENDPOINTS.ME);
+  async getMe(): Promise<ApiSuccessResponse<User>> {
+    return await http.get<User>(AUTH_ENDPOINTS.ME);
   },
 
   async getPermissions(

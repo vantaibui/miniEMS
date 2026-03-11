@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import { NavLink, useLocation } from 'react-router-dom';
 
-import { checkPermissionRaw, useRbacStore } from '@modules/auth';
+import { hasPermission, useRbacStore } from '@modules/auth';
 import type { PermissionNode } from '@libs/types';
 import type { NavGroup, NavPermission } from '../../../navigation/nav.types';
 import type { ReactNode } from 'react';
@@ -22,14 +22,13 @@ const isAllowed = (
   permission?: NavPermission,
 ) => {
   // Default to allow when no permission is configured
-  
   if (!permission) {
     return true;
   }
 
   const action = permission.action ?? 'read';
-  const path = `${permission.subModule}.${action}`;
-  return checkPermissionRaw(permissions, path);
+
+  return hasPermission(permissions, permission.subModule, action);
 };
 
 export const SidebarNav = ({ groups }: SidebarNavProps) => {

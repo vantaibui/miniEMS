@@ -64,6 +64,7 @@ const baseTheme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: tokens.shape.borderRadius.md,
+          alignItems: 'center',
           '& .MuiOutlinedInput-notchedOutline': {
             borderColor: tokens.colors.neutral[200],
           },
@@ -83,9 +84,33 @@ const baseTheme = createTheme({
         },
         input: {
           padding: `${tokens.spacing.sm} ${tokens.spacing.md}`,
+          lineHeight: 1.5,
+          // boxSizing: 'border-box',
         },
         inputSizeSmall: {
           padding: `${tokens.spacing.xs} ${tokens.spacing.sm}`,
+        },
+      },
+    },
+    MuiSelect: {
+      styleOverrides: {
+        select: {
+          display: 'flex',
+          alignItems: 'center',
+        },
+        icon: {
+          top: '50%',
+          transform: 'translateY(-50%)',
+        },
+      },
+    },
+    MuiInputAdornment: {
+      styleOverrides: {
+        root: {
+          display: 'flex',
+          alignItems: 'center',
+          alignSelf: 'center',
+          maxHeight: 'none',
         },
       },
     },

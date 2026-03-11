@@ -4,27 +4,13 @@ export const Footer = () => {
   return (
     <Box
       component="footer"
-      sx={{
-        borderTop: 1,
-        borderColor: 'divider',
-        pt: 2,
-        pb: 1,
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
+      className="flex w-full flex-col items-center justify-center border-t border-divider pb-1 pt-2"
     >
       <Typography
         variant="caption"
         color="text.secondary"
         align="center"
-        sx={{
-          fontSize: '0.7rem',
-          lineHeight: 1.4,
-          display: 'block',
-        }}
+        className="block text-[0.7rem] leading-[1.4]"
       >
         TMA Solutions CO., LTD. <br /> © 2024 All Rights Reserved
       </Typography>

@@ -25,29 +25,10 @@ export const Sidebar = ({ width = 260, children }: SidebarProps) => {
   return (
     <Box
       component="aside"
-      className="shrink-0 border-r flex flex-col"
-      sx={{
-        width,
-        minWidth: width,
-        height: '100%',
-        borderRight: '1px solid',
-        borderColor: 'divider',
-        bgcolor: 'background.paper',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-      }}
+      className="hidden shrink-0 border-r border-divider bg-surface-card lg:flex lg:flex-col"
+      style={{ width, minWidth: width }}
     >
-      <Box
-        className="flex-1 p-4"
-        sx={{
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-          p: 2,
-        }}
-      >
+      <Box className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-2">
         {children || (
           <Typography variant="body2" color="text.secondary">
             No navigation configured.
@@ -55,13 +36,7 @@ export const Sidebar = ({ width = 260, children }: SidebarProps) => {
         )}
       </Box>
 
-      <Box
-        className="p-4"
-        sx={{
-          flexShrink: 0,
-          mt: 'auto',
-        }}
-      >
+      <Box className="mt-auto shrink-0 p-2">
         <Footer />
       </Box>
     </Box>

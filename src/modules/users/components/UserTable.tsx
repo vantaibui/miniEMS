@@ -9,14 +9,19 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  Typography,
+  Typography
 } from '@mui/material';
 import React, { useMemo, useState } from 'react';
 
+import { useDataTable } from '@libs/hooks';
 import type { PaginationResult } from '@/services/http';
-import { UiEntityTableCard, UiDataTable } from '@libs/ui';
-import { useUserPermissions } from '../hooks';
+import {
+  UiDataTable,
+  UiEntityTableCard,
+  UiStatusBadge
+} from '@libs/ui';
 import type { User } from '../types';
+import { useUserPermissions } from '../hooks';
 
 interface UserTableProps {
   rows: Array<User>;
@@ -50,12 +55,12 @@ export const UserTable = ({
   };
 
   const handleEditClick = () => {
-    if (onEdit && selectedUserId) onEdit(selectedUserId);
+    if (selectedUserId) onEdit(selectedUserId);
     closeMenu();
   };
 
   const handleDeleteClick = () => {
-    if (onDelete && selectedUserId) onDelete(selectedUserId);
+    if (selectedUserId) onDelete(selectedUserId);
     closeMenu();
   };
 
@@ -71,7 +76,7 @@ export const UserTable = ({
         width: 50,
         align: 'center' as const,
         render: (_: User, index: number) => (
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          <Typography variant="body2" color="text.secondary">
             {page * size + index + 1}
           </Typography>
         ),
@@ -80,7 +85,7 @@ export const UserTable = ({
         key: 'userIdentity',
         header: 'USER IDENTITY',
         render: (row: User) => (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box className="flex items-center gap-2">
             <Avatar
               sx={{ width: 40, height: 40 }}
               src={`https://ui-avatars.com/api/?name=${encodeURIComponent(row.firstName + row.lastName)}&background=random`}
@@ -88,11 +93,12 @@ export const UserTable = ({
             <Box>
               <Typography
                 variant="body2"
-                sx={{ fontWeight: 600, color: 'text.primary' }}
+                color="text.primary"
+                className="font-semibold"
               >
-                {row.firstName}
+                {row.firstName + row.lastName}
               </Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+              <Typography variant="caption" color="text.secondary">
                 {row.email}
               </Typography>
             </Box>
@@ -103,34 +109,18 @@ export const UserTable = ({
         key: 'status',
         header: 'STATUS',
         render: (row: User) => (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box
-              component="span"
-              sx={{
-                width: 8,
-                height: 8,
-                borderRadius: '50%',
-                bgcolor: row.status ? '#10b981' : '#9ca3af',
-                display: 'inline-block',
-              }}
-            />
-            <Typography
-              variant="body2"
-              sx={{
-                fontWeight: 600,
-                color: row.status ? 'text.primary' : 'text.secondary',
-              }}
-            >
-              {row.status ? 'Active' : 'Inactive'}
-            </Typography>
-          </Box>
+          <UiStatusBadge
+            status={row.status ? 'active' : 'inactive'}
+            activeLabel="Active"
+            inactiveLabel="Inactive"
+          />
         ),
       },
       {
         key: 'lastActivity',
         header: 'LAST ACTIVITY',
         render: () => (
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          <Typography variant="body2" color="text.secondary">
             Just now
           </Typography>
         ),
@@ -139,7 +129,7 @@ export const UserTable = ({
         key: 'actions',
         header: 'ACTIONS',
         align: 'right' as const,
-        render: (row: User) =>
+render: (row: User) =>
           canEditUser || canDeleteUser ? (
             <IconButton size="small" onClick={(e) => openMenu(e, row.id)}>
               <MoreVertIcon fontSize="small" />
@@ -147,18 +137,12 @@ export const UserTable = ({
           ) : null,
       },
     ];
-  }, [page, size, canEditUser, canDeleteUser]);
+  }, [page, size]);
 
   return (
     <>
       <UiEntityTableCard
-        total={total}
-        page={page}
-        size={size}
-        entityLabelPlural="Users"
-        filterLabel="All Departments"
-      >
-        <Box>
+        tableContent={
           <UiDataTable
             aria-label="Users table"
             rows={rows}
@@ -179,28 +163,20 @@ export const UserTable = ({
                 : undefined
             }
             emptyState={
-              <div className="py-10 text-center">
+              <Box className="py-10 text-center">
                 <Typography variant="body2" color="text.secondary">
                   No users found.
                 </Typography>
-              </div>
+              </Box>
             }
           />
-        </Box>
-      </UiEntityTableCard>
+        }
+      />
 
       <Menu
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
         onClose={closeMenu}
-        slotProps={{
-          paper: {
-            sx: {
-              minWidth: 180,
-              borderRadius: 2,
-            },
-          },
-        }}
       >
         {canEditUser && (
           <MenuItem onClick={handleEditClick}>

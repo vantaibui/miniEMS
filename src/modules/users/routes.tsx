@@ -1,15 +1,32 @@
 import type { RouteObject } from 'react-router-dom';
-import { createCrudRoutes } from '@modules/auth';
+import { RouteGuard } from '@modules/auth';
 import { UserListPage } from './pages/UserListPage';
 import { UserCreatePage } from './pages/UserCreatePage';
 import { UserEditPage } from './pages/UserEditPage';
 
-export const usersRoutes: Array<RouteObject> = createCrudRoutes({
-  basePath: 'users',
-  permissionPrefix: 'USER_MANAGEMENT',
-  pages: {
-    list: UserListPage,
-    create: UserCreatePage,
-    edit: UserEditPage,
+export const usersRoutes: Array<RouteObject> = [
+  {
+    path: 'users',
+    element: (
+      <RouteGuard subModuleKey="USER_MANAGEMENT">
+        <UserListPage />
+      </RouteGuard>
+    ),
   },
-});
+  {
+    path: 'users/create',
+    element: (
+      <RouteGuard subModuleKey="USER_MANAGEMENT" actionKey="create">
+        <UserCreatePage />
+      </RouteGuard>
+    ),
+  },
+  {
+    path: 'users/:id/edit',
+    element: (
+      <RouteGuard subModuleKey="USER_MANAGEMENT" actionKey="update">
+        <UserEditPage />
+      </RouteGuard>
+    ),
+  },
+];

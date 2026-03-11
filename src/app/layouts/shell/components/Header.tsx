@@ -1,3 +1,10 @@
+import assets from '@/libs/assets';
+import { useAuthStore, useRbacStore } from '@modules/auth';
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
+import SearchIcon from '@mui/icons-material/Search';
 import {
   AppBar,
   Avatar,
@@ -12,15 +19,7 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
-import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
-import SearchIcon from '@mui/icons-material/Search';
-import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
-import { useState } from 'react';
-import { useAuthStore } from '@modules/auth/store/auth.store';
-import { MenuIcon } from '@libs/ui';
-import assets from '@/libs/assets';
+import { useMemo, useState } from 'react';
 
 interface HeaderProps {
   height?: number;
@@ -28,194 +27,110 @@ interface HeaderProps {
 }
 
 export const Header = ({ height = 64, sidebarWidth = 260 }: HeaderProps) => {
-  const { userProfile, logout } = useAuthStore();
+  const logout = useAuthStore((s) => s.logout);
+  const user = useRbacStore((s) => s.user);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
-  const initials: string = userProfile?.fullName
-    ? userProfile.fullName
-        .split(' ')
-        .map((n: string) => n[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase()
-    : userProfile?.username
-      ? userProfile.username.slice(0, 2).toUpperCase()
-      : 'AU';
+  const { fullName, initials, role } = useMemo(() => {
+    if (!user) {
+      return {
+        fullName: 'Admin User',
+        initials: 'AU',
+        role: 'Super Admin',
+      };
+    }
+
+    const firstName = user.firstName ?? '';
+    const lastName = user.lastName ?? '';
+    const username = user.username ?? '';
+    const fallbackName = `${firstName} ${lastName}`.trim() || username || 'Admin User';
+
+    return {
+      fullName: fallbackName,
+      initials:
+        `${firstName[0] ?? ''}${lastName[0] ?? ''}` ||
+        `${username[0] ?? ''}`.toUpperCase() ||
+        'AU',
+      role: user.role ?? 'Super Admin',
+    };
+  }, [user]);
 
   return (
     <AppBar
       position="sticky"
       elevation={0}
       color="inherit"
-      sx={{
-        zIndex: (theme) => theme.zIndex.drawer + 1,
-        bgcolor: 'background.paper',
-        color: 'text.primary',
-        boxShadow: 'none',
-        height,
-      }}
+      sx={{ height }}
+      className="z-1201 bg-surface-card text-text-primary shadow-none"
     >
-      <Toolbar
-        disableGutters
-        sx={{
-          minHeight: height,
-          px: 2,
-          gap: 2,
-          display: 'flex',
-          alignItems: 'center',
-        }}
-      >
+      <Toolbar disableGutters className="flex min-h-16 items-center gap-2 px-2">
         <Stack direction="row" alignItems="center" spacing={1.5}>
-          {/* Mobile Menu Toggle */}
-          <IconButton
-            color="inherit"
-            edge="start"
-            sx={{ mr: 1, display: { lg: 'none' } }}
-          >
+          {/* <IconButton color="inherit" edge="start" className="mr-1 lg:hidden">
             <MenuIcon />
-          </IconButton>
+          </IconButton> */}
 
-          {/* Logo Container */}
           <Box
-            sx={{
-              width: { xs: 'auto', lg: sidebarWidth },
-              display: 'flex',
-              alignItems: 'center',
-              flexShrink: 0,
-            }}
+            className="flex shrink-0 items-center"
+            width={sidebarWidth}
           >
             <Box
               component="img"
               src={assets.images.miniEMSLogo}
               alt="TMA Solutions"
-              sx={{ height: 52, width: 'auto' }}
+              className="h-13 w-auto"
             />
           </Box>
         </Stack>
 
-        <Box
-          sx={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            px: 4,
-          }}
-        >
-          <Box
-            sx={{
-              display: { xs: 'none', md: 'flex' },
-              alignItems: 'center',
-              gap: 1,
-              height: 44,
-              width: '100%',
-              maxWidth: 500,
-              px: 2,
-              borderRadius: '22px',
-              bgcolor: 'background.paper',
-              border: 1,
-              borderColor: 'divider',
-            }}
-          >
-            <SearchIcon fontSize="small" sx={{ color: 'text.secondary' }} />
+        <Box className="flex flex-1 items-center px-4 md:px-6">
+          <Box className="hidden h-11 w-full max-w-125 items-center gap-1 rounded-full border border-divider bg-surface-card px-2 md:flex">
+            <SearchIcon fontSize="small" color="action" />
             <InputBase
               fullWidth
               placeholder="Search for users, roles, or logs."
-              sx={{
-                fontSize: 14,
-                color: 'text.primary',
-                '& .MuiInputBase-input::placeholder': {
-                  opacity: 1,
-                  color: 'text.secondary',
-                },
-              }}
+              className="text-sm text-text-primary"
             />
           </Box>
         </Box>
 
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1.5,
-            flexShrink: 0,
-          }}
-        >
-          <IconButton
-            size="small"
-            aria-label="Help"
-            sx={{ color: 'text.secondary' }}
-          >
+        <Box className="flex shrink-0 items-center gap-1.5">
+          <IconButton size="small" aria-label="Help" color="inherit">
             <HelpOutlineOutlinedIcon fontSize="small" />
           </IconButton>
-          <IconButton
-            size="small"
-            aria-label="Notifications"
-            sx={{ color: 'text.secondary' }}
-          >
+          <IconButton size="small" aria-label="Notifications" color="inherit">
             <NotificationsNoneOutlinedIcon fontSize="small" />
           </IconButton>
 
           <Divider
             orientation="vertical"
             flexItem
-            sx={{ mx: 1, height: 24, alignSelf: 'center' }}
+            className="mx-1 h-6 self-center"
           />
 
           <Box
             component="button"
             type="button"
             onClick={(e) => setAnchorEl(e.currentTarget)}
-            className="flex items-center gap-3 ml-1"
-            sx={{
-              bgcolor: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              p: 0,
-              display: 'flex',
-              alignItems: 'center',
-            }}
+            className="ml-1 flex items-center gap-3 border-none bg-transparent p-0"
           >
-            <Box
-              sx={{
-                textAlign: 'right',
-                display: { xs: 'none', md: 'block' },
-                marginRight: 1,
-              }}
-            >
+            <Box className="mr-1 hidden text-right md:block">
               <Typography
                 variant="body2"
-                sx={{
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: 'text.primary',
-                  lineHeight: 1,
-                  mb: 0.5,
-                }}
+                className="mb-0.5 text-sm leading-none text-text-primary"
+                fontWeight={600}
               >
-                {userProfile?.fullName ?? userProfile?.username ?? 'Admin User'}
+                {fullName}
               </Typography>
               <Typography
                 variant="caption"
-                sx={{
-                  fontSize: 11,
-                  color: 'text.secondary',
-                  lineHeight: 1,
-                  display: 'block',
-                  textTransform: 'uppercase',
-                }}
+                className="block text-[11px] uppercase leading-none text-text-secondary"
               >
-                {(userProfile?.role as string) ?? 'Super Admin'}
+                {role}
               </Typography>
             </Box>
             <Avatar
-              src={'https://cdn-icons-png.flaticon.com/512/149/149071.png'}
-              sx={{
-                width: 36,
-                height: 36,
-                bgcolor: 'primary.main',
-                fontSize: 14,
-                fontWeight: 600,
-              }}
+              src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+              className="h-9 w-9 bg-primary text-sm"
             >
               {initials}
             </Avatar>
@@ -223,32 +138,18 @@ export const Header = ({ height = 64, sidebarWidth = 260 }: HeaderProps) => {
 
           <Menu
             anchorEl={anchorEl}
-            open={!!anchorEl}
+            open={Boolean(anchorEl)}
             onClose={() => setAnchorEl(null)}
             slotProps={{
               paper: {
-                sx: {
-                  mt: 1.5,
-                  minWidth: 180,
-                  borderRadius: 2,
-                  boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.08)',
-                },
+                className: 'mt-1.5 min-w-[180px] rounded-md',
               },
             }}
           >
-            <MenuItem onClick={() => setAnchorEl(null)} sx={{ py: 1 }}>
+            <MenuItem onClick={() => setAnchorEl(null)}>
               <ListItemIcon>
-                <Avatar
-                  sx={{
-                    width: 24,
-                    height: 24,
-                    bgcolor: 'primary.main',
-                    fontSize: 12,
-                  }}
-                >
-                  <AccountCircleOutlinedIcon
-                    sx={{ fontSize: 16, color: 'white' }}
-                  />
+                <Avatar className="h-6 w-6 bg-primary text-xs">
+                  <AccountCircleOutlinedIcon className="text-base text-white" />
                 </Avatar>
               </ListItemIcon>
               <Typography variant="body2" fontWeight={500}>
@@ -256,14 +157,13 @@ export const Header = ({ height = 64, sidebarWidth = 260 }: HeaderProps) => {
               </Typography>
             </MenuItem>
 
-            <Divider sx={{ my: 1 }} />
+            <Divider className="my-1" />
 
             <MenuItem
               onClick={() => {
                 setAnchorEl(null);
                 logout();
               }}
-              sx={{ py: 1 }}
             >
               <ListItemIcon>
                 <LogoutOutlinedIcon fontSize="small" />

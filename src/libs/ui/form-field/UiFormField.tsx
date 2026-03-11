@@ -3,6 +3,7 @@ import Typography from '@mui/material/Typography';
 
 import { cn } from '@libs/utils';
 import type { UiFormFieldProps } from './UiFormField.types';
+import { Box } from '@mui/material';
 
 export function UiFormField({
   label,
@@ -16,7 +17,7 @@ export function UiFormField({
   const showError = Boolean(errorText);
 
   return (
-    <div className={cn('flex min-w-0 flex-col gap-1', className)}>
+    <Box className={cn('flex min-w-0 flex-col gap-1', className)}>
       {label ? (
         <Typography
           component="label"
@@ -32,13 +33,13 @@ export function UiFormField({
         </Typography>
       ) : null}
 
-      <div className="min-w-0">{children}</div>
+      <Box className="min-w-0">{children}</Box>
 
       {showError || helperText ? (
         <FormHelperText error={showError} disabled={disabled} sx={{ m: 0 }}>
           {showError ? errorText : helperText}
         </FormHelperText>
       ) : null}
-    </div>
+    </Box>
   );
 }

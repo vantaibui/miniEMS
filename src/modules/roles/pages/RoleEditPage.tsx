@@ -1,17 +1,17 @@
-import { useNavigate, useParams } from 'react-router-dom';
-import { useState } from 'react';
-import { Box, CircularProgress, Typography } from '@mui/material';
 import { useToast } from '@libs/hooks';
 import { UiBreadcrumb, useDialogConfirm } from '@libs/ui';
+import { Box, CircularProgress, Typography } from '@mui/material';
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import {
-  useRoleDetail,
-  useRoleUpdate,
-  useRoleDelete,
-  usePermissionsById,
-} from '../hooks';
 import { RoleForm } from '../components/RoleForm';
-import type { PermissionNode, BaseRolePayload } from '../types';
+import {
+  usePermissionsById,
+  useRoleDelete,
+  useRoleDetail,
+  useRoleUpdate
+} from '../hooks';
+import type { BaseRolePayload, PermissionNode } from '../types';
 
 const extractAllocatedPermissions = (
   nodes: Array<PermissionNode>,
@@ -28,13 +28,13 @@ const extractAllocatedPermissions = (
           node.actions.update ||
           node.actions.delete),
     )
-    .map((node) => ({
-      id: node.id,
+    .map(({id, actions}) => ({
+      id: id,
       actions: {
-        create: node.actions.create,
-        read: node.actions.read,
-        update: node.actions.update,
-        delete: node.actions.delete,
+        create: actions.create,
+        read: actions.read,
+        update: actions.update,
+        delete: actions.delete,
       },
     }));
 };
@@ -60,7 +60,7 @@ export const RoleEditPage = () => {
   const handleSubmit = (data: BaseRolePayload) => {
     if (!roleId) return;
     updateRole(
-      { id: roleId, payload: data },
+      { id: roleId, payload: { ...data } },
       {
         onSuccess: (response) => {
           toast.success(
@@ -91,7 +91,8 @@ export const RoleEditPage = () => {
   };
 
   const isLoading =
-    isLoadingRole || (isLoadingPermissions && !permissions.length);
+    isLoadingRole ||
+    (isLoadingPermissions && !permissions.length)
 
   return (
     <Box>

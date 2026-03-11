@@ -1,8 +1,4 @@
-import {
-  Box,
-  Checkbox,
-  Typography,
-} from '@mui/material';
+import { Box, Checkbox, Typography } from '@mui/material';
 import { useCallback, useMemo } from 'react';
 
 import { UiDataTable } from '@libs/ui';
@@ -12,6 +8,8 @@ import type { PermissionNode } from '../types';
 interface FlatPermissionNode extends PermissionNode {
   depth: number;
 }
+
+type PermissionAction = 'create' | 'read' | 'update' | 'delete';
 
 const flattenPermissions = (
   nodes: Array<PermissionNode>,
@@ -56,13 +54,13 @@ export const RolePermissionMatrix = ({
   onPaginationChange,
   loading,
 }: RolePermissionMatrixProps) => {
-  const flattenedData = useMemo(() => flattenPermissions(permissions), [permissions]);
+  const flattenedData = useMemo(
+    () => flattenPermissions(permissions),
+    [permissions],
+  );
 
   const handleToggle = useCallback(
-    (
-      id: number,
-      action: 'create' | 'read' | 'update' | 'delete',
-    ) => {
+    (id: number, action: PermissionAction) => {
       if (readOnly) return;
 
       const existingIndex = selectedPermissions.findIndex((p) => p.id === id);
@@ -93,6 +91,53 @@ export const RolePermissionMatrix = ({
     [onChange, readOnly, selectedPermissions],
   );
 
+  const selectedPermissionsMap = useMemo(() => {
+    return new Map(selectedPermissions.map((item) => [item.id, item.actions]));
+  }, [selectedPermissions]);
+
+  const actionColumns: Array<{ key: PermissionAction; header: string }> =
+    useMemo(
+      () => [
+        { key: 'create', header: 'CREATE' },
+        { key: 'read', header: 'READ' },
+        { key: 'update', header: 'UPDATE' },
+        { key: 'delete', header: 'DELETE' },
+      ],
+      [],
+    );
+
+  const renderActionCheckbox = useCallback(
+    (module: FlatPermissionNode, action: PermissionAction) => {
+      const actions = selectedPermissionsMap.get(module.id);
+      const checked = actions?.[action] ?? false;
+
+      return (
+        <Checkbox
+          size="small"
+          checked={checked}
+          disabled={readOnly}
+          onChange={() => handleToggle(module.id, action)}
+          sx={
+            readOnly
+              ? {
+                  '&.Mui-checked': {
+                    color: 'primary.main',
+                  },
+                  '&.Mui-disabled.Mui-checked': {
+                    color: 'primary.main',
+                  },
+                  '&.Mui-disabled .MuiSvgIcon-root': {
+                    opacity: checked ? 1 : 0.38,
+                  },
+                }
+              : {}
+          }
+        />
+      );
+    },
+    [handleToggle, readOnly, selectedPermissionsMap],
+  );
+
   const columns = useMemo(() => {
     return [
       {
@@ -111,132 +156,16 @@ export const RolePermissionMatrix = ({
           </Typography>
         ),
       },
-      {
-        key: 'create',
-        header: 'CREATE',
+      ...actionColumns.map((actionColumn) => ({
+        key: actionColumn.key,
+        header: actionColumn.header,
         width: 100,
         align: 'center' as const,
-        render: (module: FlatPermissionNode) => {
-          const selected = selectedPermissions.find((p) => p.id === module.id);
-          const actions = selected?.actions || { create: false };
-          return (
-            <Checkbox
-              size="small"
-              checked={actions.create}
-              onChange={() => handleToggle(module.id, 'create')}
-              sx={
-                readOnly
-                  ? {
-                      cursor: 'default',
-                      pointerEvents: 'none',
-                      '&.Mui-checked': {
-                        color: 'primary.main',
-                      },
-                      '& .MuiSvgIcon-root': {
-                        opacity: actions.create ? 1 : 0.38,
-                      },
-                    }
-                  : {}
-              }
-            />
-          );
-        },
-      },
-      {
-        key: 'read',
-        header: 'READ',
-        width: 100,
-        align: 'center' as const,
-        render: (module: FlatPermissionNode) => {
-          const selected = selectedPermissions.find((p) => p.id === module.id);
-          const actions = selected?.actions || { read: false };
-          return (
-            <Checkbox
-              size="small"
-              checked={actions.read}
-              onChange={() => handleToggle(module.id, 'read')}
-              sx={
-                readOnly
-                  ? {
-                      cursor: 'default',
-                      pointerEvents: 'none',
-                      '&.Mui-checked': {
-                        color: 'primary.main',
-                      },
-                      '& .MuiSvgIcon-root': {
-                        opacity: actions.read ? 1 : 0.38,
-                      },
-                    }
-                  : {}
-              }
-            />
-          );
-        },
-      },
-      {
-        key: 'update',
-        header: 'UPDATE',
-        width: 100,
-        align: 'center' as const,
-        render: (module: FlatPermissionNode) => {
-          const selected = selectedPermissions.find((p) => p.id === module.id);
-          const actions = selected?.actions || { update: false };
-          return (
-            <Checkbox
-              size="small"
-              checked={actions.update}
-              onChange={() => handleToggle(module.id, 'update')}
-              sx={
-                readOnly
-                  ? {
-                      cursor: 'default',
-                      pointerEvents: 'none',
-                      '&.Mui-checked': {
-                        color: 'primary.main',
-                      },
-                      '& .MuiSvgIcon-root': {
-                        opacity: actions.update ? 1 : 0.38,
-                      },
-                    }
-                  : {}
-              }
-            />
-          );
-        },
-      },
-      {
-        key: 'delete',
-        header: 'DELETE',
-        width: 100,
-        align: 'center' as const,
-        render: (module: FlatPermissionNode) => {
-          const selected = selectedPermissions.find((p) => p.id === module.id);
-          const actions = selected?.actions || { delete: false };
-          return (
-            <Checkbox
-              size="small"
-              checked={actions.delete}
-              onChange={() => handleToggle(module.id, 'delete')}
-              sx={
-                readOnly
-                  ? {
-                      cursor: 'default',
-                      pointerEvents: 'none',
-                      '&.Mui-checked': {
-                        color: 'primary.main',
-                      },
-                      '& .MuiSvgIcon-root': {
-                        opacity: actions.delete ? 1 : 0.38,
-                      },
-                    }
-                  : {}
-              }
-            />
-          );
-        },
-      },
+        render: (module: FlatPermissionNode) =>
+          renderActionCheckbox(module, actionColumn.key),
+      })),
     ];
-  }, [handleToggle, readOnly, selectedPermissions]);
+  }, [actionColumns, renderActionCheckbox]);
 
   const total = pagination?.totalElements ?? flattenedData.length;
   const page = pagination?.page ?? 0;
@@ -280,11 +209,11 @@ export const RolePermissionMatrix = ({
             : undefined
         }
         emptyState={
-          <div className="py-10 text-center">
+          <Box className="py-10 text-center">
             <Typography variant="body2" color="text.secondary">
               No permissions found.
             </Typography>
-          </div>
+          </Box>
         }
       />
     </Box>

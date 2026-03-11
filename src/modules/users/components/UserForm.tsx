@@ -1,9 +1,22 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { DeleteIcon, UiButton, UiFormField, UiInput } from '@libs/ui';
-import { Box, Card, IconButton, MenuItem, Select, Stack, Typography } from '@mui/material';
+import {
+  DeleteIcon,
+  UiButton,
+  UiFormActions,
+  UiFormField,
+  UiInput,
+} from '@libs/ui';
+import {
+  Box,
+  Card,
+  IconButton,
+  MenuItem,
+  Select,
+  Stack,
+  Typography,
+} from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { Controller, useForm, useWatch } from 'react-hook-form';
-import { useState } from 'react';
 import * as yup from 'yup';
 
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
@@ -11,8 +24,6 @@ import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import PersonIcon from '@mui/icons-material/Person';
 import SecurityIcon from '@mui/icons-material/Security';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 import ShieldIcon from '@mui/icons-material/Shield';
 
@@ -40,7 +51,20 @@ const createSchema = (isEdit: boolean) =>
       : yup
           .string()
           .required('Password is required')
-          .min(6, 'Password must be at least 6 characters'),
+          .min(8, 'Password must be at least 8 characters')
+          .matches(/[0-9]/, 'Password must contain at least one digit')
+          .matches(
+            /[a-z]/,
+            'Password must contain at least one lowercase letter',
+          )
+          .matches(
+            /[A-Z]/,
+            'Password must contain at least one uppercase letter',
+          )
+          .matches(
+            /[^A-Za-z0-9]/,
+            'Password must contain at least one special character',
+          ),
     roleId: yup.number().required('Security role is required'),
   });
 
@@ -75,7 +99,6 @@ export const UserForm = ({
   onPaginationChange,
   isPermissionsLoading,
 }: UserFormProps) => {
-  const [showPassword, setShowPassword] = useState(false);
   const { data: rolesResponse } = useRoles();
   const roles = rolesResponse?.items || [];
 
@@ -96,10 +119,7 @@ export const UserForm = ({
     },
   });
 
-  const selectedRoleId = useWatch({
-    control,
-    name: 'roleId',
-  });
+  const selectedRoleId = useWatch({ control, name: 'roleId' });
   const { data: permissionsRes } = usePermissions({
     page: pagination?.page,
     size: pagination?.size,
@@ -140,16 +160,14 @@ export const UserForm = ({
       }));
   };
 
-  const handleFormSubmit = (
-    data: CreateUserPayload,
-  ) => {
+  const handleFormSubmit = (data: CreateUserPayload) => {
     const payload: CreateUserPayload = {
       username: data.username,
       email: data.email,
       firstName: data.firstName,
       lastName: data.lastName,
       roleId: data.roleId,
-      password: isEdit ? '' : (data.password || ''),
+      password: isEdit ? '' : data.password || '',
     };
 
     onSubmit(payload);
@@ -286,24 +304,12 @@ export const UserForm = ({
                         <UiInput
                           {...field}
                           placeholder="Enter password"
-                          type={showPassword ? 'text' : 'password'}
+                          type="password"
+                          passwordToggle
                           startAdornment={
                             <VpnKeyIcon
                               sx={{ color: 'text.secondary', fontSize: 20 }}
                             />
-                          }
-                          endAdornment={
-                            <IconButton
-                              onClick={() => setShowPassword(!showPassword)}
-                              edge="end"
-                              sx={{ color: 'text.secondary' }}
-                            >
-                              {showPassword ? (
-                                <VisibilityOffIcon fontSize="small" />
-                              ) : (
-                                <VisibilityIcon fontSize="small" />
-                              )}
-                            </IconButton>
                           }
                         />
                       </UiFormField>
@@ -341,29 +347,19 @@ export const UserForm = ({
                         {...field}
                         value={field.value || ''}
                         displayEmpty
-                        size="small"
                         fullWidth
                         sx={{
-                          borderRadius: 2,
-                          '& .MuiOutlinedInput-notchedOutline': {
-                            borderColor: 'divider',
-                          },
                           '& .MuiSelect-select': {
-                            display: 'flex',
-                            alignItems: 'center',
                             gap: 1.5,
-                            p: 1.5,
                           },
                         }}
                       >
                         <MenuItem disabled value="">
-                          <span style={{ color: '#6b7280' }}>
                             <ShieldIcon
                               fontSize="small"
                               sx={{ mr: 1, verticalAlign: 'middle' }}
-                            />{' '}
+                            />
                             Choose Security Role
-                          </span>
                         </MenuItem>
                         {roles.map((role) => (
                           <MenuItem key={role.id} value={role.id}>
@@ -414,69 +410,26 @@ export const UserForm = ({
             </Box>
           )}
 
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              mt: 4,
-              pt: 3,
-              borderTop: '1px solid',
-              borderColor: 'divider',
-            }}
-          >
-            <Box>
-              {isEdit && onDelete && (
+          <UiFormActions
+            onCancel={onCancel}
+            cancelDisabled={isLoading}
+            submitDisabled={isLoading || !isDirty || !isValid}
+            loading={isLoading}
+            submitLabel={submitLabel}
+            leadingActions={
+              isEdit && onDelete ? (
                 <UiButton
+                  type="button"
                   variant="outlined"
                   color="error"
                   startIcon={<DeleteIcon />}
                   onClick={onDelete}
-                  sx={{
-                    fontWeight: 600,
-                    px: 2,
-                    borderColor: 'error.light',
-                    '&:hover': { bgcolor: 'error.50' },
-                  }}
                 >
                   Delete Role
                 </UiButton>
-              )}
-            </Box>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <UiButton
-                type="button"
-                variant="outlined"
-                onClick={onCancel}
-                disabled={isLoading}
-                sx={{
-                  px: 3,
-                  fontWeight: 600,
-                  color: 'text.primary',
-                  borderColor: 'divider',
-                }}
-              >
-                Cancel
-              </UiButton>
-              <UiButton
-                type="submit"
-                variant="contained"
-                disabled={isLoading || !isDirty || !isValid}
-                loading={isLoading}
-                sx={{
-                  px: 3,
-                  fontWeight: 600,
-                  '&.Mui-disabled': {
-                    bgcolor: 'primary.main',
-                    color: 'common.white',
-                    opacity: 0.5,
-                  },
-                }}
-              >
-                {submitLabel}
-              </UiButton>
-            </Box>
-          </Box>
+              ) : undefined
+            }
+          />
         </Stack>
       </Card>
     </Box>

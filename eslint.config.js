@@ -59,6 +59,31 @@ export default defineConfig([
           ],
         },
       ],
+      // 'no-restricted-syntax': [
+      //   'error',
+      //   {
+      //     selector: "JSXAttribute[name.name='style']",
+      //     message:
+      //       'Inline style is banned. Use Tailwind utilities or themed component APIs.',
+      //   },
+      //   {
+      //     selector:
+      //       "JSXOpeningElement[name.name=/^(Box|Stack|Grid|Container)$/] > JSXAttribute[name.name='sx']",
+      //     message:
+      //       'Do not use sx on layout primitives. Use className (Tailwind) for layout/spacing.',
+      //   },
+      //   {
+      //     selector:
+      //       "JSXAttribute[name.name='className'] Literal[value=/\\b(?:text|bg|border|fill|stroke)-\\[#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\\]\\b/]",
+      //     message:
+      //       'Arbitrary hex classes are banned. Use semantic tokens (e.g. text-primary, bg-surface-card).',
+      //   },
+      //   {
+      //     selector:
+      //       "JSXAttribute[name.name='className'] TemplateElement[value.raw=/\\b(?:text|bg|border|fill|stroke)-\\[#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\\]\\b/]",
+      //     message: 'Arbitrary hex classes are banned. Use semantic tokens.',
+      //   },
+      // ],
     },
   },
 ])

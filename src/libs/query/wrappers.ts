@@ -12,25 +12,28 @@ import { useEffect, useRef } from 'react';
 import type { ApiSuccessResponse, AppError } from '@services/http';
 import { useApiErrorDialog } from '@libs/hooks';
 
-type AppQueryOptions<TQueryFnData, TData, TKey extends ReadonlyArray<unknown>> =
-  UseQueryOptions<TQueryFnData, AppError, TData, TKey> & {
-    /**
-     * Whether to show error dialog automatically.
-     * Default: true
-     */
-    errorDialog?: boolean;
+type AppQueryOptions<
+  TQueryFnData,
+  TData,
+  TKey extends ReadonlyArray<unknown>,
+> = UseQueryOptions<TQueryFnData, AppError, TData, TKey> & {
+  /**
+   * Whether to show error dialog automatically.
+   * Default: true
+   */
+  errorDialog?: boolean;
 
-    /**
-     * Whether to show Retry dialog (for network/5xx) and refetch on confirm.
-     * Default: true
-     */
-    retryDialog?: boolean;
+  /**
+   * Whether to show Retry dialog (for network/5xx) and refetch on confirm.
+   * Default: true
+   */
+  retryDialog?: boolean;
 
-    /**
-     * Custom error handler
-     */
-    onError?: (err: AppError) => void | Promise<void>;
-  };
+  /**
+   * Custom error handler
+   */
+  onError?: (err: AppError) => void | Promise<void>;
+};
 
 export function useAppQuery<
   TQueryFnData extends ApiSuccessResponse<unknown>,
@@ -71,7 +74,7 @@ export function useAppQuery<
             await showErrorDialog(appError, {
               onRetry: async () => {
                 lastErrorRef.current = null;
-                await queryClient.refetchQueries({ queryKey: queryKey as any });
+                await queryClient.refetchQueries({ queryKey: queryKey });
               },
             });
           } else {
@@ -84,30 +87,46 @@ export function useAppQuery<
     } else if (!query.error) {
       lastErrorRef.current = null;
     }
-  }, [query.error, queryKey, errorDialog, retryDialog, onError, queryClient, showErrorDialog]);
+  }, [
+    query.error,
+    queryKey,
+    errorDialog,
+    retryDialog,
+    onError,
+    queryClient,
+    showErrorDialog,
+  ]);
 
   return query;
 }
 
-type AppMutationOptions<TData, TVariables, TContext> =
-  UseMutationOptions<TData, AppError, TVariables, TContext> & {
-    /**
-     * Whether to show error dialog automatically.
-     * Default: true
-     */
-    errorDialog?: boolean;
+type AppMutationOptions<TData, TVariables, TContext> = UseMutationOptions<
+  TData,
+  AppError,
+  TVariables,
+  TContext
+> & {
+  /**
+   * Whether to show error dialog automatically.
+   * Default: true
+   */
+  errorDialog?: boolean;
 
-    /**
-     * Whether to show Retry dialog (for network/5xx).
-     * Default: true
-     */
-    retryDialog?: boolean;
+  /**
+   * Whether to show Retry dialog (for network/5xx).
+   * Default: true
+   */
+  retryDialog?: boolean;
 
-    /**
-     * Custom error handler matching UseMutationOptions signature or simplified
-     */
-    onAppError?: (err: AppError, variables: TVariables, context: TContext | undefined) => void | Promise<void>;
-  };
+  /**
+   * Custom error handler matching UseMutationOptions signature or simplified
+   */
+  onAppError?: (
+    err: AppError,
+    variables: TVariables,
+    context: TContext | undefined,
+  ) => void | Promise<void>;
+};
 
 export function useAppMutation<TData, TVariables = void, TContext = unknown>(
   options: AppMutationOptions<TData, TVariables, TContext>,

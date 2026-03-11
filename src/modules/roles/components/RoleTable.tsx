@@ -1,4 +1,11 @@
-import { DeleteIcon, EditOutlinedIcon, MoreVertIcon, UiDataTable, UiEntityTableCard } from '@libs/ui';
+import {
+  DeleteIcon,
+  EditOutlinedIcon,
+  MoreVertIcon,
+  UiDataTable,
+  UiEntityTableCard,
+  UiStatusBadge,
+} from '@libs/ui';
 import {
   Avatar,
   Box,
@@ -34,7 +41,8 @@ export const RoleTable = ({
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
 
-  const { canEdit: canEditRole, canDelete: canDeleteRole } = useRolePermissions();
+  const { canEdit: canEditRole, canDelete: canDeleteRole } =
+    useRolePermissions();
 
   const openMenu = (event: React.MouseEvent<HTMLElement>, roleId: number) => {
     setMenuAnchor(event.currentTarget);
@@ -58,7 +66,7 @@ export const RoleTable = ({
         width: 50,
         align: 'center' as const,
         render: (_: Role, index: number) => (
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          <Typography variant="body2" color="text.secondary">
             {page * size + index + 1}
           </Typography>
         ),
@@ -68,15 +76,12 @@ export const RoleTable = ({
         header: 'ROLE NAME',
         render: (role: Role) => {
           return (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Box className="flex items-center gap-1.5">
               <Avatar
                 sx={{ width: 40, height: 40 }}
                 src={`https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(role.name)}`}
               />
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: 600, color: 'text.primary' }}
-              >
+              <Typography variant="body2" color="text.primary" className="font-semibold">
                 {role.name}
               </Typography>
             </Box>
@@ -101,27 +106,11 @@ export const RoleTable = ({
         key: 'status',
         header: 'STATUS',
         render: (row: Role) => (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box
-              component="span"
-              sx={{
-                width: 8,
-                height: 8,
-                borderRadius: '50%',
-                bgcolor: row.status ? '#10b981' : '#9ca3af',
-                display: 'inline-block',
-              }}
-            />
-            <Typography
-              variant="body2"
-              sx={{
-                fontWeight: 600,
-                color: row.status ? 'text.primary' : 'text.secondary',
-              }}
-            >
-              {row.status ? 'Active' : 'Inactive'}
-            </Typography>
-          </Box>
+          <UiStatusBadge
+            status={row.status ? 'active' : 'inactive'}
+            activeLabel="Active"
+            inactiveLabel="Inactive"
+          />
         ),
       },
       {
@@ -142,13 +131,7 @@ export const RoleTable = ({
   return (
     <>
       <UiEntityTableCard
-        total={total}
-        page={page}
-        size={size}
-        entityLabelPlural="Roles"
-        filterLabel="All Role Types"
-      >
-        <Box>
+        tableContent={
           <UiDataTable
             aria-label="Roles table"
             rows={rows}
@@ -162,36 +145,24 @@ export const RoleTable = ({
                     rowsPerPage: size,
                     total,
                     onPageChange: (newPage) =>
-                      onPaginationChange({ page: newPage, size }),
+                      onPaginationChange({ page: newPage, size: size }),
                     onRowsPerPageChange: (newSize) =>
                       onPaginationChange({ page: 0, size: newSize }),
                   }
                 : undefined
             }
             emptyState={
-              <div className="py-10 text-center">
+              <Box className="py-10 text-center">
                 <Typography variant="body2" color="text.secondary">
                   No roles found.
                 </Typography>
-              </div>
+              </Box>
             }
           />
-        </Box>
-      </UiEntityTableCard>
+        }
+      />
 
-      <Menu
-        anchorEl={menuAnchor}
-        open={Boolean(menuAnchor)}
-        onClose={closeMenu}
-        slotProps={{
-          paper: {
-            sx: {
-              minWidth: 180,
-              borderRadius: 2,
-            },
-          },
-        }}
-      >
+      <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={closeMenu}>
         {canEditRole && (
           <MenuItem
             onClick={() => {

@@ -1,13 +1,3 @@
-/**
- * Standardized Query Key Factory
- *
- * This follows the pattern: [domain, scope, ...params]
- *
- * Benefits:
- * 1. Type safety for query keys
- * 2. Easy invalidation by domain or scope
- * 3. Centralized key management
- */
 export const queryKeys = {
   auth: {
     all: ['auth'] as const,
@@ -41,7 +31,12 @@ export const queryKeys = {
     lists: () => [...queryKeys.device.all, 'list'] as const,
     list: (params: unknown) =>
       [...queryKeys.device.lists(), { params }] as const,
+    details: () => [...queryKeys.device.all, 'detail'] as const,
+    detail: (id: string | number) => [...queryKeys.device.details(), id] as const,
     status: () => [...queryKeys.device.all, 'status'] as const,
+    protocolLists: () => [...queryKeys.device.all, 'protocol-list'] as const,
+    protocolList: (params: unknown) =>
+      [...queryKeys.device.protocolLists(), { params }] as const,
   },
   dashboard: {
     all: ['dashboard'] as const,

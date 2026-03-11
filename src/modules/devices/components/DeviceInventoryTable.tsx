@@ -1,5 +1,9 @@
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
+  Avatar,
   Box,
   IconButton,
   ListItemIcon,
@@ -10,24 +14,35 @@ import {
 } from '@mui/material';
 import React, { useMemo, useState } from 'react';
 
+import { UiDataTable, UiEntityTableCard, UiStatusBadge } from '@libs/ui';
 import type { PaginationResult } from '@services/http';
-import { UiDataTable, UiEntityTableCard } from '@libs/ui';
 
-import type { Device } from '../types';
 import { useDeviceInventoryPermissions } from '../hooks/useDeviceInventoryPermissions';
+import type { Device } from '../types';
 
 interface DeviceInventoryTableProps {
   rows: Array<Device>;
   loading?: boolean;
+  onView: (id: number) => void;
   onEdit: (id: number) => void;
   onDelete: (id: number) => void;
   pagination?: PaginationResult;
   onPaginationChange: (next: { page: number; size: number }) => void;
 }
 
+const getDeviceInitials = (name: string) => {
+  const chunks = name.trim().split(/[-_\s]+/).filter(Boolean);
+  if (chunks.length === 0) return 'DV';
+
+  const first = chunks[0]?.[0] ?? '';
+  const second = chunks[1]?.[0] ?? '';
+  return `${first}${second}`.toUpperCase();
+};
+
 export const DeviceInventoryTable = ({
   rows,
   loading,
+  onView,
   onEdit,
   onDelete,
   pagination,
@@ -36,25 +51,39 @@ export const DeviceInventoryTable = ({
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [selectedDeviceId, setSelectedDeviceId] = useState<number | null>(null);
 
-  const { canEdit, canDelete } = useDeviceInventoryPermissions();
+  const { canView, canEdit, canDelete } = useDeviceInventoryPermissions();
 
   const openMenu = (event: React.MouseEvent<HTMLElement>, deviceId: number) => {
     setMenuAnchor(event.currentTarget);
     setSelectedDeviceId(deviceId);
   };
 
+  const blurActiveElement = () => {
+    const activeElement = document.activeElement;
+    if (activeElement instanceof HTMLElement) {
+      activeElement.blur();
+    }
+  };
+
   const closeMenu = () => {
+    blurActiveElement();
     setMenuAnchor(null);
     setSelectedDeviceId(null);
   };
 
+  const handleViewClick = () => {
+    blurActiveElement();
+    if (selectedDeviceId != null) onView(selectedDeviceId);
+    closeMenu();
+  };
+
   const handleEditClick = () => {
-    if (onEdit && selectedDeviceId != null) onEdit(selectedDeviceId);
+    if (selectedDeviceId != null) onEdit(selectedDeviceId);
     closeMenu();
   };
 
   const handleDeleteClick = () => {
-    if (onDelete && selectedDeviceId != null) onDelete(selectedDeviceId);
+    if (selectedDeviceId != null) onDelete(selectedDeviceId);
     closeMenu();
   };
 
@@ -70,73 +99,60 @@ export const DeviceInventoryTable = ({
         width: 50,
         align: 'center' as const,
         render: (_: Device, index: number) => (
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          <Typography variant="body2" color="text.secondary">
             {page * size + index + 1}
           </Typography>
         ),
       },
       {
         key: 'name',
-        header: 'DEVICE',
+        header: 'DEVICE IDENTITY',
         render: (device: Device) => (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-            <Typography
-              variant="body2"
-              sx={{ fontWeight: 600, color: 'text.primary' }}
+          <Box className="flex items-center gap-2">
+            <Avatar
+              sx={{ width: 40, height: 40 }}
+              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(device.name)}&background=random`}
             >
-              {device.name}
-            </Typography>
-            <Typography
-              variant="caption"
-              sx={{ color: 'text.secondary' }}
-            >{`SN: ${device.serialNumber}`}</Typography>
+              {getDeviceInitials(device.name)}
+            </Avatar>
+            <Box>
+              <Typography variant="body2" color="text.primary" className="font-semibold">
+                {device.name}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {device.serialNumber}
+              </Typography>
+            </Box>
           </Box>
+        ),
+      },
+      {
+        key: 'ip',
+        header: 'IP',
+        render: (device: Device) => (
+          <Typography variant="body2" color="text.secondary">
+            {device.ip || 'N/A'}
+          </Typography>
+        ),
+      },
+      {
+        key: 'model',
+        header: 'MODEL',
+        render: (device: Device) => (
+          <Typography variant="body2" color="text.secondary">
+            {device.model || 'N/A'}
+          </Typography>
         ),
       },
       {
         key: 'status',
         header: 'STATUS',
         render: (device: Device) => (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box
-              component="span"
-              sx={{
-                width: 8,
-                height: 8,
-                borderRadius: '50%',
-                bgcolor: device.status === 'ACTIVE' ? '#10b981' : '#9ca3af',
-                display: 'inline-block',
-              }}
-            />
-            <Typography
-              variant="body2"
-              sx={{
-                fontWeight: 600,
-                color:
-                  device.status === 'ACTIVE' ? 'text.primary' : 'text.secondary',
-              }}
-            >
-              {device.status === 'ACTIVE' ? 'Active' : 'Inactive'}
-            </Typography>
-          </Box>
-        ),
-      },
-      {
-        key: 'location',
-        header: 'LOCATION',
-        render: (device: Device) => (
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            {device.location || 'N/A'}
-          </Typography>
-        ),
-      },
-      {
-        key: 'lastSeenAt',
-        header: 'LAST SEEN',
-        render: (device: Device) => (
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            {device.lastSeenAt || '—'}
-          </Typography>
+          <UiStatusBadge
+            status={device.status === 'Active' ? 'active' : 'inactive'}
+            activeLabel="Active"
+            inactiveLabel={device.status === 'Inactive' ? 'Inactive' : device.status}
+          />
         ),
       },
       {
@@ -144,7 +160,7 @@ export const DeviceInventoryTable = ({
         header: 'ACTIONS',
         align: 'right' as const,
         render: (device: Device) =>
-          canEdit || canDelete ? (
+          canView || canEdit || canDelete ? (
             <IconButton
               size="small"
               onClick={(e) => openMenu(e, device.id)}
@@ -155,18 +171,12 @@ export const DeviceInventoryTable = ({
           ) : null,
       },
     ];
-  }, [page, size, canEdit, canDelete]);
+  }, [canView, canEdit, canDelete, page, size]);
 
   return (
     <>
       <UiEntityTableCard
-        total={total}
-        page={page}
-        size={size}
-        entityLabelPlural="Devices"
-        filterLabel="All Device Types"
-      >
-        <Box>
+        tableContent={
           <UiDataTable
             aria-label="Devices table"
             rows={rows}
@@ -176,53 +186,48 @@ export const DeviceInventoryTable = ({
             pagination={
               pagination
                 ? {
-                    page,
+                    page: page,
                     rowsPerPage: size,
                     total,
                     onPageChange: (newPage) =>
-                      onPaginationChange({ page: newPage, size }),
+                      onPaginationChange({ page: newPage, size: size }),
                     onRowsPerPageChange: (newSize) =>
                       onPaginationChange({ page: 0, size: newSize }),
                   }
                 : undefined
             }
             emptyState={
-              <div className="py-10 text-center">
+              <Box className="py-10 text-center">
                 <Typography variant="body2" color="text.secondary">
                   No devices found.
                 </Typography>
-              </div>
+              </Box>
             }
           />
-        </Box>
-      </UiEntityTableCard>
+        }
+      />
 
-      <Menu
-        anchorEl={menuAnchor}
-        open={Boolean(menuAnchor)}
-        onClose={closeMenu}
-        slotProps={{
-          paper: {
-            sx: {
-              minWidth: 180,
-              borderRadius: 2,
-            },
-          },
-        }}
-      >
+      <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={closeMenu}>
+        {canView && (
+          <MenuItem onClick={handleViewClick}>
+            <ListItemIcon>
+              <VisibilityIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>View Device</ListItemText>
+          </MenuItem>
+        )}
         {canEdit && (
           <MenuItem onClick={handleEditClick}>
             <ListItemIcon>
-              {/* Reuse generic edit icon from MUI to keep component local */}
-              <MoreVertIcon fontSize="small" />
+              <EditIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText>Edit Device</ListItemText>
           </MenuItem>
         )}
         {canDelete && (
-          <MenuItem onClick={handleDeleteClick} sx={{ color: 'error.main' }}>
+          <MenuItem onClick={handleDeleteClick}>
             <ListItemIcon>
-              <MoreVertIcon fontSize="small" color="error" />
+              <DeleteIcon fontSize="small" color="error" />
             </ListItemIcon>
             <ListItemText>Delete</ListItemText>
           </MenuItem>
@@ -231,4 +236,3 @@ export const DeviceInventoryTable = ({
     </>
   );
 };
-

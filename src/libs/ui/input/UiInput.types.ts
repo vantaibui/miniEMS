@@ -14,6 +14,7 @@ export interface UiInputProps {
   startAdornment?: ReactNode;
   endAdornment?: ReactNode;
   className?: string;
+  passwordToggle?: boolean;
 
   name?: string;
   value?: string;
