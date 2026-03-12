@@ -81,9 +81,9 @@ export const DeviceDetailsContent = ({
         >
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
-              <Typography variant="h3" sx={{ fontWeight: 800, color: '#0F172A' }}>
-                {device.name ?? fallback}
-              </Typography>
+            <Typography variant="h3" sx={{ fontWeight: 800, color: '#0F172A' }}>
+              {device.name ?? fallback}
+            </Typography>
               <Chip
                 label={(device.status ?? 'Unknown').toUpperCase()}
                 sx={{
@@ -106,33 +106,26 @@ export const DeviceDetailsContent = ({
               Workstation • {device.model ?? fallback}
             </Typography>
           </Box>
-
-          <UiButton
-            variant="secondary"
-            startIcon={<DownloadIcon fontSize="small" />}
-          >
-            Download Logs
-          </UiButton>
         </Box>
       ) : null}
 
       <Grid container spacing={2.5}>
-        <SpecItem label="Serial Number" value={device.serialNumber} />
-        <SpecItem label="IP Address" value={device.ip} />
-        <SpecItem label="Model" value={device.model} />
+          <SpecItem label="Serial Number" value={device.serialNumber} />
+          <SpecItem label="IP Address" value={device.ip} />
+          <SpecItem label="Model" value={device.model} />
         <SpecItem label="SONiC Software Version" value={device.soNicSoftwareVersion} gridSize={{ xs: 12 }} />
       </Grid>
 
       <Grid container spacing={2.5} sx={{ borderTop: '1px solid', borderColor: '#E2E8F0', pt: 3 }}>
-        <SpecItem label="Distribution" value={device.distribution} />
-        <SpecItem label="Kernel" value={device.kernel} />
-        <SpecItem label="Build Commit" value={device.buildCommit} />
-        <SpecItem label="Platform" value={device.platform} />
+          <SpecItem label="Distribution" value={device.distribution} />
+          <SpecItem label="Kernel" value={device.kernel} />
+          <SpecItem label="Build Commit" value={device.buildCommit} />
+          <SpecItem label="Platform" value={device.platform} />
         <SpecItem label="Build Date" value={device.buildDate} gridSize={{ xs: 12 }} />
-        <SpecItem label="HW SKU" value={device.hwSKU} />
-        <SpecItem label="ASIC" value={device.asic} />
+          <SpecItem label="HW SKU" value={device.hwSKU} />
+          <SpecItem label="ASIC" value={device.asic} />
         <SpecItem label="Uptime" value={device.uptime} gridSize={{ xs: 12 }} />
-      </Grid>
+        </Grid>
     </Box>
   );
 

@@ -29,7 +29,7 @@ interface DeviceTestConnectionModalProps {
   open: boolean;
   onClose: () => void;
   data: ConnectionData;
-  onStart: () => Promise<boolean>;
+  onStart: () => Promise<TestStatus>;
   onStatusChange: (status: TestStatus) => void;
   isStarting?: boolean;
 }
@@ -86,10 +86,7 @@ export const DeviceTestConnectionModal = ({
   const [status, setStatus] = useState<TestStatus>(TestConnectionStatus.OutOfService);
 
   const handleStart = async () => {
-    const isSuccess = await onStart();
-    const nextStatus = isSuccess
-      ? TestConnectionStatus.InService
-      : TestConnectionStatus.OutOfService;
+    const nextStatus = await onStart();
     setStatus(nextStatus);
     onStatusChange(nextStatus);
   };

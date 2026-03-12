@@ -97,7 +97,7 @@ export const UiButton = forwardRef<HTMLButtonElement, UiButtonProps>(
         sx={{ fontWeight: 600, boxShadow: '0px 4px 12px rgba(11, 87, 208, 0.2)' }}
         className={cn(
           'min-w-0 disabled:opacity-50',
-          loading && 'pointer-events-none',
+          isDisabled && 'pointer-events-none opacity-50',
           className,
         )}
         {...rest}

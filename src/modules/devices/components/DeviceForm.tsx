@@ -26,7 +26,7 @@ const AUTH_OPTIONS: Array<{ label: string; value: DeviceAuthenticationType }> = 
   { label: 'Username/Password', value: 'USERNAME_PASSWORD' },
 ];
 
-const MAX_CERT_FILE_SIZE_KB = 20;
+const MAX_CERT_FILE_SIZE_KB = 100;
 const ALLOWED_CERT_EXTENSIONS: Array<string> = ['.crt', '.cert'];
 
 const schema: yup.ObjectSchema<CreateDevicePayload> = yup
@@ -75,7 +75,7 @@ const schema: yup.ObjectSchema<CreateDevicePayload> = yup
 
 interface DeviceFormProps {
   initialValues?: Partial<CreateDevicePayload>;
-  onSubmit: (data: CreateDevicePayload) => void;
+  onSubmit: (data: FormData) => void;
   onCancel: () => void;
   isLoading?: boolean;
   submitLabel?: string;
@@ -99,6 +99,7 @@ export const DeviceForm = ({
   submitLabel = 'Add Device',
 }: DeviceFormProps) => {
   const [certificateFileName, setCertificateFileName] = useState('');
+  const [certificateFile, setCertificateFile] = useState<File | null>(null);
   const [isTestConnectionModalOpen, setIsTestConnectionModalOpen] = useState(false);
   const [lastTestStatus, setLastTestStatus] = useState<TestStatus>(TestConnectionStatus.OutOfService);
   const [lastTestSignature, setLastTestSignature] = useState('');
@@ -130,6 +131,7 @@ export const DeviceForm = ({
   }, [defaultValues, reset]);
 
   const authenticationType = useWatch({ control, name: 'authenticationType' });
+  const hasInitialCertificate = Boolean(initialValues?.clientCertificate);
   const managementIp = useWatch({ control, name: 'managementIp' });
   const port = useWatch({ control, name: 'port' });
   const protocolId = useWatch({ control, name: 'protocolId' });
@@ -169,7 +171,23 @@ export const DeviceForm = ({
     [testSignature, lastTestSignature, lastTestStatus],
   );
 
-  const handleCertificateLoaded = ({ fileName, content }: { fileName: string; content: string }) => {
+  const clearCertificate = useCallback(() => {
+    if (!certificateFile && !certificateFileName && !clientCertificate) return;
+    setCertificateFile(null);
+    setCertificateFileName('');
+    setValue('clientCertificate', '', { shouldDirty: true, shouldValidate: true });
+  }, [certificateFile, certificateFileName, clientCertificate, setValue]);
+
+  const handleCertificateLoaded = ({
+    file,
+    fileName,
+    content,
+  }: {
+    file: File;
+    fileName: string;
+    content: string;
+  }) => {
+    setCertificateFile(file);
     setCertificateFileName(fileName);
     setValue('clientCertificate', content, { shouldDirty: true, shouldValidate: true });
     resetTestStatus();
@@ -177,9 +195,38 @@ export const DeviceForm = ({
 
   const handleCertificateInvalid = (message: string) => {
     toast.error(message);
-    setCertificateFileName('');
-    setValue('clientCertificate', '', { shouldDirty: true, shouldValidate: true });
+    clearCertificate();
     resetTestStatus();
+  };
+
+  const displayedCertificateName =
+    certificateFileName || (hasInitialCertificate ? initialValues?.clientCertificate || '' : '');
+
+  const buildDeviceFormData = (
+    payload: CreateDevicePayload,
+    options: {
+      includeCertificate: boolean;
+      certificateFile?: File | null;
+    },
+  ) => {
+    const formData = new FormData();
+    formData.append('managementIp', payload.managementIp);
+    formData.append('port', String(payload.port));
+    formData.append('protocolId', String(payload.protocolId));
+    formData.append('authenticationType', payload.authenticationType);
+
+    if (payload.authenticationType === 'USERNAME_PASSWORD') {
+      if (payload.username) formData.append('username', payload.username);
+      if (payload.password) formData.append('password', payload.password);
+    }
+
+    if (payload.authenticationType === 'CERT_BASE' && options.includeCertificate) {
+      if (options.certificateFile) {
+        formData.append('clientCertificate', options.certificateFile);
+      }
+    }
+
+    return formData;
   };
 
   const handleTestConnection = async () => {
@@ -195,31 +242,53 @@ export const DeviceForm = ({
 
     if (!payload.managementIp || !payload.port || !payload.protocolId) {
       toast.error('Please fill Management IP, Port and Protocol before testing.');
-      return false;
+      return TestConnectionStatus.OutOfService;
     }
 
-    try {
-      const response = await testConnection(payload);
-      const connected = response.data?.connected ?? false;
+    const formData = buildDeviceFormData(payload, {
+      includeCertificate: payload.authenticationType === 'CERT_BASE',
+      certificateFile,
+    });
 
-      if (connected) {
-        toast.success(response.data?.message || 'Connection test successful');
+    try {
+      const response = await testConnection(formData);
+      const nextStatus = (response.data as { status?: { value?: string } } | undefined)?.status?.value ?? TestConnectionStatus.OutOfService;
+
+      if (response.success) {
+        toast.success(response.message || 'Connection test successful');
       } else {
-        toast.error(response.data?.message || 'Connection test failed');
+        toast.error(response.message || 'Connection test failed');
       }
 
       setLastTestSignature(testSignature);
-      setLastTestStatus(
-        connected ? TestConnectionStatus.InService : TestConnectionStatus.OutOfService,
-      );
-      return connected;
+      setLastTestStatus(nextStatus as TestStatus);
+      return nextStatus as TestStatus;
     } catch {
-      return false;
+      return TestConnectionStatus.OutOfService;
     }
   };
 
+  const handleFormSubmit = (data: CreateDevicePayload) => {
+    const payload = {
+      managementIp: data.managementIp,
+      authenticationType: data.authenticationType,
+      port: Number(data.port),
+      protocolId: Number(data.protocolId),
+      username: data.username,
+      password: data.password,
+      clientCertificate: data.clientCertificate,
+    } as CreateDevicePayload;
+
+    const formData = buildDeviceFormData(payload, {
+      includeCertificate: payload.authenticationType === 'CERT_BASE' && Boolean(certificateFile),
+      certificateFile,
+    });
+
+    onSubmit(formData);
+  };
+
   return (
-    <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+    <Box component="form" onSubmit={handleSubmit(handleFormSubmit)}>
       <Card sx={{ p: { xs: 3, md: 5 }, borderRadius: 3, boxShadow: '0px 2px 10px rgba(0,0,0,0.05)' }}>
         <Stack spacing={4}>
           <Box>
@@ -337,7 +406,7 @@ export const DeviceForm = ({
                     <UploadFiled
                       acceptedExtensions={ALLOWED_CERT_EXTENSIONS}
                       maxFileSizeKb={MAX_CERT_FILE_SIZE_KB}
-                      selectedFileName={certificateFileName}
+                      selectedFileName={displayedCertificateName}
                       onFileLoaded={handleCertificateLoaded}
                       onInvalidFile={handleCertificateInvalid}
                     />
@@ -422,6 +491,7 @@ export const DeviceForm = ({
                 variant="outlined"
                 sx={{ ml: 2 }}
                 onClick={() => setIsTestConnectionModalOpen(true)}
+                disabled={!isValid}
               >
                 Test Connection
               </UiButton>

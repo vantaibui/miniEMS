@@ -6,7 +6,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import { DeviceForm } from '../components/DeviceForm';
 import { useDeviceDetail, useDeviceUpdate } from '../hooks';
-import type { CreateDevicePayload } from '../types';
 
 export const DeviceInventoryEditPage = () => {
   const { id } = useParams();
@@ -23,7 +22,7 @@ export const DeviceInventoryEditPage = () => {
   const { data: device, isLoading: isLoadingDetail } = useDeviceDetail(parsedId);
   const { mutate: updateDevice, isPending: isUpdating } = useDeviceUpdate();
 
-  const handleSubmit = (data: CreateDevicePayload) => {
+  const handleSubmit = (data: FormData) => {
     if (parsedId === undefined) {
       toast.error('Device id is required');
       return;
@@ -35,13 +34,7 @@ export const DeviceInventoryEditPage = () => {
         payload: data,
       },
       {
-        onSuccess: (res) => {
-          toast.success(res.message || 'Device updated successfully!');
-          navigate('/device-inventory');
-        },
-        onError: (error) => {
-          toast.error(error.message || 'Failed to update device');
-        },
+        onSuccess: () => navigate('/device-inventory')
       },
     );
   };

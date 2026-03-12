@@ -11,7 +11,7 @@ interface UploadFiledProps {
   acceptedExtensions?: Array<string>;
   maxFileSizeKb?: number;
   selectedFileName?: string;
-  onFileLoaded: (payload: { fileName: string; content: string }) => void;
+  onFileLoaded: (payload: { file: File; fileName: string; content: string }) => void;
   onInvalidFile?: (message: string) => void;
 }
 
@@ -48,7 +48,7 @@ export const UploadFiled = ({
 
     const reader = new FileReader();
     reader.onload = () => {
-      onFileLoaded({ fileName: file.name, content: String(reader.result ?? '') });
+      onFileLoaded({ file, fileName: file.name, content: String(reader.result ?? '') });
     };
     reader.readAsText(file);
   };

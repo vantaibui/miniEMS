@@ -9,23 +9,21 @@ import { useToast } from '@libs/hooks';
 
 import { devicesApi } from '../api';
 import type {
-  CreateDevicePayload,
   Device,
   DeviceTestConnectionResult,
-  UpdateDevicePayload,
 } from '../types';
 
 export interface UpdateDeviceVariables {
   id: number | string;
-  payload: UpdateDevicePayload;
+  payload: FormData;
 }
 
 export const useDeviceCreate = () => {
   const queryClient = useQueryClient();
   const toast = useToast();
 
-  return useAppMutation<ApiSuccessResponse<Device>, CreateDevicePayload>({
-    mutationFn: (payload: CreateDevicePayload) => devicesApi.create(payload),
+  return useAppMutation<ApiSuccessResponse<Device>, FormData>({
+    mutationFn: (payload: FormData) => devicesApi.create(payload),
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.device.lists() });
       toast.success(resolveSuccessMessage(res.message, 'create'));
@@ -65,7 +63,7 @@ export const useDeviceDelete = () => {
 export const useDeviceTestConnection = () => {
   return useAppMutation<
     ApiSuccessResponse<DeviceTestConnectionResult>,
-    CreateDevicePayload
+    FormData
   >({
     mutationFn: (payload) => devicesApi.testConnection(payload),
   });

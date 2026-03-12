@@ -1,4 +1,3 @@
-import { useToast } from '@libs/hooks';
 import { AddIcon, UiBreadcrumb, UiButton, useDialogConfirm } from '@libs/ui';
 import { Box, Typography } from '@mui/material';
 import { useState } from 'react';
@@ -14,7 +13,6 @@ import {
 
 export const DeviceInventoryListPage = () => {
   const navigate = useNavigate();
-  const toast = useToast();
   const confirm = useDialogConfirm();
   const { canCreate } = useDeviceInventoryPermissions();
 
@@ -52,11 +50,7 @@ export const DeviceInventoryListPage = () => {
 
     if (!delDialog) return;
 
-    deleteDevice(id, {
-      onSuccess: (res) => {
-        toast.success(res.message || 'Device deleted successfully!');
-      },
-    });
+    deleteDevice(id);
   };
 
   const handleCreate = () => {

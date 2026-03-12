@@ -51,19 +51,20 @@ export const devicesApi = {
   },
 
   async create(
-    payload: CreateDevicePayload,
+    payload: FormData,
   ): Promise<ApiSuccessResponse<Device>> {
-    return await crud.create(payload);
+    return await http.post<Device, FormData>(DEVICES_ENDPOINTS.LIST, payload, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
   },
 
   async update(
     id: number | string,
-    payload: UpdateDevicePayload,
+    payload: FormData,
   ): Promise<ApiSuccessResponse<Device>> {
-    return await http.put<Device, UpdateDevicePayload>(
-      DEVICES_ENDPOINTS.DETAIL(id),
-      payload,
-    );
+    return await http.put<Device, FormData>(DEVICES_ENDPOINTS.DETAIL(id), payload, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
   },
 
   async delete(id: number | string): Promise<ApiSuccessResponse<void>> {
@@ -71,11 +72,14 @@ export const devicesApi = {
   },
 
   async testConnection(
-    payload: CreateDevicePayload,
+    payload: FormData,
   ): Promise<ApiSuccessResponse<DeviceTestConnectionResult>> {
-    return await http.post<DeviceTestConnectionResult>(
+    return await http.post<DeviceTestConnectionResult, FormData>(
       DEVICES_ENDPOINTS.TEST_CONNECTION,
       payload,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      },
     );
   },
 };

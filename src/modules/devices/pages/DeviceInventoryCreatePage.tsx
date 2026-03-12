@@ -1,27 +1,18 @@
-import { useToast } from '@libs/hooks';
 import { UiBreadcrumb } from '@libs/ui';
 import { Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 import { DeviceForm } from '../components/DeviceForm';
 import { useDeviceCreate } from '../hooks';
-import type { CreateDevicePayload } from '../types';
 
 export const DeviceInventoryCreatePage = () => {
   const navigate = useNavigate();
-  const toast = useToast();
 
   const { mutate: createDevice, isPending: isCreating } = useDeviceCreate();
 
-  const handleSubmit = (data: CreateDevicePayload) => {
+  const handleSubmit = (data: FormData) => {
     createDevice(data, {
-      onSuccess: (res) => {
-        toast.success(res.message || 'Device created successfully!');
-        navigate('/device-inventory');
-      },
-      onError: (error) => {
-        toast.error(error.message || 'Failed to create device');
-      },
+      onSuccess: () => navigate('/device-inventory')
     });
   };
 
