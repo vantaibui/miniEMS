@@ -13,4 +13,4 @@ export interface BaseRolePayload {
 
 export type CreateRolePayload = BaseRolePayload;
 
-export type UpdateRolePayload  = BaseRolePayload;
+export type UpdateRolePayload = BaseRolePayload;

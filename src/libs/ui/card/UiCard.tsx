@@ -2,6 +2,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 
 import { cn } from '../utils/cn';
+
 import type { UiCardPadding, UiCardProps } from './UiCard.types';
 
 function paddingClass(padding: UiCardPadding) {

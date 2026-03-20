@@ -1,21 +1,22 @@
-import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+
 import { Box, CircularProgress, Typography } from '@mui/material';
-import { useToast } from '@libs/hooks';
+import { useNavigate } from 'react-router-dom';
+
 import { UiBreadcrumb } from '@libs/ui';
 
-import { useRoleCreate, usePermissions } from '../hooks';
 import { RoleForm } from '../components/RoleForm';
+import { usePermissions, useRoleCreate } from '../hooks';
+
 import type { CreateRolePayload } from '../types';
 
 export const RoleCreatePage = () => {
   const navigate = useNavigate();
-  const toast = useToast();
   const [pagination, setPagination] = useState({ page: 0, size: 10 });
 
   const { data: permissionsRes, isLoading: isLoadingPermissions } =
     usePermissions(pagination);
-  
+
   const permissions = permissionsRes?.items ?? [];
   const permissionsPagination = permissionsRes?.pagination;
 
@@ -23,12 +24,7 @@ export const RoleCreatePage = () => {
 
   const handleSubmit = (data: CreateRolePayload) => {
     createRole(data, {
-      onSuccess: (response) => {
-        toast.success(
-          response.success ? response?.message : 'Role created successfully!',
-        );
-        navigate('/roles');
-      },
+      onSuccess: () => navigate('/roles'),
     });
   };
 

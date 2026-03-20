@@ -1,10 +1,10 @@
-import Dialog from '@mui/material/Dialog';
+import Dialog, { type DialogProps } from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import type { DialogProps } from '@mui/material/Dialog';
 
 import { cn } from '@libs/utils';
+
 import type { UiModalSize, UiModalProps } from './UiModal.types';
 
 function mapSize(size: UiModalSize): DialogProps['maxWidth'] {

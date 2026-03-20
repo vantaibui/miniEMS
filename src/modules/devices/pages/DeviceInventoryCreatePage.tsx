@@ -1,6 +1,7 @@
-import { UiBreadcrumb } from '@libs/ui';
 import { Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+
+import { UiBreadcrumb } from '@libs/ui';
 
 import { DeviceForm } from '../components/DeviceForm';
 import { useDeviceCreate } from '../hooks';
@@ -12,7 +13,7 @@ export const DeviceInventoryCreatePage = () => {
 
   const handleSubmit = (data: FormData) => {
     createDevice(data, {
-      onSuccess: () => navigate('/device-inventory')
+      onSuccess: () => navigate('/device-inventory'),
     });
   };
 

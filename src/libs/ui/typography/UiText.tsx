@@ -1,7 +1,9 @@
-import Typography, { type TypographyProps } from '@mui/material/Typography';
 import { forwardRef } from 'react';
 
+import Typography, { type TypographyProps } from '@mui/material/Typography';
+
 import { cn } from '../utils/cn';
+
 import type { UiTextProps, UiTextVariant, UiTextTone } from './UiText.types';
 
 type MuiTypographyVariant = 'h4' | 'h6' | 'body1' | 'body2';

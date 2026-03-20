@@ -1,3 +1,5 @@
+import { type ReactNode, useState } from 'react';
+
 import FilterListIcon from '@mui/icons-material/FilterList';
 import {
   Box,
@@ -8,8 +10,6 @@ import {
   Tabs,
   Typography,
 } from '@mui/material';
-import type { ReactNode } from 'react';
-import { useState } from 'react';
 
 export interface UiEntityTableCardProps {
   total: number;
@@ -148,4 +148,3 @@ export const UiEntityTableCard = ({
     </Card>
   );
 };
-

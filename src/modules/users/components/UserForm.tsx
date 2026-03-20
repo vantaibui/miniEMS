@@ -1,4 +1,12 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import PersonIcon from '@mui/icons-material/Person';
+import SecurityIcon from '@mui/icons-material/Security';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import { Box, Card, MenuItem, Select, Stack, Typography } from '@mui/material';
+import Grid from '@mui/material/Grid';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import * as yup from 'yup';
+
 import {
   DeleteIcon,
   UiButton,
@@ -6,34 +14,16 @@ import {
   UiFormField,
   UiInput,
 } from '@libs/ui';
-import {
-  Box,
-  Card,
-  IconButton,
-  MenuItem,
-  Select,
-  Stack,
-  Typography,
-} from '@mui/material';
-import Grid from '@mui/material/Grid';
-import { Controller, useForm, useWatch } from 'react-hook-form';
-import * as yup from 'yup';
-
-import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
-import MailOutlineIcon from '@mui/icons-material/MailOutline';
-import PersonIcon from '@mui/icons-material/Person';
-import SecurityIcon from '@mui/icons-material/Security';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
-
-import ShieldIcon from '@mui/icons-material/Shield';
 
 import type { PaginationResult } from '@services/http';
+
 import { RolePermissionMatrix } from '../../roles/components/RolePermissionMatrix';
 import {
   usePermissions,
   usePermissionsById,
   useRoles,
 } from '../../roles/hooks';
+
 import type { PermissionNode } from '../../roles/types';
 import type { CreateUserPayload } from '../types';
 
@@ -207,15 +197,7 @@ export const UserForm = ({
                       errorText={errors.firstName?.message}
                       required
                     >
-                      <UiInput
-                        {...field}
-                        placeholder="e.g. Alex"
-                        startAdornment={
-                          <PersonIcon
-                            sx={{ color: 'text.secondary', fontSize: 20 }}
-                          />
-                        }
-                      />
+                      <UiInput {...field} placeholder="e.g. Alex" />
                     </UiFormField>
                   )}
                 />
@@ -230,15 +212,7 @@ export const UserForm = ({
                       errorText={errors.lastName?.message}
                       required
                     >
-                      <UiInput
-                        {...field}
-                        placeholder="e.g. Rivers"
-                        startAdornment={
-                          <PersonIcon
-                            sx={{ color: 'text.secondary', fontSize: 20 }}
-                          />
-                        }
-                      />
+                      <UiInput {...field} placeholder="e.g. Rivers" />
                     </UiFormField>
                   )}
                 />
@@ -253,15 +227,7 @@ export const UserForm = ({
                       errorText={errors.username?.message}
                       required
                     >
-                      <UiInput
-                        {...field}
-                        placeholder="e.g. alex.rivers"
-                        startAdornment={
-                          <AssignmentIndIcon
-                            sx={{ color: 'text.secondary', fontSize: 20 }}
-                          />
-                        }
-                      />
+                      <UiInput {...field} placeholder="e.g. alex.rivers" />
                     </UiFormField>
                   )}
                 />
@@ -280,11 +246,6 @@ export const UserForm = ({
                         {...field}
                         placeholder="your-email@com.vn"
                         type="email"
-                        startAdornment={
-                          <MailOutlineIcon
-                            sx={{ color: 'text.secondary', fontSize: 20 }}
-                          />
-                        }
                       />
                     </UiFormField>
                   )}
@@ -306,11 +267,6 @@ export const UserForm = ({
                           placeholder="Enter password"
                           type="password"
                           passwordToggle
-                          startAdornment={
-                            <VpnKeyIcon
-                              sx={{ color: 'text.secondary', fontSize: 20 }}
-                            />
-                          }
                         />
                       </UiFormField>
                     )}
@@ -355,22 +311,10 @@ export const UserForm = ({
                         }}
                       >
                         <MenuItem disabled value="">
-                            <ShieldIcon
-                              fontSize="small"
-                              sx={{ mr: 1, verticalAlign: 'middle' }}
-                            />
-                            Choose Security Role
+                          Choose Security Role
                         </MenuItem>
                         {roles.map((role) => (
                           <MenuItem key={role.id} value={role.id}>
-                            <ShieldIcon
-                              fontSize="small"
-                              sx={{
-                                mr: 1,
-                                color: 'text.secondary',
-                                verticalAlign: 'middle',
-                              }}
-                            />{' '}
                             {role.name}
                           </MenuItem>
                         ))}

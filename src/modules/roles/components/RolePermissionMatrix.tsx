@@ -1,8 +1,11 @@
-import { Box, Checkbox, Typography } from '@mui/material';
 import { useCallback, useMemo } from 'react';
 
+import { Box, Checkbox, Typography } from '@mui/material';
+
 import { UiDataTable } from '@libs/ui';
+
 import type { PaginationResult } from '@services/http';
+
 import type { PermissionNode } from '../types';
 
 interface FlatPermissionNode extends PermissionNode {

@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState } from 'react';
 
 export interface PaginationState {
   page: number;
@@ -20,14 +20,19 @@ export interface UseAppPaginationOptions {
  */
 export function useAppPagination(options: UseAppPaginationOptions = {}) {
   const [page, setPage] = useState(options.initialPage ?? 0);
-  const [rowsPerPage, setRowsPerPage] = useState(options.initialRowsPerPage ?? 10);
+  const [rowsPerPage, setRowsPerPage] = useState(
+    options.initialRowsPerPage ?? 10,
+  );
 
-  // Sync with server page if provided (handles clamping/BE source of truth)
-  useEffect(() => {
-    if (options.serverPage !== undefined && options.serverPage !== page) {
-      setPage(options.serverPage);
-    }
-  }, [options.serverPage, page]);
+  // Track previous serverPage in state to detect changes (React getDerivedStateFromProps pattern)
+  const [prevServerPage, setPrevServerPage] = useState(options.serverPage);
+  if (
+    prevServerPage !== options.serverPage &&
+    options.serverPage !== undefined
+  ) {
+    setPrevServerPage(options.serverPage);
+    setPage(options.serverPage);
+  }
 
   const onPageChange = useCallback((newPage: number) => {
     setPage(newPage);

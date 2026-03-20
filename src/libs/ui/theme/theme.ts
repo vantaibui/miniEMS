@@ -1,4 +1,5 @@
 import { createTheme } from '@mui/material/styles';
+
 import { tokens } from './tokens';
 
 // Project uses single-theme mode by design
@@ -153,7 +154,7 @@ const baseTheme = createTheme({
           padding: 0,
           '&:last-child': {
             paddingBottom: 0,
-          }
+          },
         },
       },
     },

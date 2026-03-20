@@ -3,6 +3,7 @@ import AlertTitle from '@mui/material/AlertTitle';
 import IconButton from '@mui/material/IconButton';
 
 import { cn } from '../utils/cn';
+
 import type { UiAlertProps } from './UiAlert.types';
 
 export function UiAlert({

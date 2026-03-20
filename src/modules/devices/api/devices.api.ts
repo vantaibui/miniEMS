@@ -1,4 +1,8 @@
-import { createResourceApi, http, type ApiSuccessResponse } from '@services/http';
+import {
+  createResourceApi,
+  http,
+  type ApiSuccessResponse,
+} from '@services/http';
 
 import { DEVICES_ENDPOINTS } from './devices.endpoints';
 
@@ -7,10 +11,15 @@ import type {
   Device,
   DeviceDetail,
   DeviceTestConnectionResult,
+  Protocol,
   UpdateDevicePayload,
 } from '../types';
 
-const crud = createResourceApi<Device, CreateDevicePayload, UpdateDevicePayload>({
+const crud = createResourceApi<
+  Device,
+  CreateDevicePayload,
+  UpdateDevicePayload
+>({
   base: DEVICES_ENDPOINTS.LIST,
 });
 
@@ -18,11 +27,6 @@ export interface DevicesListParams {
   page?: number;
   size?: number;
   [key: string]: unknown;
-}
-
-export interface Protocol {
-  id: number;
-  display: string;
 }
 
 export interface ProtocolsListParams {
@@ -46,13 +50,13 @@ export const devicesApi = {
     });
   },
 
-  async getById(id: number | string): Promise<ApiSuccessResponse<DeviceDetail>> {
+  async getById(
+    id: number | string,
+  ): Promise<ApiSuccessResponse<DeviceDetail>> {
     return await http.get<DeviceDetail>(DEVICES_ENDPOINTS.DETAIL(id));
   },
 
-  async create(
-    payload: FormData,
-  ): Promise<ApiSuccessResponse<Device>> {
+  async create(payload: FormData): Promise<ApiSuccessResponse<Device>> {
     return await http.post<Device, FormData>(DEVICES_ENDPOINTS.LIST, payload, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
@@ -62,9 +66,13 @@ export const devicesApi = {
     id: number | string,
     payload: FormData,
   ): Promise<ApiSuccessResponse<Device>> {
-    return await http.put<Device, FormData>(DEVICES_ENDPOINTS.DETAIL(id), payload, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    return await http.patch<Device, FormData>(
+      DEVICES_ENDPOINTS.DETAIL(id),
+      payload,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      },
+    );
   },
 
   async delete(id: number | string): Promise<ApiSuccessResponse<void>> {

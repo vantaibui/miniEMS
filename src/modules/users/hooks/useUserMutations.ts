@@ -1,10 +1,16 @@
 import { useQueryClient } from '@tanstack/react-query';
 
-import { queryKeys, useAppMutation } from '@/libs/query';
-import { resolveSuccessMessage, type ApiSuccessResponse } from '@/services/http';
 import { useToast } from '@libs/hooks';
+
 import { usersApi } from '../api';
+
 import type { CreateUserPayload, User, UpdateUserPayload } from '../types';
+
+import { queryKeys, useAppMutation } from '@/libs/query';
+import {
+  resolveSuccessMessage,
+  type ApiSuccessResponse,
+} from '@/services/http';
 
 export interface UpdateUserVariables {
   id: number | string;

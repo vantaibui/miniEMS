@@ -1,16 +1,18 @@
-import { useToast } from '@libs/hooks';
-import { UiBreadcrumb, useDialogConfirm } from '@libs/ui';
-import { Box, CircularProgress, Typography } from '@mui/material';
 import { useState } from 'react';
+
+import { Box, CircularProgress, Typography } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
+
+import { UiBreadcrumb, useDialogConfirm } from '@libs/ui';
 
 import { RoleForm } from '../components/RoleForm';
 import {
   usePermissionsById,
   useRoleDelete,
   useRoleDetail,
-  useRoleUpdate
+  useRoleUpdate,
 } from '../hooks';
+
 import type { BaseRolePayload, PermissionNode } from '../types';
 
 const extractAllocatedPermissions = (
@@ -18,7 +20,7 @@ const extractAllocatedPermissions = (
 ): Array<{
   id: number;
   actions: { create: boolean; read: boolean; update: boolean; delete: boolean };
-  }> => {
+}> => {
   return nodes
     .filter(
       (node) =>
@@ -28,7 +30,7 @@ const extractAllocatedPermissions = (
           node.actions.update ||
           node.actions.delete),
     )
-    .map(({id, actions}) => ({
+    .map(({ id, actions }) => ({
       id: id,
       actions: {
         create: actions.create,
@@ -41,7 +43,6 @@ const extractAllocatedPermissions = (
 
 export const RoleEditPage = () => {
   const navigate = useNavigate();
-  const toast = useToast();
   const { id } = useParams();
   const roleId = id ? Number(id) : undefined;
   const [pagination, setPagination] = useState({ page: 0, size: 10 });
@@ -62,12 +63,7 @@ export const RoleEditPage = () => {
     updateRole(
       { id: roleId, payload: { ...data } },
       {
-        onSuccess: (response) => {
-          toast.success(
-            response.success ? response?.message : 'Role updated successfully!',
-          );
-          navigate('/roles');
-        },
+        onSuccess: () => navigate('/roles'),
       },
     );
   };
@@ -77,22 +73,17 @@ export const RoleEditPage = () => {
       type: 'delete',
       title: 'Delete role',
       description: 'Are you sure you want to delete this role?',
-      confirmText: 'Yes, Delete',
+      confirmText: 'Delete',
       cancelText: 'Cancel',
     });
 
     if (!delDialog) return;
 
-    deleteRole(id, {
-      onSuccess: (res) => {
-        toast.success(res.message || 'Role deleted successfully!');
-      },
-    });
+    deleteRole(id);
   };
 
   const isLoading =
-    isLoadingRole ||
-    (isLoadingPermissions && !permissions.length)
+    isLoadingRole || (isLoadingPermissions && !permissions.length);
 
   return (
     <Box>

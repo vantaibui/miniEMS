@@ -10,6 +10,7 @@ export const keycloakInitOptions = {
   onLoad: 'check-sso' as const,
   pkceMethod: 'S256' as const,
   checkLoginIframe: false,
+  silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
   enableLogging: import.meta.env.DEV,
   responseMode: 'fragment' as const,
 } as const;

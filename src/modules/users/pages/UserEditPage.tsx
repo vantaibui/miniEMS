@@ -1,16 +1,16 @@
-import { useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
+
 import { Box, CircularProgress, Typography } from '@mui/material';
-import { useToast } from '@libs/hooks';
+import { useNavigate, useParams } from 'react-router-dom';
+
 import { UiBreadcrumb } from '@libs/ui';
 
-import { useUserDetail, useUserUpdate, useUserDelete } from '../hooks';
 import { usePermissions } from '../../roles/hooks';
 import { UserForm } from '../components/UserForm';
+import { useUserDelete, useUserDetail, useUserUpdate } from '../hooks';
 
 export const UserEditPage = () => {
   const navigate = useNavigate();
-  const toast = useToast();
   const { id } = useParams();
   const userId = id ? Number(id) : undefined;
 
@@ -29,10 +29,7 @@ export const UserEditPage = () => {
     updateUser(
       { id: userId, payload: data },
       {
-        onSuccess: () => {
-          toast.success('User updated successfully!');
-          navigate('/users');
-        },
+        onSuccess: () => navigate('/users'),
       },
     );
   };

@@ -1,15 +1,15 @@
-import { useToast } from '@libs/hooks';
-import { AddIcon, UiBreadcrumb, UiButton, useDialogConfirm } from '@libs/ui';
-import { Box, Typography } from '@mui/material';
 import { useState } from 'react';
+
+import { Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+
+import { AddIcon, UiBreadcrumb, UiButton, useDialogConfirm } from '@libs/ui';
 
 import { RoleTable } from '../components/RoleTable';
 import { useRoleDelete, useRoles } from '../hooks';
 
 export const RoleListPage = () => {
   const navigate = useNavigate();
-  const toast = useToast();
   const confirm = useDialogConfirm();
 
   const [params, setParams] = useState({
@@ -32,17 +32,13 @@ export const RoleListPage = () => {
       type: 'delete',
       title: 'Delete role',
       description: 'Are you sure you want to delete this role?',
-      confirmText: 'Yes, Delete',
+      confirmText: 'Delete',
       cancelText: 'Cancel',
     });
 
     if (!delDialog) return;
 
-    deleteRole(id, {
-      onSuccess: (res) => {
-        toast.success(res.message || 'Role deleted successfully!');
-      },
-    });
+    deleteRole(id);
   };
 
   const handleCreate = () => {

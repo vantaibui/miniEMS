@@ -1,6 +1,7 @@
 import { hasPermission } from './rbac.utils';
-import type { PermissionNode } from '@libs/types';
 import { PERMISSION_ACTIONS } from '../constants/permissions.constants';
+
+import type { PermissionNode } from '../../../libs/types/permission.types';
 
 const buildPermissionNode = (
   overrides?: Partial<PermissionNode>,

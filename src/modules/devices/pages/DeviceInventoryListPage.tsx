@@ -1,7 +1,9 @@
-import { AddIcon, UiBreadcrumb, UiButton, useDialogConfirm } from '@libs/ui';
-import { Box, Typography } from '@mui/material';
 import { useState } from 'react';
+
+import { Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+
+import { AddIcon, UiBreadcrumb, UiButton, useDialogConfirm } from '@libs/ui';
 
 import { DeviceDetailsModal } from '../components/DeviceDetailsModal';
 import { DeviceInventoryTable } from '../components/DeviceInventoryTable';
@@ -21,7 +23,9 @@ export const DeviceInventoryListPage = () => {
     size: 10,
   });
 
-  const [viewDeviceId, setViewDeviceId] = useState<number | undefined>(undefined);
+  const [viewDeviceId, setViewDeviceId] = useState<number | undefined>(
+    undefined,
+  );
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
   const { data, isLoading } = useDevices(params);
@@ -44,7 +48,7 @@ export const DeviceInventoryListPage = () => {
       type: 'delete',
       title: 'Delete device',
       description: 'Are you sure you want to delete this device?',
-      confirmText: 'Yes, Delete',
+      confirmText: 'Delete',
       cancelText: 'Cancel',
     });
 
@@ -63,7 +67,7 @@ export const DeviceInventoryListPage = () => {
   };
 
   return (
-    <Box>
+    <Box className="flex min-h-full flex-col">
       <Box sx={{ mb: 2 }}>
         <UiBreadcrumb
           items={[
@@ -81,12 +85,19 @@ export const DeviceInventoryListPage = () => {
             mt: 2,
           }}
         >
-          <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary' }}>
+          <Typography
+            variant="h4"
+            sx={{ fontWeight: 700, color: 'text.primary' }}
+          >
             Device Inventory
           </Typography>
 
           {canCreate && (
-            <UiButton variant="primary" startIcon={<AddIcon />} onClick={handleCreate}>
+            <UiButton
+              variant="primary"
+              startIcon={<AddIcon />}
+              onClick={handleCreate}
+            >
               Add New Device
             </UiButton>
           )}

@@ -1,4 +1,5 @@
 import { createContext } from 'react';
+
 import type { UiConfirmDialogProps } from './UiConfirmDialog.types';
 
 type ConfirmOptions = Omit<UiConfirmDialogProps, 'isOpen' | 'onClose'>;

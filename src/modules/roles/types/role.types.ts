@@ -21,6 +21,6 @@ export interface RolePermissionModule {
   };
 }
 
-export interface RoleDetails extends Role{
+export interface RoleDetails extends Role {
   permissions: Array<RolePermissionModule>;
 }

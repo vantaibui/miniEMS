@@ -1,5 +1,6 @@
-import { useAuth, useRbacStore } from '@modules/auth';
 import { type ReactNode, useEffect } from 'react';
+
+import { useAuth, useRbacStore } from '@modules/auth';
 
 interface AppInitializerProps {
   children: ReactNode;

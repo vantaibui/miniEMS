@@ -7,9 +7,12 @@ import {
   IconButton,
   Typography,
 } from '@mui/material';
-import type { DialogProps } from '@mui/material/Dialog';
 
-import type { UiCommonModalProps, UiCommonModalSize } from './UiCommonModal.types';
+import type {
+  UiCommonModalProps,
+  UiCommonModalSize,
+} from './UiCommonModal.types';
+import type { DialogProps } from '@mui/material/Dialog';
 
 function mapSize(size: UiCommonModalSize): DialogProps['maxWidth'] {
   switch (size) {

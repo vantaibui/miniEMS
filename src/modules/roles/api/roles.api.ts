@@ -1,4 +1,10 @@
-import { createResourceApi, http, type ApiSuccessResponse } from '@services/http';
+import {
+  createResourceApi,
+  http,
+  type ApiSuccessResponse,
+} from '@services/http';
+
+import { ROLES_ENDPOINTS } from './roles.endpoints';
 
 import type {
   CreateRolePayload,
@@ -7,8 +13,6 @@ import type {
   Role,
   UpdateRolePayload,
 } from '../types';
-
-import { ROLES_ENDPOINTS } from './roles.endpoints';
 
 const crud = createResourceApi<
   RoleDetails,
@@ -24,11 +28,12 @@ export interface RolesListParams {
 }
 
 export const rolesApi = {
-  async getList(params?: RolesListParams): Promise<ApiSuccessResponse<Array<Role>>> {
-    return await http.get<Array<Role>>(
-      ROLES_ENDPOINTS.LIST,
-      { params: params as Record<string, unknown> },
-    );
+  async getList(
+    params?: RolesListParams,
+  ): Promise<ApiSuccessResponse<Array<Role>>> {
+    return await http.get<Array<Role>>(ROLES_ENDPOINTS.LIST, {
+      params: params as Record<string, unknown>,
+    });
   },
 
   async getById(id: number | string): Promise<ApiSuccessResponse<RoleDetails>> {
@@ -52,11 +57,13 @@ export const rolesApi = {
   ): Promise<ApiSuccessResponse<Array<PermissionNode>>> {
     return await http.get<Array<PermissionNode>>(
       ROLES_ENDPOINTS.ALL_PERMISSIONS,
-      { params: params as Record<string, unknown> }
+      { params: params as Record<string, unknown> },
     );
   },
 
-  async create(payload: CreateRolePayload): Promise<ApiSuccessResponse<RoleDetails>> {
+  async create(
+    payload: CreateRolePayload,
+  ): Promise<ApiSuccessResponse<RoleDetails>> {
     return await crud.create(payload);
   },
 

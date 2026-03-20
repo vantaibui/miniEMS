@@ -1,6 +1,12 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
-import { useAuthStore } from '@/modules/auth/store/auth.store';
+import { AuthContext } from './AuthContext';
 import {
   initKeycloak,
   keycloak,
@@ -9,7 +15,10 @@ import {
   refreshToken,
   startSessionWatcher,
 } from '../api/keycloak';
-import { AuthContext } from './AuthContext';
+import { AUTH_REFRESH_TOKEN_KEY, AUTH_TOKEN_KEY } from '../constants/storage';
+
+import { clearStorage, setStorage } from '@/libs/utils';
+import { useAuthStore } from '@/modules/auth/store/auth.store';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -34,12 +43,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         token: keycloak.token,
         refreshToken: keycloak.refreshToken,
       });
+
+      setStorage(AUTH_TOKEN_KEY, keycloak.token);
+      setStorage(AUTH_REFRESH_TOKEN_KEY, keycloak.refreshToken);
     } else {
       setAuth({
         isAuthenticated: false,
         token: undefined,
         refreshToken: undefined,
       });
+
+      clearStorage();
     }
   }, [setAuth]);
 
@@ -75,6 +89,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         token: undefined,
         refreshToken: undefined,
       });
+
+      clearStorage();
     };
 
     const init = async () => {

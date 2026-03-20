@@ -1,18 +1,18 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { UiButton, UiFormActions, UiFormField, UiInput } from '@libs/ui';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SecurityIcon from '@mui/icons-material/Security';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { Box, Card, Divider, Grid, Stack, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
-import DeleteIcon from '@mui/icons-material/Delete';
-import DescriptionIcon from '@mui/icons-material/Description';
-import SecurityIcon from '@mui/icons-material/Security';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import { UiButton, UiFormActions, UiFormField, UiInput } from '@libs/ui';
 
 import type { PaginationResult } from '@services/http';
-import type { CreateRolePayload, PermissionNode } from '../types';
+
 import { RolePermissionMatrix } from './RolePermissionMatrix';
+
+import type { CreateRolePayload, PermissionNode } from '../types';
 
 const schema = yup.object().shape({
   name: yup.string().required('Role name is required').min(2).max(50),
@@ -111,15 +111,7 @@ export const RoleForm = ({
                       errorText={errors.name?.message}
                       required
                     >
-                      <UiInput
-                        {...field}
-                        placeholder="e.g. Regional Manager"
-                        startAdornment={
-                          <AssignmentIndIcon
-                            sx={{ color: 'text.secondary', fontSize: 20 }}
-                          />
-                        }
-                      />
+                      <UiInput {...field} placeholder="e.g. Regional Manager" />
                     </UiFormField>
                   )}
                 />
@@ -132,16 +124,10 @@ export const RoleForm = ({
                     <UiFormField
                       label="DESCRIPTION"
                       errorText={errors.description?.message}
-                      required
                     >
                       <UiInput
                         {...field}
                         placeholder="Brief description of this role's purpose"
-                        startAdornment={
-                          <DescriptionIcon
-                            sx={{ color: 'text.secondary', fontSize: 20 }}
-                          />
-                        }
                       />
                     </UiFormField>
                   )}

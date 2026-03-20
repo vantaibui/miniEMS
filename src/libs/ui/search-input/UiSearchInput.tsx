@@ -1,6 +1,8 @@
 import { IconButton, CloseIcon, SearchIcon } from '@libs/ui';
 import { cn } from '@libs/utils';
+
 import { UiInput } from '../input';
+
 import type { UiSearchInputProps } from './UiSearchInput.types';
 
 export function UiSearchInput({

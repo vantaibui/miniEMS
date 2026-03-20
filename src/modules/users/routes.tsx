@@ -1,8 +1,10 @@
-import type { RouteObject } from 'react-router-dom';
 import { RouteGuard } from '@modules/auth';
-import { UserListPage } from './pages/UserListPage';
+
 import { UserCreatePage } from './pages/UserCreatePage';
 import { UserEditPage } from './pages/UserEditPage';
+import { UserListPage } from './pages/UserListPage';
+
+import type { RouteObject } from 'react-router-dom';
 
 export const usersRoutes: Array<RouteObject> = [
   {

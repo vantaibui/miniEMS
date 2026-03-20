@@ -1,11 +1,5 @@
-import {
-  DeleteIcon,
-  EditOutlinedIcon,
-  MoreVertIcon,
-  UiDataTable,
-  UiEntityTableCard,
-  UiStatusBadge,
-} from '@libs/ui';
+import { useMemo, useState } from 'react';
+
 import {
   Avatar,
   Box,
@@ -15,10 +9,20 @@ import {
   MenuItem,
   Typography,
 } from '@mui/material';
+
+import {
+  DeleteIcon,
+  EditOutlinedIcon,
+  MoreVertIcon,
+  UiDataTable,
+  UiEntityTableCard,
+  UiStatusBadge,
+} from '@libs/ui';
+
 import type { PaginationResult } from '@services/http';
-import { useMemo, useState } from 'react';
 
 import { useRolePermissions } from '../hooks/useRolePermissions';
+
 import type { Role } from '../types';
 
 export interface RoleTableProps {
@@ -81,7 +85,11 @@ export const RoleTable = ({
                 sx={{ width: 40, height: 40 }}
                 src={`https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(role.name)}`}
               />
-              <Typography variant="body2" color="text.primary" className="font-semibold">
+              <Typography
+                variant="body2"
+                color="text.primary"
+                className="font-semibold"
+              >
                 {role.name}
               </Typography>
             </Box>
@@ -162,7 +170,11 @@ export const RoleTable = ({
         }
       />
 
-      <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={closeMenu}>
+      <Menu
+        anchorEl={menuAnchor}
+        open={Boolean(menuAnchor)}
+        onClose={closeMenu}
+      >
         {canEditRole && (
           <MenuItem
             onClick={() => {

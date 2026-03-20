@@ -1,17 +1,18 @@
-import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+
 import { Box, Typography } from '@mui/material';
-import { useToast } from '@libs/hooks';
+import { useNavigate } from 'react-router-dom';
+
 import { UiBreadcrumb } from '@libs/ui';
 
-import { useUserCreate } from '../hooks';
-import { UserForm } from '../components/UserForm';
 import { usePermissions } from '../../roles/hooks';
+import { UserForm } from '../components/UserForm';
+import { useUserCreate } from '../hooks';
+
 import type { CreateUserPayload } from '../types';
 
 export const UserCreatePage = () => {
   const navigate = useNavigate();
-  const toast = useToast();
   const [pagination, setPagination] = useState({ page: 0, size: 10 });
 
   const { data: permissionsRes, isLoading: isLoadingPermissions } =
@@ -23,13 +24,7 @@ export const UserCreatePage = () => {
 
   const handleSubmit = (data: CreateUserPayload) => {
     createUser(data, {
-      onSuccess: () => {
-        toast.success('User created successfully!');
-        navigate('/users');
-      },
-      onError: (error) => {
-        toast.error(error.message || 'Failed to create user');
-      },
+      onSuccess: () => navigate('/users'),
     });
   };
 

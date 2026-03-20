@@ -1,17 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query';
 
-import { queryKeys, useAppMutation } from '@libs/query';
-import {
-  resolveSuccessMessage,
-  type ApiSuccessResponse,
-} from '@services/http';
 import { useToast } from '@libs/hooks';
+import { queryKeys, useAppMutation } from '@libs/query';
+
+import { resolveSuccessMessage, type ApiSuccessResponse } from '@services/http';
 
 import { devicesApi } from '../api';
-import type {
-  Device,
-  DeviceTestConnectionResult,
-} from '../types';
+
+import type { Device, DeviceTestConnectionResult } from '../types';
 
 export interface UpdateDeviceVariables {
   id: number | string;

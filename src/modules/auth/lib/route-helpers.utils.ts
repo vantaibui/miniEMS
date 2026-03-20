@@ -1,7 +1,6 @@
-import type { ComponentType } from 'react';
-import React from 'react';
-import type { RouteObject } from 'react-router-dom';
-import { Navigate } from 'react-router-dom';
+import React, { type ComponentType } from 'react';
+
+import { Navigate, type RouteObject } from 'react-router-dom';
 
 import { RouteGuard } from '../components/guards/PermissionGuard';
 import { PERMISSION_ACTIONS } from '../constants/permissions.constants';

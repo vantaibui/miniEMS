@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 
-import { cn } from '../utils/cn';
 import { Box } from '@mui/material';
+
+import { cn } from '../utils/cn';
 
 export interface UiToolbarProps {
   left?: ReactNode;

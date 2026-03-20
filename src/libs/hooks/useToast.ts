@@ -38,7 +38,7 @@ export const useToast = () => {
     dismiss: (toastId?: number | string) => {
       toast.dismiss(toastId);
     },
-    
+
     promise: <T>(
       promise: Promise<T> | (() => Promise<T>),
       messages: {
@@ -46,13 +46,12 @@ export const useToast = () => {
         success?: string;
         error?: string;
       },
-      options?: ToastOptions
+      options?: ToastOptions,
     ) => {
-      return toast.promise(
-        promise,
-        messages,
-        { ...defaultOptions, ...options }
-      );
+      return toast.promise(promise, messages, {
+        ...defaultOptions,
+        ...options,
+      });
     },
 
     isActive: (toastId: number | string) => toast.isActive(toastId),

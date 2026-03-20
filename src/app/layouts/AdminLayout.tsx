@@ -1,6 +1,6 @@
 import { AppShellLayout } from './shell';
-import { SidebarNav } from './shell/components/SidebarNav';
 import { NAV_MANAGEMENT } from '../navigation/nav.config';
+import { SidebarNav } from './shell/components/SidebarNav';
 
 /**
  * AdminLayout provides the administrative application shell with management navigation.

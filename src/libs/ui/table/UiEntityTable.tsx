@@ -1,5 +1,6 @@
-import { Box, Card, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
+
+import { Box, Card, Typography } from '@mui/material';
 
 export interface UiEntityTableCardProps {
   title?: ReactNode;

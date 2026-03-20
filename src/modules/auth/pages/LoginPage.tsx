@@ -1,9 +1,12 @@
-import assets from '../../../libs/assets/index';
-import { Box, Button, Paper, Typography, LoginIcon } from '@libs/ui';
+import { useEffect } from 'react';
+
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+
 import { getPageTitle, PAGE_TITLES } from '@libs/constants';
 import { useDocumentTitle } from '@libs/hooks';
-import { useEffect } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Box, Button, Paper, Typography, LoginIcon } from '@libs/ui';
+
+import assets from '../../../libs/assets/index';
 import { useAuthStore } from '../store/auth.store';
 
 const LoginPage = () => {

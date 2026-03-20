@@ -1,6 +1,7 @@
 import axios, { type AxiosInstance } from 'axios';
 
 import { envConfig } from '@libs/configs';
+
 import { attachInterceptors } from './http.interceptor';
 
 const getApiBaseUrl = () => {

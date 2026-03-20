@@ -1,7 +1,5 @@
-import type {
-  ApiResponse,
-  NormalizedApiError
-} from '@libs/types';
+import type { ApiResponse, NormalizedApiError } from '@libs/types';
+
 import type { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 export type {
@@ -10,7 +8,7 @@ export type {
   ApiResponse,
   ApiSuccessResponse,
   NormalizedApiError,
-  PaginationResult
+  PaginationResult,
 } from '@libs/types';
 
 /**

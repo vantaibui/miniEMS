@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+
 import type { SxProps, Theme } from '@mui/material/styles';
 
 export type UiCommonModalSize = 'sm' | 'md' | 'lg' | 'xl';

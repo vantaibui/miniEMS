@@ -1,7 +1,9 @@
-import { UiBreadcrumb } from '@libs/ui';
-import { Box, Typography } from '@mui/material';
 import { useMemo } from 'react';
+
+import { Box, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
+
+import { UiBreadcrumb } from '@libs/ui';
 
 import { DeviceDetailsContent } from '../components/DeviceDetailsContent';
 import { useDeviceDetail } from '../hooks';
@@ -38,7 +40,11 @@ export const DeviceInventoryDetailPage = () => {
         </Typography>
       </Box>
 
-      <DeviceDetailsContent device={device} isLoading={isLoading} />
+      <DeviceDetailsContent
+        device={device}
+        isLoading={isLoading}
+        showDeviceHeading
+      />
     </Box>
   );
 };

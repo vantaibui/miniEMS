@@ -1,11 +1,12 @@
+import { Box } from '@mui/material';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 
-import { Box } from '@mui/material';
 import { UiSearchInput } from '../search-input';
 import { UiSelect } from '../select';
 import { UiToolbar } from '../toolbar';
 import { cn } from '../utils/cn';
+
 import type { UiTableFiltersProps } from './UiTableFilters.types';
 
 export function UiTableFilters({

@@ -1,5 +1,6 @@
 import { queryKeys, useAppQuery } from '@libs/query';
 import type { PermissionNode, User } from '@libs/types';
+
 import type { ApiSuccessResponse } from '@services/http';
 
 import { authService, type PaginationParams } from '../api/auth.api';

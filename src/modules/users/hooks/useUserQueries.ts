@@ -1,7 +1,9 @@
-import type { ApiSuccessResponse, PaginationResult } from '@/services/http';
 import { queryKeys, useAppQuery } from '@libs/query';
+
 import { usersApi, type UsersListParams } from '../api';
+
 import type { User } from '../types';
+import type { ApiSuccessResponse, PaginationResult } from '@/services/http';
 
 export type ListResult<T> = {
   items: Array<T>;

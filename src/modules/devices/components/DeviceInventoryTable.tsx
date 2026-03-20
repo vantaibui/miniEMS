@@ -1,9 +1,10 @@
+import React, { useMemo, useState } from 'react';
+
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
-  Avatar,
   Box,
   IconButton,
   ListItemIcon,
@@ -12,12 +13,14 @@ import {
   MenuItem,
   Typography,
 } from '@mui/material';
-import React, { useMemo, useState } from 'react';
 
 import { UiDataTable, UiEntityTableCard, UiStatusBadge } from '@libs/ui';
+import { DATE_FORMATS, formatUtcOrFallback } from '@libs/utils';
+
 import type { PaginationResult } from '@services/http';
 
 import { useDeviceInventoryPermissions } from '../hooks/useDeviceInventoryPermissions';
+
 import type { Device } from '../types';
 
 interface DeviceInventoryTableProps {
@@ -29,15 +32,6 @@ interface DeviceInventoryTableProps {
   pagination?: PaginationResult;
   onPaginationChange: (next: { page: number; size: number }) => void;
 }
-
-const getDeviceInitials = (name: string) => {
-  const chunks = name.trim().split(/[-_\s]+/).filter(Boolean);
-  if (chunks.length === 0) return 'DV';
-
-  const first = chunks[0]?.[0] ?? '';
-  const second = chunks[1]?.[0] ?? '';
-  return `${first}${second}`.toUpperCase();
-};
 
 export const DeviceInventoryTable = ({
   rows,
@@ -106,58 +100,70 @@ export const DeviceInventoryTable = ({
       },
       {
         key: 'name',
-        header: 'DEVICE IDENTITY',
-        render: (device: Device) => (
-          <Box className="flex items-center gap-2">
-            <Avatar
-              sx={{ width: 40, height: 40 }}
-              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(device.name)}&background=random`}
-            >
-              {getDeviceInitials(device.name)}
-            </Avatar>
-            <Box>
-              <Typography variant="body2" color="text.primary" className="font-semibold">
-                {device.name}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {device.serialNumber}
-              </Typography>
-            </Box>
-          </Box>
+        header: 'NAME',
+        render: ({ name }: Device) => (
+          <Typography
+            variant="body2"
+            color="text.primary"
+            className="font-semibold"
+          >
+            {name || 'N/A'}
+          </Typography>
+        ),
+      },
+      {
+        key: 'serialNumber',
+        header: 'SERIAL NUMBER',
+        render: ({ serialNumber }: Device) => (
+          <Typography variant="body2" color="text.secondary">
+            {serialNumber || 'N/A'}
+          </Typography>
         ),
       },
       {
         key: 'ip',
         header: 'IP',
-        render: (device: Device) => (
+        render: ({ managementIp }: Device) => (
           <Typography variant="body2" color="text.secondary">
-            {device.ip || 'N/A'}
+            {managementIp || 'N/A'}
           </Typography>
         ),
       },
       {
         key: 'model',
         header: 'MODEL',
-        render: (device: Device) => (
+        render: ({ model }: Device) => (
           <Typography variant="body2" color="text.secondary">
-            {device.model || 'N/A'}
+            {model || 'N/A'}
           </Typography>
         ),
       },
       {
         key: 'status',
         header: 'STATUS',
-        render: (device: Device) => (
+        render: ({ status }: Device) => (
           <UiStatusBadge
-            status={device.status === 'Active' ? 'active' : 'inactive'}
-            activeLabel="Active"
-            inactiveLabel={device.status === 'Inactive' ? 'Inactive' : device.status}
+            status={status.value === 'IN_SERVICE' ? 'active' : 'inactive'}
+            activeLabel="IS"
+            inactiveLabel="OOS"
           />
         ),
       },
       {
+        key: 'lastModifiedDate',
+        header: 'LAST UPDATE',
+        render: ({ lastModifiedDate }: Device) => (
+          <Typography variant="body2" color="text.secondary">
+            {formatUtcOrFallback(
+              lastModifiedDate,
+              DATE_FORMATS.DISPLAY_DATE_TIME,
+            )}
+          </Typography>
+        ),
+      },
+      {
         key: 'actions',
-        header: 'ACTIONS',
+        header: 'Actions',
         align: 'right' as const,
         render: (device: Device) =>
           canView || canEdit || canDelete ? (
@@ -207,7 +213,11 @@ export const DeviceInventoryTable = ({
         }
       />
 
-      <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={closeMenu}>
+      <Menu
+        anchorEl={menuAnchor}
+        open={Boolean(menuAnchor)}
+        onClose={closeMenu}
+      >
         {canView && (
           <MenuItem onClick={handleViewClick}>
             <ListItemIcon>

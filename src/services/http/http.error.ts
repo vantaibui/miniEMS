@@ -1,5 +1,5 @@
-import type { AxiosError } from 'axios';
 import type { ApiErrorResponse, AppError } from './http.types';
+import type { AxiosError } from 'axios';
 
 export const mapBackendErrorToAppError = (
   backend: ApiErrorResponse,

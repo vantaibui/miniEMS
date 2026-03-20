@@ -22,6 +22,5 @@ export type UiConfirmDialogProps = {
    */
   confirmOnly?: boolean;
 
-
   showCloseIcon?: boolean;
 };

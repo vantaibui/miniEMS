@@ -1,18 +1,14 @@
-import { createResourceApi, http, type ApiSuccessResponse } from '@services/http';
+import {
+  createResourceApi,
+  http,
+  type ApiSuccessResponse,
+} from '@services/http';
 
 import { USERS_ENDPOINTS } from './users.endpoints';
 
-import type {
-  CreateUserPayload,
-  UpdateUserPayload,
-  User,
-} from '../types';
+import type { CreateUserPayload, UpdateUserPayload, User } from '../types';
 
-const crud = createResourceApi<
-  User,
-  CreateUserPayload,
-  UpdateUserPayload
->({
+const crud = createResourceApi<User, CreateUserPayload, UpdateUserPayload>({
   base: USERS_ENDPOINTS.LIST,
 });
 
@@ -23,7 +19,9 @@ export interface UsersListParams {
 }
 
 export const usersApi = {
-  async getList(params?: UsersListParams): Promise<ApiSuccessResponse<Array<User>>> {
+  async getList(
+    params?: UsersListParams,
+  ): Promise<ApiSuccessResponse<Array<User>>> {
     return await crud.getList(params as Record<string, unknown>);
   },
 

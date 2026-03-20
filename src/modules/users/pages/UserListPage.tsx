@@ -1,18 +1,17 @@
-import { useToast } from '@libs/hooks';
-import { UiBreadcrumb, UiButton, useDialogConfirm } from '@libs/ui';
+import { useState } from 'react';
+
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { Box, Typography } from '@mui/material';
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { UiBreadcrumb, UiButton, useDialogConfirm } from '@libs/ui';
+
 import { UserTable } from '../components/UserTable';
-import { useUsers, useUserDelete } from '../hooks';
+import { useUserDelete, useUsers } from '../hooks';
 
 export const UserListPage = () => {
   const navigate = useNavigate();
-  const toast = useToast();
   const confirm = useDialogConfirm();
-
 
   const { mutate: deleteUser } = useUserDelete();
 
@@ -34,17 +33,13 @@ export const UserListPage = () => {
       type: 'delete',
       title: 'Delete user',
       description: 'Are you sure you want to delete this user?',
-      confirmText: 'Yes, Delete',
+      confirmText: 'Delete',
       cancelText: 'Cancel',
     });
 
     if (!delDialog) return;
 
-    deleteUser(id, {
-      onSuccess: () => {
-        toast.success('Role deleted successfully!');
-      },
-    });
+    deleteUser(id);
   };
 
   const handleCreate = () => {

@@ -46,19 +46,25 @@ export function formatUtc(input: DateInput, format = DATE_FORMATS.DATE_TIME) {
 
 export function formatUtcOrFallback(
   input: DateInput | null | undefined,
-  format = DATE_FORMATS.DATE_TIME,
-  fallback = '--'
+  format: string = DATE_FORMATS.DATE_TIME,
+  fallback = '--',
 ) {
   if (input === null || input === undefined) return fallback;
   const parsed = dayjs.utc(input);
   return parsed.isValid() ? parsed.format(format) : fallback;
 }
 
-export function formatEpochMsUtc(epochMs: number, format = DATE_FORMATS.DATE_TIME) {
+export function formatEpochMsUtc(
+  epochMs: number,
+  format = DATE_FORMATS.DATE_TIME,
+) {
   return dayjs.utc(epochMs).format(format);
 }
 
-export function formatUtcToLocal(input: DateInput, format = DATE_FORMATS.DISPLAY_DATE_TIME) {
+export function formatUtcToLocal(
+  input: DateInput,
+  format = DATE_FORMATS.DISPLAY_DATE_TIME,
+) {
   return dayjs.utc(input).local().format(format);
 }
 
@@ -86,7 +92,12 @@ export function subtractUtc(input: DateInput, amount: number, unit: AddUnit) {
   return dayjs.utc(input).subtract(amount, unit);
 }
 
-export function diffUtc(a: DateInput, b: DateInput, unit: DiffUnit = 'millisecond', float = false) {
+export function diffUtc(
+  a: DateInput,
+  b: DateInput,
+  unit: DiffUnit = 'millisecond',
+  float = false,
+) {
   return dayjs.utc(a).diff(dayjs.utc(b), unit, float);
 }
 
@@ -102,6 +113,10 @@ export function isBeforeUtc(a: DateInput, b: DateInput) {
   return dayjs.utc(a).isBefore(dayjs.utc(b));
 }
 
-export function isSameUtc(a: DateInput, b: DateInput, unit: DiffUnit = 'millisecond') {
+export function isSameUtc(
+  a: DateInput,
+  b: DateInput,
+  unit: DiffUnit = 'millisecond',
+) {
   return dayjs.utc(a).isSame(dayjs.utc(b), unit);
 }

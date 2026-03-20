@@ -67,6 +67,15 @@ export const DeviceDetailsContent = ({
     );
   }
 
+  const deviceInfo = device?.device ?? null;
+  const deviceStatus = deviceInfo?.status ?? null;
+
+  const statusDisplay = String(
+    deviceStatus?.display ?? deviceStatus?.value ?? fallback,
+  );
+  const statusValue = deviceStatus?.value;
+  const isActive = statusValue === 'IN_SERVICE';
+
   const content = (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       {showDeviceHeading ? (
@@ -80,12 +89,22 @@ export const DeviceDetailsContent = ({
           }}
         >
           <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
-            <Typography variant="h3" sx={{ fontWeight: 800, color: '#0F172A' }}>
-              {device.name ?? fallback}
-            </Typography>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.5,
+                flexWrap: 'wrap',
+              }}
+            >
+              <Typography
+                variant="h3"
+                sx={{ fontWeight: 800, color: '#0F172A' }}
+              >
+                {deviceInfo?.name ?? fallback}
+              </Typography>
               <Chip
-                label={(device.status ?? 'Unknown').toUpperCase()}
+                label={statusDisplay}
                 sx={{
                   height: 28,
                   fontSize: 12,
@@ -93,39 +112,78 @@ export const DeviceDetailsContent = ({
                   letterSpacing: 0.8,
                   px: 1.5,
                   borderRadius: 999,
-                  bgcolor: device.status === 'Active' ? '#B8EBD2' : '#E2E8F0',
-                  color: device.status === 'Active' ? '#047857' : '#475467',
+                  bgcolor: isActive ? '#D1FAE5' : '#FEE2E2',
+                  color: isActive ? '#047857' : '#B91C1C',
                 }}
               />
             </Box>
             <Typography
               variant="body1"
-              sx={{ mt: 1, color: '#64748B', display: 'flex', alignItems: 'center', gap: 0.75 }}
+              sx={{
+                mt: 1,
+                color: '#64748B',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.75,
+              }}
             >
               <DesktopWindowsIcon sx={{ fontSize: 16 }} />
-              Workstation • {device.model ?? fallback}
+              {deviceInfo?.deviceType?.display ?? fallback} •{' '}
+              {deviceInfo?.model ?? fallback}
             </Typography>
           </Box>
+
+          <UiButton
+            variant="secondary"
+            startIcon={<DownloadIcon fontSize="small" />}
+          >
+            Download Logs
+          </UiButton>
         </Box>
       ) : null}
 
       <Grid container spacing={2.5}>
-          <SpecItem label="Serial Number" value={device.serialNumber} />
-          <SpecItem label="IP Address" value={device.ip} />
-          <SpecItem label="Model" value={device.model} />
-        <SpecItem label="SONiC Software Version" value={device.soNicSoftwareVersion} gridSize={{ xs: 12 }} />
+        <SpecItem label="Serial Number" value={deviceInfo?.serialNumber} />
+        <SpecItem label="IP Address" value={deviceInfo?.managementIp} />
+        <SpecItem label="MAC Address" value={deviceInfo?.macAddress} />
+        <SpecItem label="Model" value={deviceInfo?.model} />
+        <SpecItem label="Device Type" value={deviceInfo?.deviceType?.display} />
+        <SpecItem label="OS Type" value={deviceInfo?.osType?.display} />
+        <SpecItem
+          label="OS Version"
+          value={deviceInfo?.osVersion}
+          gridSize={{ xs: 12 }}
+        />
       </Grid>
 
-      <Grid container spacing={2.5} sx={{ borderTop: '1px solid', borderColor: '#E2E8F0', pt: 3 }}>
-          <SpecItem label="Distribution" value={device.distribution} />
-          <SpecItem label="Kernel" value={device.kernel} />
-          <SpecItem label="Build Commit" value={device.buildCommit} />
-          <SpecItem label="Platform" value={device.platform} />
-        <SpecItem label="Build Date" value={device.buildDate} gridSize={{ xs: 12 }} />
-          <SpecItem label="HW SKU" value={device.hwSKU} />
-          <SpecItem label="ASIC" value={device.asic} />
-        <SpecItem label="Uptime" value={device.uptime} gridSize={{ xs: 12 }} />
-        </Grid>
+      <Grid
+        container
+        spacing={2.5}
+        sx={{ borderTop: '1px solid', borderColor: '#E2E8F0', pt: 3 }}
+      >
+        <SpecItem label="Distribution" value={deviceInfo?.distribution} />
+        <SpecItem label="Kernel" value={deviceInfo?.kernel} />
+        <SpecItem label="Build Commit" value={deviceInfo?.buildCommit} />
+        <SpecItem label="Built By" value={deviceInfo?.builtBy} />
+        <SpecItem label="Platform" value={deviceInfo?.platform} />
+        <SpecItem label="HW SKU" value={deviceInfo?.hwSku} />
+        <SpecItem
+          label="Hardware Revision"
+          value={deviceInfo?.hardwareRevision}
+        />
+        <SpecItem
+          label="Build Date"
+          value={deviceInfo?.buildDate}
+          gridSize={{ xs: 12 }}
+        />
+        <SpecItem label="ASIC Type" value={deviceInfo?.asicType} />
+        <SpecItem label="ASIC Count" value={deviceInfo?.asicCount} />
+        <SpecItem
+          label="Uptime (s)"
+          value={deviceInfo?.uptime}
+          gridSize={{ xs: 12 }}
+        />
+      </Grid>
     </Box>
   );
 

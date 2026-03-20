@@ -1,8 +1,6 @@
-import type { RouteObject } from 'react-router-dom';
-import { Navigate } from 'react-router-dom';
+import { Navigate, type RouteObject } from 'react-router-dom';
 
 import { RouteGuard } from '../auth';
-
 import { RoleCreatePage, RoleEditPage, RoleListPage } from './pages';
 
 export const rolesRoutes: Array<RouteObject> = [

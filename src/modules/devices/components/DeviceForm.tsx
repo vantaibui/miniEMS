@@ -1,30 +1,37 @@
 // cspell:ignore certbase usernamepassword
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useToast } from '@libs/hooks';
-import { UiButton, UiFormField, UiInput } from '@libs/ui';
-import CircleIcon from '@mui/icons-material/Circle';
-import DnsIcon from '@mui/icons-material/Dns';
-import HttpsIcon from '@mui/icons-material/Https';
-import LockPersonIcon from '@mui/icons-material/LockPerson';
-import RouterIcon from '@mui/icons-material/Router';
-import LanIcon from '@mui/icons-material/Lan';
-import SecurityIcon from '@mui/icons-material/Security';
-import { Box, Card, Grid, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { yupResolver } from '@hookform/resolvers/yup';
+import CircleIcon from '@mui/icons-material/Circle';
+import LanIcon from '@mui/icons-material/Lan';
+import RouterIcon from '@mui/icons-material/Router';
+import {
+  Box,
+  Card,
+  Grid,
+  MenuItem,
+  Select,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import * as yup from 'yup';
 
+import { useToast } from '@libs/hooks';
+import { UiButton, UiFormField, UiInput } from '@libs/ui';
+
 import { useDeviceTestConnection } from '../hooks';
-import type { CreateDevicePayload, DeviceAuthenticationType } from '../types';
-import { DeviceTestConnectionModal } from './DeviceTestConnectionModal';
 import { ProtocolSelect } from './ProtocolSelect';
 import { UploadFiled } from './UploadFiled';
 import { TestConnectionStatus, type TestStatus } from '../constants';
 
-const AUTH_OPTIONS: Array<{ label: string; value: DeviceAuthenticationType }> = [
-  { label: 'Certificate-based', value: 'CERT_BASE' },
-  { label: 'Username/Password', value: 'USERNAME_PASSWORD' },
-];
+import type { CreateDevicePayload, DeviceAuthenticationType } from '../types';
+
+const AUTH_OPTIONS: Array<{ label: string; value: DeviceAuthenticationType }> =
+  [
+    { label: 'Certificate-based', value: 'CERT_BASE' },
+    { label: 'Username/Password', value: 'USERNAME_PASSWORD' },
+  ];
 
 const MAX_CERT_FILE_SIZE_KB = 100;
 const ALLOWED_CERT_EXTENSIONS: Array<string> = ['.crt', '.cert'];
@@ -62,7 +69,7 @@ const schema: yup.ObjectSchema<CreateDevicePayload> = yup
     }),
     password: yup.string().when('authenticationType', {
       is: 'USERNAME_PASSWORD',
-      then: (s) => s.required('Password is required').min(6),
+      then: (s) => s.required('Password is required').min(3),
       otherwise: (s) => s.optional(),
     }),
     clientCertificate: yup.string().when('authenticationType', {
@@ -81,7 +88,9 @@ interface DeviceFormProps {
   submitLabel?: string;
 }
 
-const buildDefaults = (initialValues?: Partial<CreateDevicePayload>): CreateDevicePayload => ({
+const buildDefaults = (
+  initialValues?: Partial<CreateDevicePayload>,
+): CreateDevicePayload => ({
   managementIp: initialValues?.managementIp ?? '',
   port: initialValues?.port ?? 443,
   protocolId: initialValues?.protocolId ?? 0,
@@ -100,17 +109,18 @@ export const DeviceForm = ({
 }: DeviceFormProps) => {
   const [certificateFileName, setCertificateFileName] = useState('');
   const [certificateFile, setCertificateFile] = useState<File | null>(null);
-  const [isTestConnectionModalOpen, setIsTestConnectionModalOpen] = useState(false);
-  const [lastTestStatus, setLastTestStatus] = useState<TestStatus>(TestConnectionStatus.OutOfService);
+  const [lastTestStatus, setLastTestStatus] = useState<TestStatus>(
+    TestConnectionStatus.OutOfService,
+  );
   const [lastTestSignature, setLastTestSignature] = useState('');
-  const [selectedProtocolDisplay, setSelectedProtocolDisplay] = useState('');
   const toast = useToast();
 
   const resetTestStatus = useCallback(() => {
     setLastTestStatus(TestConnectionStatus.OutOfService);
     setLastTestSignature('');
   }, []);
-  const { mutateAsync: testConnection, isPending: isTestingConnection } = useDeviceTestConnection();
+  const { mutateAsync: testConnection, isPending: isTestingConnection } =
+    useDeviceTestConnection();
 
   const {
     control,
@@ -124,7 +134,10 @@ export const DeviceForm = ({
     defaultValues: buildDefaults(initialValues),
   });
 
-  const defaultValues = useMemo(() => buildDefaults(initialValues), [initialValues]);
+  const defaultValues = useMemo(
+    () => buildDefaults(initialValues),
+    [initialValues],
+  );
 
   useEffect(() => {
     reset(defaultValues);
@@ -175,7 +188,10 @@ export const DeviceForm = ({
     if (!certificateFile && !certificateFileName && !clientCertificate) return;
     setCertificateFile(null);
     setCertificateFileName('');
-    setValue('clientCertificate', '', { shouldDirty: true, shouldValidate: true });
+    setValue('clientCertificate', '', {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
   }, [certificateFile, certificateFileName, clientCertificate, setValue]);
 
   const handleCertificateLoaded = ({
@@ -189,7 +205,10 @@ export const DeviceForm = ({
   }) => {
     setCertificateFile(file);
     setCertificateFileName(fileName);
-    setValue('clientCertificate', content, { shouldDirty: true, shouldValidate: true });
+    setValue('clientCertificate', content, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
     resetTestStatus();
   };
 
@@ -200,7 +219,8 @@ export const DeviceForm = ({
   };
 
   const displayedCertificateName =
-    certificateFileName || (hasInitialCertificate ? initialValues?.clientCertificate || '' : '');
+    certificateFileName ||
+    (hasInitialCertificate ? initialValues?.clientCertificate || '' : '');
 
   const buildDeviceFormData = (
     payload: CreateDevicePayload,
@@ -220,7 +240,10 @@ export const DeviceForm = ({
       if (payload.password) formData.append('password', payload.password);
     }
 
-    if (payload.authenticationType === 'CERT_BASE' && options.includeCertificate) {
+    if (
+      payload.authenticationType === 'CERT_BASE' &&
+      options.includeCertificate
+    ) {
       if (options.certificateFile) {
         formData.append('clientCertificate', options.certificateFile);
       }
@@ -230,7 +253,7 @@ export const DeviceForm = ({
   };
 
   const handleTestConnection = async () => {
-    const payload = {
+    const payload: CreateDevicePayload = {
       managementIp: managementIp || '',
       authenticationType,
       port: Number(port),
@@ -238,11 +261,16 @@ export const DeviceForm = ({
       username,
       password,
       clientCertificate,
-    } as CreateDevicePayload;
+    };
 
-    if (!payload.managementIp || !payload.port || !payload.protocolId) {
-      toast.error('Please fill Management IP, Port and Protocol before testing.');
-      return TestConnectionStatus.OutOfService;
+    const isRequiredFieldsMissing =
+      !payload.managementIp || !payload.port || !payload.protocolId;
+
+    if (isRequiredFieldsMissing) {
+      toast.error(
+        'Please fill Management IP, Port and Protocol before testing.',
+      );
+      return;
     }
 
     const formData = buildDeviceFormData(payload, {
@@ -252,19 +280,20 @@ export const DeviceForm = ({
 
     try {
       const response = await testConnection(formData);
-      const nextStatus = (response.data as { status?: { value?: string } } | undefined)?.status?.value ?? TestConnectionStatus.OutOfService;
+      const resultStatus =
+        response.data?.status?.value ?? TestConnectionStatus.OutOfService;
+      const isInService = resultStatus === TestConnectionStatus.InService;
 
-      if (response.success) {
+      if (isInService) {
         toast.success(response.message || 'Connection test successful');
       } else {
         toast.error(response.message || 'Connection test failed');
       }
 
       setLastTestSignature(testSignature);
-      setLastTestStatus(nextStatus as TestStatus);
-      return nextStatus as TestStatus;
+      setLastTestStatus(resultStatus as TestStatus);
     } catch {
-      return TestConnectionStatus.OutOfService;
+      setLastTestStatus(TestConnectionStatus.OutOfService);
     }
   };
 
@@ -280,7 +309,8 @@ export const DeviceForm = ({
     } as CreateDevicePayload;
 
     const formData = buildDeviceFormData(payload, {
-      includeCertificate: payload.authenticationType === 'CERT_BASE' && Boolean(certificateFile),
+      includeCertificate:
+        payload.authenticationType === 'CERT_BASE' && Boolean(certificateFile),
       certificateFile,
     });
 
@@ -289,12 +319,23 @@ export const DeviceForm = ({
 
   return (
     <Box component="form" onSubmit={handleSubmit(handleFormSubmit)}>
-      <Card sx={{ p: { xs: 3, md: 5 }, borderRadius: 3, boxShadow: '0px 2px 10px rgba(0,0,0,0.05)' }}>
+      <Card
+        sx={{
+          p: { xs: 3, md: 5 },
+          borderRadius: 3,
+          boxShadow: '0px 2px 10px rgba(0,0,0,0.05)',
+        }}
+      >
         <Stack spacing={4}>
           <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}
+            >
               <RouterIcon color="primary" />
-              <Typography variant="subtitle1" sx={{ fontWeight: 700, letterSpacing: '0.5px' }}>
+              <Typography
+                variant="subtitle1"
+                sx={{ fontWeight: 700, letterSpacing: '0.5px' }}
+              >
                 DEVICE INFO
               </Typography>
             </Box>
@@ -305,7 +346,11 @@ export const DeviceForm = ({
                   name="managementIp"
                   control={control}
                   render={({ field }) => (
-                    <UiFormField label="MANAGEMENT IP" required errorText={errors.managementIp?.message}>
+                    <UiFormField
+                      label="MANAGEMENT IP"
+                      required
+                      errorText={errors.managementIp?.message}
+                    >
                       <UiInput
                         {...field}
                         placeholder="Enter IP..."
@@ -313,7 +358,6 @@ export const DeviceForm = ({
                           field.onChange(event);
                           resetTestStatus();
                         }}
-                        startAdornment={<DnsIcon sx={{ color: 'text.secondary', fontSize: 20 }} />}
                       />
                     </UiFormField>
                   )}
@@ -325,7 +369,11 @@ export const DeviceForm = ({
                   name="port"
                   control={control}
                   render={({ field }) => (
-                    <UiFormField label="PORT" required errorText={errors.port?.message}>
+                    <UiFormField
+                      label="PORT"
+                      required
+                      errorText={errors.port?.message}
+                    >
                       <UiInput
                         {...field}
                         type="number"
@@ -335,24 +383,12 @@ export const DeviceForm = ({
                           field.onChange(Number(event.target.value));
                           resetTestStatus();
                         }}
-                        startAdornment={<RouterIcon sx={{ color: 'text.secondary', fontSize: 20 }} />}
                       />
                     </UiFormField>
                   )}
                 />
               </Grid>
-            </Grid>
-          </Box>
 
-          <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
-              <SecurityIcon color="primary" />
-              <Typography variant="subtitle1" sx={{ fontWeight: 700, letterSpacing: '0.5px' }}>
-                ACCESS CONFIGURATION
-              </Typography>
-            </Box>
-
-            <Grid container spacing={4}>
               <Grid size={{ xs: 12, md: 6 }}>
                 <Controller
                   name="protocolId"
@@ -364,7 +400,6 @@ export const DeviceForm = ({
                       errorText={errors.protocolId?.message}
                       disabled={isLoading}
                       onResetTestStatus={resetTestStatus}
-                      onDisplayChange={setSelectedProtocolDisplay}
                     />
                   )}
                 />
@@ -375,7 +410,11 @@ export const DeviceForm = ({
                   name="authenticationType"
                   control={control}
                   render={({ field }) => (
-                    <UiFormField label="AUTHENTICATION" required errorText={errors.authenticationType?.message}>
+                    <UiFormField
+                      label="AUTHENTICATION"
+                      required
+                      errorText={errors.authenticationType?.message}
+                    >
                       <Select
                         {...field}
                         value={field.value || ''}
@@ -397,7 +436,7 @@ export const DeviceForm = ({
               </Grid>
 
               {authenticationType === 'CERT_BASE' ? (
-                <Grid size={{md: 12 }}>
+                <Grid size={{ md: 12 }}>
                   <UiFormField
                     label="CLIENT CERTIFICATE"
                     required
@@ -419,7 +458,11 @@ export const DeviceForm = ({
                       name="username"
                       control={control}
                       render={({ field }) => (
-                        <UiFormField label="USERNAME" required errorText={errors.username?.message}>
+                        <UiFormField
+                          label="USERNAME"
+                          required
+                          errorText={errors.username?.message}
+                        >
                           <UiInput
                             {...field}
                             placeholder="Enter username..."
@@ -427,7 +470,6 @@ export const DeviceForm = ({
                               field.onChange(event);
                               resetTestStatus();
                             }}
-                            startAdornment={<LockPersonIcon sx={{ color: 'text.secondary', fontSize: 20 }} />}
                           />
                         </UiFormField>
                       )}
@@ -439,7 +481,11 @@ export const DeviceForm = ({
                       name="password"
                       control={control}
                       render={({ field }) => (
-                        <UiFormField label="PASSWORD" required errorText={errors.password?.message}>
+                        <UiFormField
+                          label="PASSWORD"
+                          required
+                          errorText={errors.password?.message}
+                        >
                           <UiInput
                             {...field}
                             type="password"
@@ -449,7 +495,6 @@ export const DeviceForm = ({
                               field.onChange(event);
                               resetTestStatus();
                             }}
-                            startAdornment={<HttpsIcon sx={{ color: 'text.secondary', fontSize: 20 }} />}
                           />
                         </UiFormField>
                       )}
@@ -459,11 +504,15 @@ export const DeviceForm = ({
               )}
             </Grid>
           </Box>
-
           <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}
+            >
               <LanIcon color="primary" />
-              <Typography variant="subtitle1" sx={{ fontWeight: 700, letterSpacing: '0.5px' }}>
+              <Typography
+                variant="subtitle1"
+                sx={{ fontWeight: 700, letterSpacing: '0.5px' }}
+              >
                 CONNECTION
               </Typography>
             </Box>
@@ -490,8 +539,9 @@ export const DeviceForm = ({
                 type="button"
                 variant="outlined"
                 sx={{ ml: 2 }}
-                onClick={() => setIsTestConnectionModalOpen(true)}
-                disabled={!isValid}
+                onClick={handleTestConnection}
+                disabled={!isValid || isTestingConnection}
+                loading={isTestingConnection}
               >
                 Test Connection
               </UiButton>
@@ -508,33 +558,25 @@ export const DeviceForm = ({
               gap: 2,
             }}
           >
-            <UiButton type="button" variant="outlined" onClick={onCancel} disabled={isLoading}>
+            <UiButton
+              type="button"
+              variant="outlined"
+              onClick={onCancel}
+              disabled={isLoading}
+            >
               Cancel
             </UiButton>
-            <UiButton type="submit" variant="contained" disabled={isLoading || !isDirty || !isValid} loading={isLoading}>
+            <UiButton
+              type="submit"
+              variant="contained"
+              disabled={isLoading || !isDirty || !isValid}
+              loading={isLoading}
+            >
               {submitLabel}
             </UiButton>
           </Box>
         </Stack>
       </Card>
-      <DeviceTestConnectionModal
-        open={isTestConnectionModalOpen}
-        onClose={() => setIsTestConnectionModalOpen(false)}
-        onStart={handleTestConnection}
-        onStatusChange={setLastTestStatus}
-        isStarting={isTestingConnection}
-        data={{
-          name: 'Device connection test',
-          serialNumber: '-',
-          ip: managementIp || '-',
-          port: port ? String(port) : '-',
-          protocol: selectedProtocolDisplay || (protocolId ? String(protocolId) : '-'),
-          authenticationType:
-            authenticationType === 'CERT_BASE' ? 'Certificate-based' : 'Username/Password',
-          username: authenticationType === 'USERNAME_PASSWORD' ? username || '-' : undefined,
-          certificate: authenticationType === 'CERT_BASE' ? certificateFileName || '-' : undefined,
-        }}
-      />
     </Box>
   );
 };

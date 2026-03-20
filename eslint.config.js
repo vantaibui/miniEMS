@@ -1,8 +1,11 @@
 
 import js from '@eslint/js'
 import globals from 'globals'
+import importPlugin from 'eslint-plugin-import'
 import reactHooks from 'eslint-plugin-react-hooks'
+import reactPlugin from 'eslint-plugin-react'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import unusedImports from 'eslint-plugin-unused-imports'
 import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 import prettierConfig from 'eslint-config-prettier'
@@ -22,12 +25,65 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    plugins: {
+      import: importPlugin,
+      react: reactPlugin,
+      'unused-imports': unusedImports,
+    },
     rules: {
       '@typescript-eslint/array-type': [
         'error',
         {
           default: 'generic',
           readonly: 'generic',
+        },
+      ],
+      'no-duplicate-imports': 'error',
+      'unused-imports/no-unused-imports': 'error',
+      'import/order': [
+        'error',
+        {
+          groups: [
+            'builtin',
+            'external',
+            'internal',
+            ['parent', 'sibling', 'index'],
+            'object',
+            'type',
+          ],
+          pathGroups: [
+            {
+              pattern: 'react',
+              group: 'external',
+              position: 'before',
+            },
+            {
+              pattern: '@app/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@libs/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@modules/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@services/**',
+              group: 'internal',
+              position: 'before',
+            },
+          ],
+          pathGroupsExcludedImportTypes: ['react'],
+          alphabetize: {
+            order: 'asc',
+            caseInsensitive: true,
+          },
+          'newlines-between': 'always',
         },
       ],
       // Enforce module boundaries: modules cannot import each other directly,

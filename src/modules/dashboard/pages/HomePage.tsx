@@ -1,5 +1,8 @@
-import type { UiDataTableColumn, UiDataTableId } from '@libs/ui';
+import { useState } from 'react';
+
 import {
+  type UiDataTableColumn,
+  type UiDataTableId,
   AddIcon,
   Box,
   DownloadIcon,
@@ -14,9 +17,8 @@ import {
   UiModal,
   UiSelect,
   UiTableFilters,
-  UiText
+  UiText,
 } from '@libs/ui';
-import { useState } from 'react';
 
 // --- Mock Data ---
 interface UserRow {

@@ -1,6 +1,7 @@
 import Pagination from '@mui/material/Pagination';
 
 import { cn } from '../utils/cn';
+
 import type { UiPaginationProps, UiPaginationSize } from './UiPagination.types';
 
 function mapSize(size: UiPaginationSize): 'small' | 'medium' | 'large' {

@@ -1,4 +1,3 @@
-
 export const PERMISSION_ACTIONS = {
   CREATE: 'create',
   READ: 'read',
@@ -6,5 +5,5 @@ export const PERMISSION_ACTIONS = {
   DELETE: 'delete',
 } as const;
 
-export type PermissionAction = (typeof PERMISSION_ACTIONS)[keyof typeof PERMISSION_ACTIONS];
-
+export type PermissionAction =
+  (typeof PERMISSION_ACTIONS)[keyof typeof PERMISSION_ACTIONS];

@@ -11,6 +11,6 @@ export * from './constants/permission.keys';
 export * from './constants/permissions.constants';
 export * from './store/auth.store';
 export * from './lib/rbac.utils';
-export * from './lib/route-helpers.utils'
+export * from './lib/route-helpers.utils';
 export { default as LoginPage } from './pages/LoginPage';
 export { authRoutes } from './routes';

@@ -36,7 +36,7 @@ export type ApiResponse<T = unknown> = ApiSuccessResponse<T> | ApiErrorResponse;
 export interface NormalizedApiError {
   message: string;
   code?: string;
-  fieldErrors: Record<string, string>;
+  fieldErrors: Record<string, string> | Record<string, unknown>;
   raw?: ApiErrorResponse;
   status?: number;
 }

@@ -1,13 +1,14 @@
-import type { ApiSuccessResponse, PaginationResult } from '@services/http';
 import { queryKeys, useAppQuery } from '@libs/query';
+
+import type { ApiSuccessResponse, PaginationResult } from '@services/http';
 
 import {
   devicesApi,
   type DevicesListParams,
-  type Protocol,
   type ProtocolsListParams,
 } from '../api';
-import type { Device, DeviceDetail } from '../types';
+
+import type { Device, DeviceDetail, Protocol } from '../types';
 
 export type ListResult<T> = {
   items: Array<T>;
@@ -26,14 +27,16 @@ export const useDevices = (params: DevicesListParams = {}) => {
 };
 
 export const useProtocols = (params: ProtocolsListParams = {}) => {
-  return useAppQuery<ApiSuccessResponse<Array<Protocol>>, ListResult<Protocol>>({
-    queryKey: queryKeys.device.protocolList(params),
-    queryFn: () => devicesApi.getProtocols(params),
-    select: (response) => ({
-      items: response?.data ?? [],
-      pagination: response?.meta?.pagination,
-    }),
-  });
+  return useAppQuery<ApiSuccessResponse<Array<Protocol>>, ListResult<Protocol>>(
+    {
+      queryKey: queryKeys.device.protocolList(params),
+      queryFn: () => devicesApi.getProtocols(params),
+      select: (response) => ({
+        items: response?.data ?? [],
+        pagination: response?.meta?.pagination,
+      }),
+    },
+  );
 };
 
 export const useDeviceDetail = (id: number | string | undefined) => {

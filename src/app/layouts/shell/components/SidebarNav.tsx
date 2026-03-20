@@ -1,20 +1,24 @@
+import type { ReactNode } from 'react';
+
 import {
   Box,
-  Chip,
   List,
   ListItemButton,
   ListItemIcon,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { NavLink, useLocation } from 'react-router-dom';
 
-import { hasPermission, useRbacStore } from '@modules/auth';
 import type { PermissionNode } from '@libs/types';
+
+import { hasPermission, useRbacStore } from '@modules/auth';
+
 import type { NavGroup, NavPermission } from '../../../navigation/nav.types';
-import type { ReactNode } from 'react';
 
 interface SidebarNavProps {
   groups: Array<NavGroup>;
+  compact?: boolean;
 }
 
 const isAllowed = (
@@ -31,7 +35,7 @@ const isAllowed = (
   return hasPermission(permissions, permission.subModule, action);
 };
 
-export const SidebarNav = ({ groups }: SidebarNavProps) => {
+export const SidebarNav = ({ groups, compact = true }: SidebarNavProps) => {
   const permissions = useRbacStore((s) => s.permissions);
   const isLoading = useRbacStore((s) => s.isLoading);
   const isInitialized = useRbacStore((s) => s.isInitialized);
@@ -40,14 +44,14 @@ export const SidebarNav = ({ groups }: SidebarNavProps) => {
 
   if (!isInitialized || isLoading) {
     return (
-      <Box className="flex flex-col gap-3">
+      <Box className={compact ? 'flex flex-col gap-2' : 'flex flex-col gap-3'}>
         {Array.from({ length: 6 }).map((_, idx) => (
           <Box
             key={idx}
-            className="h-10 rounded-xl border"
+            className={compact ? 'h-10 rounded-lg' : 'h-10 rounded-xl border'}
             sx={{
               borderColor: 'divider',
-              bgcolor: 'background.paper',
+              bgcolor: compact ? 'primary.dark' : 'background.paper',
               opacity: 0.6,
             }}
           />
@@ -69,10 +73,10 @@ export const SidebarNav = ({ groups }: SidebarNavProps) => {
     .filter((g) => g.items.length > 0);
 
   return (
-    <Box className="flex flex-col gap-6">
+    <Box className={compact ? 'flex flex-col gap-4' : 'flex flex-col gap-6'}>
       {filteredGroups.map((group) => (
         <Box key={group.key}>
-          {group.section && (
+          {!compact && group.section && (
             <Typography
               variant="overline"
               color="text.secondary"
@@ -83,12 +87,54 @@ export const SidebarNav = ({ groups }: SidebarNavProps) => {
             </Typography>
           )}
 
-          <List dense className="mt-2 p-0">
+          <List dense className={compact ? 'mt-0 p-0' : 'mt-2 p-0'}>
             {group.items.map((item) => {
               const isActive =
                 location.pathname === item.to ||
                 (item.to !== '/' &&
                   location.pathname.startsWith(`${item.to}/`));
+
+              if (compact) {
+                return (
+                  <Tooltip key={item.key} title={item.label} placement="right">
+                    <ListItemButton
+                      component={NavLink}
+                      to={item.to}
+                      className="mb-1 rounded-lg"
+                      sx={{
+                        minHeight: 40,
+                        borderRadius: 1.5,
+                        px: 0,
+                        justifyContent: 'center',
+                        color: 'primary.contrastText',
+                        opacity: isActive ? 1 : 0.85,
+                        '&:hover': {
+                          bgcolor: 'primary.dark',
+                          opacity: 1,
+                        },
+                        '&.active': {
+                          bgcolor: 'primary.dark',
+                          color: 'primary.contrastText',
+                          opacity: 1,
+                        },
+                        '& .MuiListItemIcon-root': {
+                          minWidth: 0,
+                          color: 'inherit',
+                          justifyContent: 'center',
+                        },
+                      }}
+                    >
+                      {item.icon ? (
+                        <ListItemIcon>{item.icon as ReactNode}</ListItemIcon>
+                      ) : (
+                        <Typography variant="caption" fontWeight={600}>
+                          {item.label.slice(0, 1)}
+                        </Typography>
+                      )}
+                    </ListItemButton>
+                  </Tooltip>
+                );
+              }
 
               return (
                 <ListItemButton
@@ -137,20 +183,6 @@ export const SidebarNav = ({ groups }: SidebarNavProps) => {
                   >
                     {item.label}
                   </Typography>
-
-                  {isActive && (
-                    <Chip
-                      label="Active"
-                      size="small"
-                      color="primary"
-                      sx={{
-                        height: 20,
-                        fontSize: '0.65rem',
-                        fontWeight: 700,
-                        borderRadius: '999px',
-                      }}
-                    />
-                  )}
                 </ListItemButton>
               );
             })}

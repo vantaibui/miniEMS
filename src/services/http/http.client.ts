@@ -1,5 +1,6 @@
-import type { AxiosResponse, AxiosError } from 'axios';
 import axiosInstance from './axios.instance';
+import { mapBackendErrorToAppError, mapUnknownToAppError } from './http.error';
+
 import type {
   ApiResponse,
   ApiSuccessResponse,
@@ -7,10 +8,10 @@ import type {
   AppError,
   ApiErrorResponse,
 } from './http.types';
-import { mapBackendErrorToAppError, mapUnknownToAppError } from './http.error';
+import type { AxiosResponse, AxiosError } from 'axios';
 
 const unwrap = async <T>(
-  promise: Promise<AxiosResponse<ApiResponse<T>>>
+  promise: Promise<AxiosResponse<ApiResponse<T>>>,
 ): Promise<ApiSuccessResponse<T>> => {
   try {
     const res = await promise;
@@ -23,7 +24,11 @@ const unwrap = async <T>(
   } catch (error) {
     const appError = error as AppError;
     // If it's already mapped to AppError, rethrow as-is.
-    if (appError && typeof appError.message === 'string' && (appError.code || appError.raw || appError.status !== undefined)) {
+    if (
+      appError &&
+      typeof appError.message === 'string' &&
+      (appError.code || appError.raw || appError.status !== undefined)
+    ) {
       throw appError;
     }
     throw mapUnknownToAppError(error as AxiosError<ApiErrorResponse>);

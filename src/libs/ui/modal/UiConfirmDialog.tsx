@@ -1,7 +1,7 @@
-import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import {
   Box,
   Dialog,
@@ -10,11 +10,15 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import type { DialogProps } from '@mui/material/Dialog';
 
-import { tokens } from '../theme/tokens';
 import { UiButton } from '../button';
-import type { UiConfirmDialogProps, UiConfirmDialogType } from './UiConfirmDialog.types';
+import { tokens } from '../theme/tokens';
+
+import type {
+  UiConfirmDialogProps,
+  UiConfirmDialogType,
+} from './UiConfirmDialog.types';
+import type { DialogProps } from '@mui/material/Dialog';
 
 type VariantConfig = {
   icon: React.ReactNode;
@@ -47,7 +51,9 @@ function getVariantConfig(type: UiConfirmDialogType): VariantConfig {
       };
     case 'success':
       return {
-        icon: <CheckCircleOutlineIcon sx={{ color: tokens.colors.success.main }} />,
+        icon: (
+          <CheckCircleOutlineIcon sx={{ color: tokens.colors.success.main }} />
+        ),
         iconColor: tokens.colors.success.main,
         iconBg: 'rgba(46, 125, 50, 0.10)',
         confirmButtonSx: {
@@ -153,7 +159,9 @@ export function UiConfirmDialog({
           </Box>
         </Box>
 
-        <Typography sx={{ fontWeight: 700, fontSize: tokens.typography.sizes.xl }}>
+        <Typography
+          sx={{ fontWeight: 700, fontSize: tokens.typography.sizes.xl }}
+        >
           {title}
         </Typography>
 
@@ -211,9 +219,7 @@ export function UiConfirmDialog({
               flex: 1,
               borderRadius: '9999px',
               color: tokens.colors.neutral[50],
-              ...(isSingleButton
-                ? { minWidth: 220 }
-                : null),
+              ...(isSingleButton ? { minWidth: 220 } : null),
               ...variant.confirmButtonSx,
             }}
           >

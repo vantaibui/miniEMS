@@ -6,7 +6,9 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+
 import { UiConfirmDialog } from './UiConfirmDialog';
+
 import type { UiConfirmDialogProps } from './UiConfirmDialog.types';
 
 type ConfirmOptions = Omit<UiConfirmDialogProps, 'isOpen' | 'onClose'>;

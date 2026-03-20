@@ -1,5 +1,9 @@
 import type { Actions, PermissionNode } from '@libs/types';
-import { PERMISSION_ACTIONS, type PermissionAction } from '../constants/permissions.constants';
+
+import {
+  PERMISSION_ACTIONS,
+  type PermissionAction,
+} from '../constants/permissions.constants';
 
 export const buildPermissionPath = (
   subModuleKey: string,
@@ -24,4 +28,3 @@ export const hasPermission = (
 
   return record.actions.read ?? false;
 };
-

@@ -1,3 +1,5 @@
+import React, { useMemo, useState } from 'react';
+
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -9,19 +11,15 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  Typography
+  Typography,
 } from '@mui/material';
-import React, { useMemo, useState } from 'react';
 
-import { useDataTable } from '@libs/hooks';
-import type { PaginationResult } from '@/services/http';
-import {
-  UiDataTable,
-  UiEntityTableCard,
-  UiStatusBadge
-} from '@libs/ui';
-import type { User } from '../types';
+import { UiDataTable, UiEntityTableCard, UiStatusBadge } from '@libs/ui';
+
 import { useUserPermissions } from '../hooks';
+
+import type { User } from '../types';
+import type { PaginationResult } from '@/services/http';
 
 interface UserTableProps {
   rows: Array<User>;
@@ -42,7 +40,8 @@ export const UserTable = ({
 }: UserTableProps) => {
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-  const { canEdit: canEditUser, canDelete: canDeleteUser } = useUserPermissions();
+  const { canEdit: canEditUser, canDelete: canDeleteUser } =
+    useUserPermissions();
 
   const openMenu = (event: React.MouseEvent<HTMLElement>, userId: number) => {
     setMenuAnchor(event.currentTarget);
@@ -129,7 +128,7 @@ export const UserTable = ({
         key: 'actions',
         header: 'ACTIONS',
         align: 'right' as const,
-render: (row: User) =>
+        render: (row: User) =>
           canEditUser || canDeleteUser ? (
             <IconButton size="small" onClick={(e) => openMenu(e, row.id)}>
               <MoreVertIcon fontSize="small" />
@@ -137,7 +136,7 @@ render: (row: User) =>
           ) : null,
       },
     ];
-  }, [page, size]);
+  }, [page, size, canEditUser, canDeleteUser]);
 
   return (
     <>

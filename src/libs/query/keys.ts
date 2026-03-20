@@ -32,7 +32,8 @@ export const queryKeys = {
     list: (params: unknown) =>
       [...queryKeys.device.lists(), { params }] as const,
     details: () => [...queryKeys.device.all, 'detail'] as const,
-    detail: (id: string | number) => [...queryKeys.device.details(), id] as const,
+    detail: (id: string | number) =>
+      [...queryKeys.device.details(), id] as const,
     status: () => [...queryKeys.device.all, 'status'] as const,
     protocolLists: () => [...queryKeys.device.all, 'protocol-list'] as const,
     protocolList: (params: unknown) =>

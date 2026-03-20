@@ -1,11 +1,17 @@
 import { useQueryClient } from '@tanstack/react-query';
 
-import { queryKeys, useAppMutation } from '@libs/query';
-import { resolveSuccessMessage, type ApiSuccessResponse } from '@services/http';
 import { useToast } from '@libs/hooks';
+import { queryKeys, useAppMutation } from '@libs/query';
+
+import { resolveSuccessMessage, type ApiSuccessResponse } from '@services/http';
 
 import { rolesApi } from '../api';
-import type { CreateRolePayload, RoleDetails, UpdateRolePayload } from '../types';
+
+import type {
+  CreateRolePayload,
+  RoleDetails,
+  UpdateRolePayload,
+} from '../types';
 
 export interface UpdateRoleVariables {
   id: number | string;

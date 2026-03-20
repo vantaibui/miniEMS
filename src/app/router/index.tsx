@@ -1,15 +1,22 @@
-import { Box, CircularProgress } from '@mui/material';
 import { Suspense, type ComponentType } from 'react';
-import type { RouteObject } from 'react-router-dom';
-import { createBrowserRouter, Navigate } from 'react-router-dom';
 
-import { deviceRoutes } from '@/modules/devices';
+import { Box, CircularProgress } from '@mui/material';
+import {
+  createBrowserRouter,
+  Navigate,
+  type RouteObject,
+} from 'react-router-dom';
+
 import { NotFoundPage } from '@libs/pages';
+
 import { authRoutes } from '@modules/auth';
 import { rolesRoutes } from '@modules/roles';
 import { usersRoutes } from '@modules/users';
+
 import { AuthLayout, RootLayout } from '../layouts';
 import { ProtectedRoute } from './ProtectedRoute';
+
+import { deviceRoutes } from '@/modules/devices';
 
 /**
  * Centrally managed route registry for the application shell.

@@ -1,8 +1,10 @@
+import { useEffect } from 'react';
+
+import { Box, CircularProgress, MenuItem, Select } from '@mui/material';
+import { useInfiniteQuery } from '@tanstack/react-query';
+
 import { queryKeys } from '@libs/query';
 import { UiFormField } from '@libs/ui';
-import { Box, CircularProgress, MenuItem, Select } from '@mui/material';
-import { useEffect } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
 
 import { devicesApi } from '../api';
 
@@ -49,22 +51,26 @@ export const ProtocolSelect = ({
   const protocolMap = new Map<number, string>();
 
   data?.pages.forEach((page) => {
-    page.data.forEach((item) => {
-      if (item.id != null && item.display) {
-        protocolMap.set(item.id, item.display);
+    page.data.forEach(({ id, name }) => {
+      const normalizedId = Number(id);
+      if (!Number.isNaN(normalizedId)) {
+        const displayLabel = name;
+        if (displayLabel) {
+          protocolMap.set(normalizedId, displayLabel);
+        }
       }
     });
   });
 
   const protocolOptions = Array.from(protocolMap.entries()).map(
-    ([id, display]) => ({ id, display }),
+    ([id, label]) => ({ id, label }),
   );
 
   useEffect(() => {
     if (!value || !onDisplayChange) return;
     const selectedOption = protocolOptions.find((opt) => opt.id === value);
-    if (selectedOption?.display) {
-      onDisplayChange(selectedOption.display);
+    if (selectedOption?.label) {
+      onDisplayChange(selectedOption.label);
     }
   }, [value, protocolOptions, onDisplayChange]);
 
@@ -79,20 +85,18 @@ export const ProtocolSelect = ({
   };
 
   return (
-    <UiFormField
-      label="PROTOCOL"
-      required={required}
-      errorText={errorText}
-    >
+    <UiFormField label="PROTOCOL" required={required} errorText={errorText}>
       <Select
-        value={value}
+        value={value === '' ? '' : Number(value)}
         onChange={(event) => {
           const selectedId = Number(event.target.value);
           onChange(selectedId);
           onResetTestStatus?.();
-          const selectedOption = protocolOptions.find((opt) => opt.id === selectedId);
-          if (selectedOption?.display) {
-            onDisplayChange?.(selectedOption.display);
+          const selectedOption = protocolOptions.find(
+            (opt) => opt.id === selectedId,
+          );
+          if (selectedOption?.label) {
+            onDisplayChange?.(selectedOption.label);
           }
         }}
         fullWidth
@@ -103,8 +107,10 @@ export const ProtocolSelect = ({
             return <Box sx={{ color: 'text.disabled' }}>Select protocol</Box>;
           }
 
-          const selectedOption = protocolOptions.find((opt) => opt.id === selected);
-          return selectedOption?.display ?? selected;
+          const selectedOption = protocolOptions.find(
+            (opt) => opt.id === selected,
+          );
+          return selectedOption?.label ?? 'Unknown protocol';
         }}
         MenuProps={{
           PaperProps: {
@@ -128,7 +134,7 @@ export const ProtocolSelect = ({
         ) : (
           protocolOptions.map((opt) => (
             <MenuItem key={opt.id} value={opt.id}>
-              {opt.display}
+              {opt.label}
             </MenuItem>
           ))
         )}

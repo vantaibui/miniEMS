@@ -4,11 +4,11 @@ import FormHelperText from '@mui/material/FormHelperText';
 import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-
 import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 
 import { cn } from '../utils/cn';
+
 import type { UiSelectOptionValue, UiSelectProps } from './UiSelect.types';
 
 function isEmptyValue(value: UiSelectOptionValue | undefined) {

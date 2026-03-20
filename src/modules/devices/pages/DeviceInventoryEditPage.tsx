@@ -1,8 +1,10 @@
+import { useMemo } from 'react';
+
+import { Box, Typography } from '@mui/material';
+import { useNavigate, useParams } from 'react-router-dom';
+
 import { useToast } from '@libs/hooks';
 import { UiBreadcrumb } from '@libs/ui';
-import { Box, Typography } from '@mui/material';
-import { useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 
 import { DeviceForm } from '../components/DeviceForm';
 import { useDeviceDetail, useDeviceUpdate } from '../hooks';
@@ -19,7 +21,8 @@ export const DeviceInventoryEditPage = () => {
     return Number.isNaN(numberId) ? id : numberId;
   }, [id]);
 
-  const { data: device, isLoading: isLoadingDetail } = useDeviceDetail(parsedId);
+  const { data: device, isLoading: isLoadingDetail } =
+    useDeviceDetail(parsedId);
   const { mutate: updateDevice, isPending: isUpdating } = useDeviceUpdate();
 
   const handleSubmit = (data: FormData) => {
@@ -34,7 +37,7 @@ export const DeviceInventoryEditPage = () => {
         payload: data,
       },
       {
-        onSuccess: () => navigate('/device-inventory')
+        onSuccess: () => navigate('/device-inventory'),
       },
     );
   };
@@ -77,20 +80,22 @@ export const DeviceInventoryEditPage = () => {
         </Typography>
 
         <Typography variant="body1" sx={{ color: 'text.secondary', mt: 2 }}>
-          Update management connection and authentication settings for this device.
+          Update management connection and authentication settings for this
+          device.
         </Typography>
       </Box>
 
       <Box sx={{ mt: 4 }}>
         <DeviceForm
           initialValues={{
-            managementIp: device?.managementIp ?? device?.ip ?? '',
-            port: device?.port ?? 8080,
-            protocolId: device?.protocolId ?? 6,
-            authenticationType: device?.authenticationType ?? 'USERNAME_PASSWORD',
-            username: device?.username ?? '',
-            password: device?.password ?? '',
-            clientCertificate: device?.clientCertificate ?? '',
+            managementIp: device?.device?.managementIp ?? '',
+            port: device?.connection?.port ?? 8080,
+            protocolId: device?.protocol?.id ?? 6,
+            authenticationType:
+              device?.credential?.authenticationType ?? 'USERNAME_PASSWORD',
+            username: device?.credential?.username ?? '',
+            password: device?.credential?.password ?? '',
+            clientCertificate: device?.credential?.clientCertificate ?? '',
           }}
           onSubmit={handleSubmit}
           onCancel={() => navigate('/device-inventory')}

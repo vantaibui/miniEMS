@@ -1,9 +1,10 @@
 import React from 'react';
+
+import HomeIcon from '@mui/icons-material/Home';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import { Breadcrumbs as MuiBreadcrumbs, Typography, Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 
-import { Breadcrumbs as MuiBreadcrumbs, Typography, Box } from '@mui/material';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import HomeIcon from '@mui/icons-material/Home';
 import type { BreadcrumbProps } from './UiBreadcrumb.types';
 
 const UiBreadcrumb: React.FC<BreadcrumbProps> = ({ items, className = '' }) => {

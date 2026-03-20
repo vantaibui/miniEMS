@@ -2,7 +2,9 @@ import AnalyticsOutlinedIcon from '@mui/icons-material/AnalyticsOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined';
+
 import { PERMISSION_SUBMODULES } from '@modules/auth';
+
 import type { NavGroup } from './nav.types';
 
 export const NAV_MAIN: Array<NavGroup> = [

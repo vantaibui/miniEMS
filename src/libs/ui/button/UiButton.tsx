@@ -1,8 +1,10 @@
 import { forwardRef } from 'react';
+
 import MuiButton from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import { cn } from '../utils/cn';
+
 import type {
   UiButtonProps,
   UiButtonSize,
@@ -94,10 +96,13 @@ export const UiButton = forwardRef<HTMLButtonElement, UiButtonProps>(
         fullWidth={fullWidth}
         startIcon={loading ? undefined : startIcon}
         endIcon={loading ? undefined : endIcon}
-        sx={{ fontWeight: 600, boxShadow: '0px 4px 12px rgba(11, 87, 208, 0.2)' }}
+        sx={{
+          fontWeight: 600,
+          boxShadow: '0px 4px 12px rgba(11, 87, 208, 0.2)',
+        }}
         className={cn(
           'min-w-0 disabled:opacity-50',
-          isDisabled && 'pointer-events-none opacity-50',
+          loading && 'pointer-events-none',
           className,
         )}
         {...rest}

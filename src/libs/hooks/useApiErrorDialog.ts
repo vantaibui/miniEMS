@@ -1,4 +1,5 @@
 import { useDialogConfirm } from '@libs/ui';
+
 import type { AppError } from '@services/http';
 
 export type RetryOptions = {
@@ -10,7 +11,10 @@ function isServerOrNetworkError(error: AppError): boolean {
   return status === undefined || status >= 500;
 }
 
-export type ShowApiErrorDialogFn = (error: AppError, retry?: RetryOptions) => Promise<void>;
+export type ShowApiErrorDialogFn = (
+  error: AppError,
+  retry?: RetryOptions,
+) => Promise<void>;
 
 export function useApiErrorDialog(): ShowApiErrorDialogFn {
   const confirm = useDialogConfirm();

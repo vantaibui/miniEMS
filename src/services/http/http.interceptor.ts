@@ -1,9 +1,8 @@
 import { keycloak, login, refreshToken } from '@modules/auth';
-import type {
-  AxiosInstance,
-  InternalAxiosRequestConfig,
-} from 'axios';
+
 import { mapUnknownToAppError } from './http.error';
+
+import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 
 interface RetryableRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;

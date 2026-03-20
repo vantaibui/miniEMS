@@ -1,93 +1,171 @@
-# SonicVista-UI
+# SonicVista UI
 
+---
 
+## Tech Stack
 
-## Getting started
+| Category          | Technology                       | Version    |
+| ----------------- | -------------------------------- | ---------- |
+| UI Framework      | React                            | 19.x       |
+| Build Tool        | Vite                             | 7.x        |
+| Language          | TypeScript                       | ~5.9       |
+| Component Library | MUI (Material UI)                | 7.x        |
+| Styling           | Tailwind CSS v4                  | 4.x        |
+| Routing           | React Router DOM                 | v7         |
+| Server State      | TanStack React Query             | v5         |
+| Client State      | Zustand                          | v5         |
+| Auth              | Keycloak JS                      | v26        |
+| Forms             | React Hook Form + Yup            | 7.x / 1.x  |
+| HTTP              | Axios                            | 1.x        |
+| Notifications     | React Toastify                   | 11.x       |
+| Testing           | Jest + ts-jest + Testing Library | 30.x       |
+| Linting           | ESLint 9 (flat config)           | 9.x        |
+| Formatting        | Prettier                         | 3.x        |
+| Git Hooks         | Husky + lint-staged              | 9.x / 16.x |
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+---
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## Features
 
-## Add your files
+- **User Management** — Create, view, edit, and delete users
+- **Role & Permission Management** — Define roles with granular CRUD permission matrices per sub-module
+- **Device Inventory** — Manage network/infrastructure devices with connection testing, protocol configuration, and credential management
+- **RBAC-driven UI** — Sidebar navigation and routes are dynamically filtered based on the authenticated user's permissions
+- **Keycloak SSO** — Authentication via Keycloak with PKCE S256 and silent SSO
 
-* [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+---
+
+## Prerequisites
+
+- Node.js >= 18
+- npm >= 9
+
+---
+
+## Getting Started
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure environment
+
+Copy the example below into a `.env` file in the project root:
+
+```env
+VITE_API_BASE_URL=https://<your-api-host>/api
+VITE_KEYCLOAK_URL=https://<your-keycloak-host>/auth
+VITE_KEYCLOAK_REALM=<realm-name>
+VITE_KEYCLOAK_CLIENT_ID=<client-id>
+```
+
+For local development with a local Keycloak instance, see [README-auth.md](./README-auth.md).
+
+### 3. Start the dev server
+
+```bash
+npm run dev
+```
+
+The app runs at `http://localhost:3000`.
+
+---
+
+## Available Scripts
+
+| Script                  | Description                           |
+| ----------------------- | ------------------------------------- |
+| `npm run dev`           | Start Vite dev server on port 3000    |
+| `npm run build`         | Type-check + production build         |
+| `npm run preview`       | Preview the production build          |
+| `npm run test`          | Run unit tests                        |
+| `npm run test:watch`    | Run tests in watch mode               |
+| `npm run test:coverage` | Run tests with coverage report        |
+| `npm run lint`          | Lint all `.ts` / `.tsx` files         |
+| `npm run lint:fix`      | Lint and auto-fix                     |
+| `npm run format`        | Format all source files with Prettier |
+
+---
+
+## Project Structure
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.tma.com.vn/dc14-miniems/sonicvista-ui.git
-git branch -M main
-git push -uf origin main
+src/
+├── app/                    # Application shell
+│   ├── layouts/            # RootLayout, AuthLayout, AppShellLayout (header, sidebar, footer)
+│   ├── navigation/         # Sidebar nav config and types
+│   ├── providers/          # AppCoreProvider, AppInitializer, QueryProvider
+│   └── router/             # Centralized route registry + ProtectedRoute
+├── modules/                # Feature modules (vertical slices)
+│   ├── auth/               # Keycloak client, AuthProvider, RBAC store, route guards
+│   ├── users/              # User CRUD pages, components, API hooks
+│   ├── roles/              # Role & permission management
+│   ├── devices/            # Device inventory CRUD + connection testing
+│   └── dashboard/          # Dashboard / demo components
+├── libs/                   # Shared infrastructure
+│   ├── ui/                 # 20+ shared UI components (UiButton, UiTable, UiModal, etc.)
+│   ├── hooks/              # useDataTable, useToast, useApiErrorDialog, etc.
+│   ├── types/              # Shared TypeScript types
+│   ├── utils/              # General utilities, date utils, cn() helper
+│   ├── configs/            # Keycloak config, Day.js, env
+│   ├── constants/          # App-wide constants (APP_NAME, PAGE_TITLES)
+│   ├── query/              # queryKeys registry
+│   └── pages/              # Shared pages (NotFoundPage, 403, etc.)
+└── services/
+    └── http/               # Axios instance, interceptors, typed HTTP client, CRUD factory
 ```
 
-## Integrate with your tools
+### Module Boundaries
 
-* [Set up project integrations](https://gitlab.tma.com.vn/dc14-miniems/sonicvista-ui/-/settings/integrations)
+Each feature module exposes a **public API** via its `index.ts`. ESLint enforces that modules cannot import each other directly — only the application shell (`src/app`) may depend on multiple modules.
 
-## Collaborate with your team
+---
 
-* [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+## Authentication & Authorization
 
-## Test and Deploy
+Authentication uses a two-layer approach:
 
-Use the built-in continuous integration in GitLab.
+1. **Keycloak (Identity / SSO)** — `keycloak-js` with Authorization Code Flow + PKCE S256. Tokens are stored in `localStorage` and proactively refreshed before expiry. Silent SSO is enabled via `/silent-check-sso.html`.
 
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+2. **Backend RBAC (Authorization)** — After login, the app fetches the current user's role and its associated permissions from the API (`/me` → `/roles/{roleId}/permissions`). Permissions are stored in Zustand and used to guard routes and hide nav items.
 
-***
+**Route guards:**
 
-# Editing this README
+- `ProtectedRoute` — redirects to `/login` if not authenticated
+- `RouteGuard` — checks a specific sub-module + action; redirects to `/403` if denied
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+For local Keycloak setup (Docker + PostgreSQL + custom theme), see [README-auth.md](./README-auth.md).
 
-## Suggestions for a good README
+---
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+## Path Aliases
 
-## Name
-Choose a self-explaining name for your project.
+| Alias       | Resolves to     |
+| ----------- | --------------- |
+| `@`         | `src/`          |
+| `@app`      | `src/app/`      |
+| `@modules`  | `src/modules/`  |
+| `@libs/*`   | `src/libs/*/`   |
+| `@services` | `src/services/` |
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+---
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+## Code Quality
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+- **ESLint 9** (flat config) with TypeScript, React Hooks, import ordering, and module boundary rules
+- **Prettier** for consistent formatting
+- **Husky** pre-commit hook runs `eslint --fix` + `prettier --write` on staged files via `lint-staged`
+- **Jest** + **ts-jest** + **Testing Library** for unit and component tests
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+---
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+## Environment Variables Reference
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+| Variable                  | Description                       |
+| ------------------------- | --------------------------------- |
+| `VITE_API_BASE_URL`       | Base URL for the backend REST API |
+| `VITE_KEYCLOAK_URL`       | Keycloak server URL               |
+| `VITE_KEYCLOAK_REALM`     | Keycloak realm name               |
+| `VITE_KEYCLOAK_CLIENT_ID` | Keycloak client ID                |

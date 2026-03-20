@@ -1,8 +1,9 @@
-import { UiButton } from '@libs/ui';
+import { type ChangeEvent, type DragEvent, useRef, useState } from 'react';
+
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
 import { Box, Typography } from '@mui/material';
-import type { ChangeEvent, DragEvent } from 'react';
-import { useRef, useState } from 'react';
+
+import { UiButton } from '@libs/ui';
 
 const DEFAULT_MAX_FILE_SIZE_KB = 20;
 const DEFAULT_ACCEPTED_EXTENSIONS: Array<string> = ['.crt', '.pem', '.key'];
@@ -11,7 +12,11 @@ interface UploadFiledProps {
   acceptedExtensions?: Array<string>;
   maxFileSizeKb?: number;
   selectedFileName?: string;
-  onFileLoaded: (payload: { file: File; fileName: string; content: string }) => void;
+  onFileLoaded: (payload: {
+    file: File;
+    fileName: string;
+    content: string;
+  }) => void;
   onInvalidFile?: (message: string) => void;
 }
 
@@ -31,24 +36,34 @@ export const UploadFiled = ({
 
   const processFile = (file: File) => {
     const lowerName = file.name.toLowerCase();
-    const isAllowedType = acceptedExtensions.some((ext) => lowerName.endsWith(ext.toLowerCase()));
+    const isAllowedType = acceptedExtensions.some((ext) =>
+      lowerName.endsWith(ext.toLowerCase()),
+    );
 
     if (!isAllowedType) {
-      onInvalidFile?.(`Invalid file type. Accepted: ${acceptedExtensions.join(', ')}`);
+      onInvalidFile?.(
+        `Invalid file type. Accepted: ${acceptedExtensions.join(', ')}`,
+      );
       resetInput();
       return;
     }
 
     const maxFileSizeBytes = maxFileSizeKb * 1024;
     if (file.size > maxFileSizeBytes) {
-      onInvalidFile?.(`Certificate file size must be less than or equal to ${maxFileSizeKb}KB.`);
+      onInvalidFile?.(
+        `Certificate file size must be less than or equal to ${maxFileSizeKb}KB.`,
+      );
       resetInput();
       return;
     }
 
     const reader = new FileReader();
     reader.onload = () => {
-      onFileLoaded({ file, fileName: file.name, content: String(reader.result ?? '') });
+      onFileLoaded({
+        file,
+        fileName: file.name,
+        content: String(reader.result ?? ''),
+      });
     };
     reader.readAsText(file);
   };
@@ -95,14 +110,21 @@ export const UploadFiled = ({
         Certificate Upload
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-        Drag and drop your certificate files ({acceptedExtensions.join(', ')}) here to secure your connection.
+        Drag and drop your certificate files ({acceptedExtensions.join(', ')})
+        here to secure your connection.
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
         Maximum size: {maxFileSizeKb}KB
       </Typography>
       <UiButton variant="contained" component="label">
         Browse Files
-        <input ref={inputRef} type="file" hidden accept={acceptedExtensions.join(',')} onChange={handleChange} />
+        <input
+          ref={inputRef}
+          type="file"
+          hidden
+          accept={acceptedExtensions.join(',')}
+          onChange={handleChange}
+        />
       </UiButton>
       {selectedFileName ? (
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5 }}>

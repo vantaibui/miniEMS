@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+
 import { Box, Typography, Button } from '@mui/material';
 
 interface Props {

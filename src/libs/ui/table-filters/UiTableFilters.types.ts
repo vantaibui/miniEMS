@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+
 import type { UiSelectOption, UiSelectOptionValue } from '../select';
 
 export interface UiTableFiltersTab {

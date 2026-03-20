@@ -1,6 +1,6 @@
-import type { KeycloakTokenParsed } from 'keycloak-js';
 import type { PermissionNode } from './permission.types';
 import type { User } from './user.types';
+import type { KeycloakTokenParsed } from 'keycloak-js';
 
 // export interface UserProfile {
 //   id?: string;

@@ -1,13 +1,15 @@
 import { useMemo, useState } from 'react';
+
 import {
+  type UiDataTableColumn,
+  type UiDataTableId,
+  UiBadge,
+  UiButton,
   UiCard,
   UiDataTable,
   UiTableFilters,
   UiText,
-  UiBadge,
-  UiButton,
 } from '@libs/ui';
-import type { UiDataTableColumn, UiDataTableId } from '@libs/ui';
 
 interface DemoRow {
   id: number;

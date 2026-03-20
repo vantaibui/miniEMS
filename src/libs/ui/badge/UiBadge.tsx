@@ -1,6 +1,7 @@
 import Chip from '@mui/material/Chip';
 
 import { cn } from '@libs/utils';
+
 import type {
   UiBadgeProps,
   UiBadgeSize,

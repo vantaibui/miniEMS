@@ -1,13 +1,16 @@
-import type { AuthState } from '@libs/types';
-import { Box, CircularProgress } from '@mui/material';
 import React from 'react';
+
+import { Box, CircularProgress } from '@mui/material';
 import { Navigate, useLocation } from 'react-router-dom';
-import { usePermission } from '../../hooks/usePermission';
-import { useRbacStore } from '../../store/auth.store';
+
+import type { AuthState } from '@libs/types';
+
 import {
   PERMISSION_ACTIONS,
   type PermissionAction,
 } from '../../constants/permissions.constants';
+import { usePermission } from '../../hooks/usePermission';
+import { useRbacStore } from '../../store/auth.store';
 
 interface GuardProps {
   subModuleKey: string;
@@ -17,9 +20,7 @@ interface GuardProps {
 }
 
 const FullPageLoader = () => (
-  <Box
-  className="flex justify-center items-center h-screen"
-  >
+  <Box className="flex justify-center items-center h-screen">
     <CircularProgress />
   </Box>
 );

@@ -1,13 +1,14 @@
+import { useState } from 'react';
+
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
-import TextField from '@mui/material/TextField';
-import type { TextFieldProps } from '@mui/material/TextField';
-import { useState } from 'react';
+import TextField, { type TextFieldProps } from '@mui/material/TextField';
 
 import { cn } from '../utils/cn';
+
 import type { UiFieldSize, UiInputProps } from './UiInput.types';
 
 function mapSize(size: UiFieldSize): 'small' | 'medium' {
@@ -47,7 +48,11 @@ export function UiInput({
   const isPasswordType = type === 'password';
   const shouldShowToggle = passwordToggle && isPasswordType && !loading;
 
-  const effectiveType = shouldShowToggle ? (showPassword ? 'text' : 'password') : type;
+  const effectiveType = shouldShowToggle
+    ? showPassword
+      ? 'text'
+      : 'password'
+    : type;
 
   const slotProps: TextFieldProps['slotProps'] = {
     input: {

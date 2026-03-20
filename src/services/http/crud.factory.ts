@@ -17,8 +17,7 @@ export const createResourceApi = <
   getById: (id: number | string) =>
     http.get<TEntity>(`${endpoints.base}/${id}`),
 
-  create: (payload: TCreateDto) =>
-    http.post<TEntity>(endpoints.base, payload),
+  create: (payload: TCreateDto) => http.post<TEntity>(endpoints.base, payload),
 
   update: (id: number | string, payload: TUpdateDto) =>
     http.put<TEntity>(`${endpoints.base}/${id}`, payload),

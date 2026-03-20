@@ -1,32 +1,24 @@
-import assets from '@/libs/assets';
-import { useAuthStore, useRbacStore } from '@modules/auth';
+import { useMemo, useState } from 'react';
+
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
-import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
-import SearchIcon from '@mui/icons-material/Search';
 import {
-  AppBar,
   Avatar,
   Box,
-  Divider,
-  IconButton,
-  InputBase,
   ListItemIcon,
   Menu,
   MenuItem,
-  Stack,
-  Toolbar,
   Typography,
 } from '@mui/material';
-import { useMemo, useState } from 'react';
+
+import { useAuthStore, useRbacStore } from '@modules/auth';
 
 interface HeaderProps {
   height?: number;
-  sidebarWidth?: number;
+  title?: string;
 }
 
-export const Header = ({ height = 64, sidebarWidth = 260 }: HeaderProps) => {
+export const Header = ({ height = 56, title = 'ADMINISTRATION' }: HeaderProps) => {
   const logout = useAuthStore((s) => s.logout);
   const user = useRbacStore((s) => s.user);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -43,7 +35,8 @@ export const Header = ({ height = 64, sidebarWidth = 260 }: HeaderProps) => {
     const firstName = user.firstName ?? '';
     const lastName = user.lastName ?? '';
     const username = user.username ?? '';
-    const fallbackName = `${firstName} ${lastName}`.trim() || username || 'Admin User';
+    const fallbackName =
+      `${firstName} ${lastName}`.trim() || username || 'Admin User';
 
     return {
       fullName: fallbackName,
@@ -56,125 +49,79 @@ export const Header = ({ height = 64, sidebarWidth = 260 }: HeaderProps) => {
   }, [user]);
 
   return (
-    <AppBar
-      position="sticky"
-      elevation={0}
-      color="inherit"
+    <Box
+      component="header"
       sx={{ height }}
-      className="z-1201 bg-surface-card text-text-primary shadow-none"
+      className="sticky top-0 z-[1100] flex shrink-0 items-center justify-between border-b border-divider bg-surface-card px-4 md:px-5"
     >
-      <Toolbar disableGutters className="flex min-h-16 items-center gap-2 px-2">
-        <Stack direction="row" alignItems="center" spacing={1.5}>
-          {/* <IconButton color="inherit" edge="start" className="mr-1 lg:hidden">
-            <MenuIcon />
-          </IconButton> */}
+      <Typography
+        variant="h6"
+        fontWeight={700}
+        className="text-text-primary"
+        sx={{ letterSpacing: '0.04em' }}
+      >
+        {title}
+      </Typography>
 
-          <Box
-            className="flex shrink-0 items-center"
-            width={sidebarWidth}
-          >
-            <Box
-              component="img"
-              src={assets.images.miniEMSLogo}
-              alt="TMA Solutions"
-              className="h-13 w-auto"
-            />
+      <Box className="flex shrink-0 items-center">
+        <Box
+          component="button"
+          type="button"
+          onClick={(e) => setAnchorEl(e.currentTarget)}
+          className="flex items-center gap-2 border-none bg-transparent p-0"
+        >
+          <Box className="hidden text-right md:block">
+            <Typography
+              variant="body2"
+              className="leading-none text-text-primary"
+              fontWeight={600}
+            >
+              {fullName}
+            </Typography>
+            <Typography
+              variant="caption"
+              className="uppercase leading-none text-text-secondary"
+            >
+              {role}
+            </Typography>
           </Box>
-        </Stack>
-
-        <Box className="flex flex-1 items-center px-4 md:px-6">
-          <Box className="hidden h-11 w-full max-w-125 items-center gap-1 rounded-full border border-divider bg-surface-card px-2 md:flex">
-            <SearchIcon fontSize="small" color="action" />
-            <InputBase
-              fullWidth
-              placeholder="Search for users, roles, or logs."
-              className="text-sm text-text-primary"
-            />
-          </Box>
+          <Avatar className="h-8 w-8 bg-primary text-xs">{initials}</Avatar>
         </Box>
 
-        <Box className="flex shrink-0 items-center gap-1.5">
-          <IconButton size="small" aria-label="Help" color="inherit">
-            <HelpOutlineOutlinedIcon fontSize="small" />
-          </IconButton>
-          <IconButton size="small" aria-label="Notifications" color="inherit">
-            <NotificationsNoneOutlinedIcon fontSize="small" />
-          </IconButton>
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={() => setAnchorEl(null)}
+          slotProps={{
+            paper: {
+              className: 'mt-1 min-w-[180px] rounded-md',
+            },
+          }}
+        >
+          <MenuItem onClick={() => setAnchorEl(null)}>
+            <ListItemIcon>
+              <AccountCircleOutlinedIcon fontSize="small" />
+            </ListItemIcon>
+            <Typography variant="body2" fontWeight={500}>
+              My account
+            </Typography>
+          </MenuItem>
 
-          <Divider
-            orientation="vertical"
-            flexItem
-            className="mx-1 h-6 self-center"
-          />
-
-          <Box
-            component="button"
-            type="button"
-            onClick={(e) => setAnchorEl(e.currentTarget)}
-            className="ml-1 flex items-center gap-3 border-none bg-transparent p-0"
-          >
-            <Box className="mr-1 hidden text-right md:block">
-              <Typography
-                variant="body2"
-                className="mb-0.5 text-sm leading-none text-text-primary"
-                fontWeight={600}
-              >
-                {fullName}
-              </Typography>
-              <Typography
-                variant="caption"
-                className="block text-[11px] uppercase leading-none text-text-secondary"
-              >
-                {role}
-              </Typography>
-            </Box>
-            <Avatar
-              src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-              className="h-9 w-9 bg-primary text-sm"
-            >
-              {initials}
-            </Avatar>
-          </Box>
-
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={() => setAnchorEl(null)}
-            slotProps={{
-              paper: {
-                className: 'mt-1.5 min-w-[180px] rounded-md',
-              },
+          <MenuItem
+            onClick={() => {
+              setAnchorEl(null);
+              logout();
             }}
           >
-            <MenuItem onClick={() => setAnchorEl(null)}>
-              <ListItemIcon>
-                <Avatar className="h-6 w-6 bg-primary text-xs">
-                  <AccountCircleOutlinedIcon className="text-base text-white" />
-                </Avatar>
-              </ListItemIcon>
-              <Typography variant="body2" fontWeight={500}>
-                My account
-              </Typography>
-            </MenuItem>
-
-            <Divider className="my-1" />
-
-            <MenuItem
-              onClick={() => {
-                setAnchorEl(null);
-                logout();
-              }}
-            >
-              <ListItemIcon>
-                <LogoutOutlinedIcon fontSize="small" />
-              </ListItemIcon>
-              <Typography variant="body2" fontWeight={500}>
-                Logout
-              </Typography>
-            </MenuItem>
-          </Menu>
-        </Box>
-      </Toolbar>
-    </AppBar>
+            <ListItemIcon>
+              <LogoutOutlinedIcon fontSize="small" />
+            </ListItemIcon>
+            <Typography variant="body2" fontWeight={500}>
+              Logout
+            </Typography>
+          </MenuItem>
+        </Menu>
+      </Box>
+    </Box>
   );
 };

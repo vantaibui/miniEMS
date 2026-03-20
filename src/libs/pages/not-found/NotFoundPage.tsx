@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 import {
   Box,
   Typography,
@@ -7,7 +9,6 @@ import {
   DashboardIcon,
   HeadsetMicIcon,
 } from '@libs/ui';
-import { useNavigate } from 'react-router-dom';
 
 const NotFoundPage = () => {
   const navigate = useNavigate();
