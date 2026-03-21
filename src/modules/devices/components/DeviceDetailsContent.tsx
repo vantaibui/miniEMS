@@ -1,9 +1,7 @@
 // cspell:ignore asic hwsku sonic
 import DesktopWindowsIcon from '@mui/icons-material/DesktopWindows';
-import DownloadIcon from '@mui/icons-material/Download';
 import { Box, Card, Chip, Grid, Typography } from '@mui/material';
 
-import { UiButton } from '@libs/ui';
 
 import type { DeviceDetail } from '../types';
 

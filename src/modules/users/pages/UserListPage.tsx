@@ -3,9 +3,10 @@ import { useState } from 'react';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useNavigate } from 'react-router-dom';
 
+import { PageLayout } from '@app/layout';
+
 import { UiButton, useDialogConfirm } from '@libs/ui';
 
-import { PageLayout } from '@/components/layout';
 
 import { UserTable } from '../components/UserTable';
 import { useUserDelete, useUsers } from '../hooks';
@@ -50,10 +51,6 @@ export const UserListPage = () => {
   return (
     <PageLayout
       title="User Management"
-      breadcrumbs={[
-        { label: 'Home', href: '/' },
-        { label: 'User Management' },
-      ]}
       actions={
         <UiButton
           variant="contained"

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-import { PageLayout } from '@/components/layout';
+import { PageLayout } from '@app/layout';
 
 import { RoleForm } from '../components/RoleForm';
 import { usePermissions, useRoleCreate } from '../hooks';
@@ -24,18 +24,14 @@ export const RoleCreatePage = () => {
 
   const handleSubmit = (data: CreateRolePayload) => {
     createRole(data, {
-      onSuccess: () => navigate('/roles'),
+      onSuccess: () => navigate('/admin/roles'),
     });
   };
 
   return (
     <PageLayout
       title="Add New Role"
-      breadcrumbs={[
-        { label: 'Home', href: '/' },
-        { label: 'Role Management', href: '/roles' },
-        { label: 'Add New Role' },
-      ]}
+      description="Define a new security role and configure specific module-level access permissions."
     >
       {isLoadingPermissions && !permissions.length ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
@@ -45,7 +41,7 @@ export const RoleCreatePage = () => {
         <RoleForm
           Permissions={permissions}
           onSubmit={handleSubmit}
-          onCancel={() => navigate('/roles')}
+          onCancel={() => navigate('/admin/roles')}
           isLoading={isCreating}
           submitLabel="Create Role"
           permissionsPagination={permissionsPagination}

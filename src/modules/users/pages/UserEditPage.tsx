@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { PageLayout } from '@/components/layout';
+import { PageLayout } from '@app/layout';
 
 import { usePermissions } from '../../roles/hooks';
 import { UserForm } from '../components/UserForm';
@@ -29,7 +29,7 @@ export const UserEditPage = () => {
     updateUser(
       { id: userId, payload: data },
       {
-        onSuccess: () => navigate('/users'),
+        onSuccess: () => navigate('/admin/users'),
       },
     );
   };
@@ -39,11 +39,7 @@ export const UserEditPage = () => {
       title={
         user ? `Edit User: ${user.firstName} ${user.lastName}` : 'Edit User'
       }
-      breadcrumbs={[
-        { label: 'Home', href: '/' },
-        { label: 'User Management', href: '/users' },
-        { label: 'Edit User' },
-      ]}
+      description="Modify account settings and permission levels for the selected user profile."
     >
       {isLoadingUser ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
@@ -59,7 +55,7 @@ export const UserEditPage = () => {
             roleId: user.roleId,
           }}
           onSubmit={handleSubmit}
-          onCancel={() => navigate('/users')}
+          onCancel={() => navigate('/admin/users')}
           onDelete={() => deleteUser(user.id)}
           isLoading={isUpdating || isDeleting}
           submitLabel="Update User"

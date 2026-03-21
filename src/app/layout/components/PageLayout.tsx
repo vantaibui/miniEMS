@@ -2,11 +2,9 @@ import { type ReactNode, useEffect } from 'react';
 
 import { Box } from '@mui/material';
 
-import { Header } from './Header';
+import { DOCUMENT_TITLE_SUFFIX } from '@app/navigation';
 
-import type { HeaderProps } from './Header';
-
-const APP_NAME = 'miniEMS';
+import { Header, type HeaderProps } from './Header';
 
 export type PageLayoutProps = HeaderProps & {
   children: ReactNode;
@@ -14,24 +12,19 @@ export type PageLayoutProps = HeaderProps & {
 
 export const PageLayout = ({
   title,
-  breadcrumbs,
   description,
   actions,
   children,
 }: PageLayoutProps) => {
   useEffect(() => {
-    document.title = `${title} | ${APP_NAME}`;
+    document.title = `${title} | ${DOCUMENT_TITLE_SUFFIX}`;
   }, [title]);
+
   return (
     <Box className="flex min-h-full flex-col">
-      <Header
-        title={title}
-        breadcrumbs={breadcrumbs}
-        description={description}
-        actions={actions}
-      />
+      <Header title={title} description={description} actions={actions} />
 
-      <Box className="min-h-0 flex-1 p-6 bg-[#F1F5F9]">
+      <Box className="min-h-0 flex-1 bg-[#F1F5F9] p-6">
         <Box className="rounded-lg shadow-sm">
           {children}
         </Box>

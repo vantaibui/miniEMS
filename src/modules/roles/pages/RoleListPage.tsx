@@ -2,9 +2,10 @@ import { useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
+import { PageLayout } from '@app/layout';
+
 import { AddIcon, UiButton, useDialogConfirm } from '@libs/ui';
 
-import { PageLayout } from '@/components/layout';
 
 import { RoleTable } from '../components/RoleTable';
 import { useRoleDelete, useRoles } from '../hooks';
@@ -49,10 +50,6 @@ export const RoleListPage = () => {
   return (
     <PageLayout
       title="Role Management"
-      breadcrumbs={[
-        { label: 'Home', href: '/' },
-        { label: 'Role Management' },
-      ]}
       actions={
         <UiButton
           variant="primary"

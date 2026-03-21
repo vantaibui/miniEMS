@@ -1,46 +1,38 @@
-import AnalyticsOutlinedIcon from '@mui/icons-material/AnalyticsOutlined';
-import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
+import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
 import DevicesOtherOutlinedIcon from '@mui/icons-material/DevicesOtherOutlined';
-import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
-import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined';
 
 import { PERMISSION_SUBMODULES } from '@modules/auth';
 
-import type { NavGroup, SidebarTopItem } from './nav.types';
+import type { SidebarTopItem, TabGroup } from './nav.types';
 
 /* ------------------------------------------------------------------ */
-/*  Top-level sidebar navigation (3 direct items, no tabs)            */
+/*  Sidebar items                                                     */
 /* ------------------------------------------------------------------ */
 
 export const SIDEBAR_NAV: Array<SidebarTopItem> = [
   {
-    key: 'users',
-    label: 'Users',
-    icon: <PeopleAltOutlinedIcon sx={{ fontSize: 24 }} />,
-    to: '/users',
-    pathPrefixes: ['/users'],
-    permission: {
-      subModule: PERMISSION_SUBMODULES.USER_MANAGEMENT,
-      action: 'read',
-    },
-  },
-  {
-    key: 'roles',
-    label: 'Roles',
-    icon: <SecurityOutlinedIcon sx={{ fontSize: 24 }} />,
-    to: '/roles',
-    pathPrefixes: ['/roles'],
-    permission: {
-      subModule: PERMISSION_SUBMODULES.ROLE_MANAGEMENT,
-      action: 'read',
-    },
+    key: 'admin',
+    label: 'Admin',
+    icon: <AdminPanelSettingsOutlinedIcon sx={{ fontSize: 24 }} />,
+    to: '/admin/users',
+    pathPrefixes: ['/admin'],
+    permissionAnyOf: [
+      {
+        subModule: PERMISSION_SUBMODULES.USER_MANAGEMENT,
+        action: 'read',
+      },
+      {
+        subModule: PERMISSION_SUBMODULES.ROLE_MANAGEMENT,
+        action: 'read',
+      },
+    ],
   },
   {
     key: 'devices',
     label: 'Devices',
     icon: <DevicesOtherOutlinedIcon sx={{ fontSize: 24 }} />,
-    to: '/device-inventory',
-    pathPrefixes: ['/device-inventory'],
+    to: '/devices',
+    pathPrefixes: ['/devices'],
     permission: {
       subModule: PERMISSION_SUBMODULES.DEVICE_MANAGEMENT,
       action: 'read',
@@ -49,89 +41,25 @@ export const SIDEBAR_NAV: Array<SidebarTopItem> = [
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Legacy flat navigation (kept for backward-compat)                 */
+/*  Header tabs (labels must stay aligned with breadcrumbs.ts)        */
 /* ------------------------------------------------------------------ */
 
-export const NAV_MAIN: Array<NavGroup> = [
+export const TAB_GROUPS: Array<TabGroup> = [
   {
-    key: 'main',
-    section: 'MAIN NAVIGATION',
-    items: [
-      {
-        key: 'dashboard',
-        label: 'Dashboard',
-        to: '/dashboard',
-        icon: <DashboardOutlinedIcon fontSize="small" />,
-      },
-      {
-        key: 'analytics',
-        label: 'Analytics',
-        to: '/analytics',
-        icon: <AnalyticsOutlinedIcon fontSize="small" />,
-      },
+    matchPrefix: '/admin',
+    tabs: [
+      { label: 'User Management', path: '/admin/users' },
+      { label: 'Role Management', path: '/admin/roles' },
     ],
+  },
+  {
+    matchPrefix: '/devices',
+    tabs: [{ label: 'Device Management', path: '/devices' }],
   },
 ];
 
-export const NAV_ACCESS: Array<NavGroup> = [
-  {
-    key: 'access',
-    section: 'ACCESS MANAGEMENT',
-    items: [
-      {
-        key: 'users',
-        label: 'User Management',
-        to: '/users',
-        icon: <PeopleAltOutlinedIcon fontSize="small" />,
-        permission: {
-          subModule: PERMISSION_SUBMODULES.USER_MANAGEMENT,
-          action: 'read',
-        },
-      },
-      {
-        key: 'roles',
-        label: 'Roles & Permissions',
-        to: '/roles',
-        icon: <SecurityOutlinedIcon fontSize="small" />,
-        permission: {
-          subModule: PERMISSION_SUBMODULES.ROLE_MANAGEMENT,
-          action: 'read',
-        },
-      },
-    ],
-  },
-];
+/* ------------------------------------------------------------------ */
+/*  Document title                                                    */
+/* ------------------------------------------------------------------ */
 
-export const NAV_ASSET: Array<NavGroup> = [
-  {
-    key: 'asset',
-    section: 'ASSET MANAGEMENT',
-    items: [
-      {
-        key: 'device_inventory',
-        label: 'Device Inventory',
-        to: '/device-inventory',
-        icon: <PeopleAltOutlinedIcon fontSize="small" />,
-        permission: {
-          subModule: PERMISSION_SUBMODULES.DEVICE_MANAGEMENT,
-          action: 'read',
-        },
-      },
-      {
-        key: 'device_configuration',
-        label: 'Device Configuration',
-        to: '/device-configuration',
-        icon: <SecurityOutlinedIcon fontSize="small" />,
-        permission: {
-          subModule: PERMISSION_SUBMODULES.DEVICE_CONFIGURATION,
-          action: 'read',
-        },
-      },
-    ],
-  },
-];
-
-export const NAV_MANAGEMENT: Array<NavGroup> = [
-  ...NAV_ACCESS,
-  ...NAV_ASSET,
-];
+export const DOCUMENT_TITLE_SUFFIX = 'miniEMS';

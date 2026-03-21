@@ -2,9 +2,10 @@ import { useMemo } from 'react';
 
 import { useNavigate, useParams } from 'react-router-dom';
 
+import { PageLayout } from '@app/layout';
+
 import { useToast } from '@libs/hooks';
 
-import { PageLayout } from '@/components/layout';
 
 import { DeviceForm } from '../components/DeviceForm';
 import { useDeviceDetail, useDeviceUpdate } from '../hooks';
@@ -37,7 +38,7 @@ export const DeviceInventoryEditPage = () => {
         payload: data,
       },
       {
-        onSuccess: () => navigate('/device-inventory'),
+        onSuccess: () => navigate('/devices'),
       },
     );
   };
@@ -45,11 +46,7 @@ export const DeviceInventoryEditPage = () => {
   return (
     <PageLayout
       title="Edit Device"
-      breadcrumbs={[
-        { label: 'Home', href: '/' },
-        { label: 'Device Management', href: '/device-inventory' },
-        { label: 'Edit Device' },
-      ]}
+      description="Update management connection and authentication settings for this device."
     >
       <DeviceForm
         initialValues={{
@@ -63,7 +60,7 @@ export const DeviceInventoryEditPage = () => {
           clientCertificate: device?.credential?.clientCertificate ?? '',
         }}
         onSubmit={handleSubmit}
-        onCancel={() => navigate('/device-inventory')}
+        onCancel={() => navigate('/devices')}
         isLoading={isUpdating || isLoadingDetail}
         submitLabel="Save Changes"
       />

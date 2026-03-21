@@ -8,30 +8,28 @@ import { ToastContainer } from 'react-toastify';
 
 import { ConfirmDialogProvider, GlobalErrorBoundary, theme } from '@libs/ui';
 
-import { AuthProvider } from '@modules/auth'; // provides auth context and initializes RBAC
+import { AuthProvider } from '@modules/auth';
 
 import { QueryProvider } from './QueryProvider';
 
 const muiCache = createCache({ key: 'mui', prepend: true });
 
-export const AppCoreProvider = ({ children }: { children: ReactNode }) => {
-  return (
-    <CacheProvider value={muiCache}>
-      <StyledEngineProvider injectFirst>
-        <GlobalErrorBoundary>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <QueryProvider>
-              <AuthProvider>
-                <ConfirmDialogProvider>
-                  <ToastContainer />
-                  {children}
-                </ConfirmDialogProvider>
-              </AuthProvider>
-            </QueryProvider>
-          </ThemeProvider>
-        </GlobalErrorBoundary>
-      </StyledEngineProvider>
-    </CacheProvider>
-  );
-};
+export const AppCoreProvider = ({ children }: { children: ReactNode }) => (
+  <CacheProvider value={muiCache}>
+    <StyledEngineProvider injectFirst>
+      <GlobalErrorBoundary>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <QueryProvider>
+            <AuthProvider>
+              <ConfirmDialogProvider>
+                <ToastContainer />
+                {children}
+              </ConfirmDialogProvider>
+            </AuthProvider>
+          </QueryProvider>
+        </ThemeProvider>
+      </GlobalErrorBoundary>
+    </StyledEngineProvider>
+  </CacheProvider>
+);

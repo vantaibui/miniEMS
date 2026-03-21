@@ -2,9 +2,10 @@ import { useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
+import { PageLayout } from '@app/layout';
+
 import { AddIcon, UiButton, useDialogConfirm } from '@libs/ui';
 
-import { PageLayout } from '@/components/layout';
 
 import { DeviceDetailsModal } from '../components/DeviceDetailsModal';
 import { DeviceInventoryTable } from '../components/DeviceInventoryTable';
@@ -69,11 +70,7 @@ export const DeviceInventoryListPage = () => {
 
   return (
     <PageLayout
-      title="Device Inventory"
-      breadcrumbs={[
-        { label: 'Home', href: '/' },
-        { label: 'Device Management' },
-      ]}
+      title="Device Management"
       actions={
         canCreate ? (
           <UiButton

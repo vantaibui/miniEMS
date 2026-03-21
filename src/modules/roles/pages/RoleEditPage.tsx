@@ -3,9 +3,10 @@ import { useState } from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import { PageLayout } from '@app/layout';
+
 import { useDialogConfirm } from '@libs/ui';
 
-import { PageLayout } from '@/components/layout';
 
 import { RoleForm } from '../components/RoleForm';
 import {
@@ -65,7 +66,7 @@ export const RoleEditPage = () => {
     updateRole(
       { id: roleId, payload: { ...data } },
       {
-        onSuccess: () => navigate('/roles'),
+        onSuccess: () => navigate('/admin/roles'),
       },
     );
   };
@@ -90,11 +91,7 @@ export const RoleEditPage = () => {
   return (
     <PageLayout
       title={role ? `Edit Role: ${role.name}` : 'Edit Role'}
-      breadcrumbs={[
-        { label: 'Home', href: '/' },
-        { label: 'Role Management', href: '/roles' },
-        { label: 'Edit Role' },
-      ]}
+      description="Modify security role configurations and module-level access permissions for the selected role."
     >
       {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
@@ -109,7 +106,7 @@ export const RoleEditPage = () => {
           }}
           Permissions={permissions}
           onSubmit={handleSubmit}
-          onCancel={() => navigate('/roles')}
+          onCancel={() => navigate('/admin/roles')}
           onDelete={() => handleDelete(role.id)}
           isLoading={isUpdating || isDeleting}
           submitLabel="Update Role"

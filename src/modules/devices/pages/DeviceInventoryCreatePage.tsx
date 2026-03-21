@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
-import { PageLayout } from '@/components/layout';
+import { PageLayout } from '@app/layout';
 
 import { DeviceForm } from '../components/DeviceForm';
 import { useDeviceCreate } from '../hooks';
@@ -12,22 +12,18 @@ export const DeviceInventoryCreatePage = () => {
 
   const handleSubmit = (data: FormData) => {
     createDevice(data, {
-      onSuccess: () => navigate('/device-inventory'),
+      onSuccess: () => navigate('/devices'),
     });
   };
 
   return (
     <PageLayout
       title="Add Device"
-      breadcrumbs={[
-        { label: 'Home', href: '/' },
-        { label: 'Device Management', href: '/device-inventory' },
-        { label: 'Add Device' },
-      ]}
+      description="Configure management connection and authentication for a new device."
     >
       <DeviceForm
         onSubmit={handleSubmit}
-        onCancel={() => navigate('/device-inventory')}
+        onCancel={() => navigate('/devices')}
         isLoading={isCreating}
         submitLabel="Add Device"
       />

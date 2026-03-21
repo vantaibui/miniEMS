@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
-import { PageLayout } from '@/components/layout';
+import { PageLayout } from '@app/layout';
 
 import { usePermissions } from '../../roles/hooks';
 import { UserForm } from '../components/UserForm';
@@ -23,22 +23,18 @@ export const UserCreatePage = () => {
 
   const handleSubmit = (data: CreateUserPayload) => {
     createUser(data, {
-      onSuccess: () => navigate('/users'),
+      onSuccess: () => navigate('/admin/users'),
     });
   };
 
   return (
     <PageLayout
       title="Add New User"
-      breadcrumbs={[
-        { label: 'Home', href: '/' },
-        { label: 'User Management', href: '/users' },
-        { label: 'Add New User' },
-      ]}
+      description="Create a new user profile and define their system-wide access permissions."
     >
       <UserForm
         onSubmit={handleSubmit}
-        onCancel={() => navigate('/users')}
+        onCancel={() => navigate('/admin/users')}
         isLoading={isCreating}
         submitLabel="Save User"
         pagination={permissionsPagination}

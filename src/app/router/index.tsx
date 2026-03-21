@@ -7,17 +7,18 @@ import {
   type RouteObject,
 } from 'react-router-dom';
 
+import { AuthLayout, RootLayout } from '@app/layout';
+
 import { NotFoundPage } from '@libs/pages';
 
 import { authRoutes } from '@modules/auth';
-import HomePage from '@modules/dashboard/pages/HomePage';
+import { HomePage } from '@modules/dashboard';
+import { deviceRoutes } from '@modules/devices';
 import { rolesRoutes } from '@modules/roles';
 import { usersRoutes } from '@modules/users';
 
-import { AuthLayout, RootLayout } from '../layouts';
-import { ProtectedRoute } from './ProtectedRoute';
 
-import { deviceRoutes } from '@/modules/devices';
+import { ProtectedRoute } from './ProtectedRoute';
 
 const withSuspense = (Component: ComponentType<unknown>) => (
   <Suspense
@@ -54,14 +55,23 @@ const routes: Array<RouteObject> = [
     children: [
       {
         index: true,
-        element: <Navigate to="/users" replace />,
+        element: <Navigate to="/admin/users" replace />,
       },
       {
         path: 'dashboard',
         element: <HomePage />,
       },
-      ...usersRoutes,
-      ...rolesRoutes,
+      {
+        path: 'admin',
+        children: [
+          {
+            index: true,
+            element: <Navigate to="users" replace />,
+          },
+          ...usersRoutes,
+          ...rolesRoutes,
+        ],
+      },
       ...deviceRoutes,
     ],
   },
