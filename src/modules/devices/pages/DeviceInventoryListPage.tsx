@@ -1,9 +1,10 @@
 import { useState } from 'react';
 
-import { Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-import { AddIcon, UiBreadcrumb, UiButton, useDialogConfirm } from '@libs/ui';
+import { AddIcon, UiButton, useDialogConfirm } from '@libs/ui';
+
+import { PageLayout } from '@/components/layout';
 
 import { DeviceDetailsModal } from '../components/DeviceDetailsModal';
 import { DeviceInventoryTable } from '../components/DeviceInventoryTable';
@@ -67,43 +68,24 @@ export const DeviceInventoryListPage = () => {
   };
 
   return (
-    <Box className="flex min-h-full flex-col">
-      <Box sx={{ mb: 2 }}>
-        <UiBreadcrumb
-          items={[
-            { label: 'Dashboard', href: '/' },
-            { label: 'Asset Management', href: '#' },
-            { label: 'Device Inventory' },
-          ]}
-        />
-
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            mt: 2,
-          }}
-        >
-          <Typography
-            variant="h4"
-            sx={{ fontWeight: 700, color: 'text.primary' }}
+    <PageLayout
+      title="Device Inventory"
+      breadcrumbs={[
+        { label: 'Home', href: '/' },
+        { label: 'Device Management' },
+      ]}
+      actions={
+        canCreate ? (
+          <UiButton
+            variant="primary"
+            startIcon={<AddIcon />}
+            onClick={handleCreate}
           >
-            Device Inventory
-          </Typography>
-
-          {canCreate && (
-            <UiButton
-              variant="primary"
-              startIcon={<AddIcon />}
-              onClick={handleCreate}
-            >
-              Add New Device
-            </UiButton>
-          )}
-        </Box>
-      </Box>
-
+            Add New Device
+          </UiButton>
+        ) : undefined
+      }
+    >
       <DeviceInventoryTable
         rows={rows}
         loading={isLoading}
@@ -119,6 +101,6 @@ export const DeviceInventoryListPage = () => {
         deviceId={viewDeviceId}
         onClose={handleCloseViewModal}
       />
-    </Box>
+    </PageLayout>
   );
 };

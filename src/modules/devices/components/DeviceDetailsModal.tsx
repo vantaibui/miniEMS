@@ -28,7 +28,6 @@ export const DeviceDetailsModal = ({
           Device Detail
         </Typography>
       }
-      subtitle="Dashboard > Device Inventory > Device Detail"
       contentSx={{ p: { xs: 2, md: 3 }, bgcolor: '#FFFFFF' }}
     >
       <DeviceDetailsContent

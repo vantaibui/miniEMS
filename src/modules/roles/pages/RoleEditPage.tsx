@@ -3,7 +3,9 @@ import { useState } from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { UiBreadcrumb, useDialogConfirm } from '@libs/ui';
+import { useDialogConfirm } from '@libs/ui';
+
+import { PageLayout } from '@/components/layout';
 
 import { RoleForm } from '../components/RoleForm';
 import {
@@ -86,75 +88,41 @@ export const RoleEditPage = () => {
     isLoadingRole || (isLoadingPermissions && !permissions.length);
 
   return (
-    <Box>
-      <Box sx={{ mb: 4 }}>
-        <Box sx={{ mb: 2 }}>
-          <UiBreadcrumb
-            items={[
-              { label: 'Dashboard', href: '/' },
-              { label: 'Administration', href: '#' },
-              { label: 'Roles & Permissions', href: '/roles' },
-              { label: 'Edit Role' },
-            ]}
-          />
+    <PageLayout
+      title={role ? `Edit Role: ${role.name}` : 'Edit Role'}
+      breadcrumbs={[
+        { label: 'Home', href: '/' },
+        { label: 'Role Management', href: '/roles' },
+        { label: 'Edit Role' },
+      ]}
+    >
+      {isLoading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
+          <CircularProgress />
         </Box>
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: 700,
-            color: 'text.primary',
-            mb: 1,
-            display: 'inline-block',
-            position: 'relative',
-            '&::after': {
-              content: '""',
-              position: 'absolute',
-              bottom: -4,
-              left: 0,
-              width: '40px',
-              height: '3px',
-              bgcolor: 'primary.main',
-              borderRadius: '2px',
-            },
+      ) : role && permissions.length > 0 ? (
+        <RoleForm
+          initialValues={{
+            name: role.name,
+            description: role.description,
+            permissions: extractAllocatedPermissions(permissions),
           }}
-        >
-          {role ? `Edit Role: ${role.name}` : 'Edit Role'}
+          Permissions={permissions}
+          onSubmit={handleSubmit}
+          onCancel={() => navigate('/roles')}
+          onDelete={() => handleDelete(role.id)}
+          isLoading={isUpdating || isDeleting}
+          submitLabel="Update Role"
+          isEdit
+          permissionsPagination={permissionsPagination}
+          onPermissionsPaginationChange={setPagination}
+          isPermissionsLoading={isLoadingPermissions}
+        />
+      ) : (
+        <Typography color="error">
+          Failed to load role details or permissions.
         </Typography>
-        <Typography variant="body1" sx={{ color: 'text.secondary', mt: 2 }}>
-          Modify security role configurations and module-level access
-          permissions for the selected role.
-        </Typography>
-      </Box>
-
-      <Box sx={{ mt: 4 }}>
-        {isLoading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
-            <CircularProgress />
-          </Box>
-        ) : role && permissions.length > 0 ? (
-          <RoleForm
-            initialValues={{
-              name: role.name,
-              description: role.description,
-              permissions: extractAllocatedPermissions(permissions),
-            }}
-            Permissions={permissions}
-            onSubmit={handleSubmit}
-            onCancel={() => navigate('/roles')}
-            onDelete={() => handleDelete(role.id)}
-            isLoading={isUpdating || isDeleting}
-            submitLabel="Update Role"
-            isEdit
-            permissionsPagination={permissionsPagination}
-            onPermissionsPaginationChange={setPagination}
-            isPermissionsLoading={isLoadingPermissions}
-          />
-        ) : (
-          <Typography color="error">
-            Failed to load role details or permissions.
-          </Typography>
-        )}
-      </Box>
-    </Box>
+      )}
+    </PageLayout>
   );
 };

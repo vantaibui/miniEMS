@@ -1,5 +1,3 @@
-import type { ReactNode } from 'react';
-
 import {
   Box,
   List,
@@ -8,187 +6,130 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { NavLink, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import type { PermissionNode } from '@libs/types';
 
 import { hasPermission, useRbacStore } from '@modules/auth';
 
-import type { NavGroup, NavPermission } from '../../../navigation/nav.types';
+import type {
+  NavPermission,
+  SidebarTopItem,
+} from '../../../navigation/nav.types';
 
 interface SidebarNavProps {
-  groups: Array<NavGroup>;
-  compact?: boolean;
+  items: Array<SidebarTopItem>;
 }
 
 const isAllowed = (
   permissions: Array<PermissionNode> | null,
   permission?: NavPermission,
 ) => {
-  // Default to allow when no permission is configured
-  if (!permission) {
-    return true;
-  }
-
-  const action = permission.action ?? 'read';
-
-  return hasPermission(permissions, permission.subModule, action);
+  if (!permission) return true;
+  return hasPermission(
+    permissions,
+    permission.subModule,
+    permission.action ?? 'read',
+  );
 };
 
-export const SidebarNav = ({ groups, compact = true }: SidebarNavProps) => {
+export const SidebarNav = ({ items }: SidebarNavProps) => {
   const permissions = useRbacStore((s) => s.permissions);
   const isLoading = useRbacStore((s) => s.isLoading);
   const isInitialized = useRbacStore((s) => s.isInitialized);
   const error = useRbacStore((s) => s.error);
   const location = useLocation();
+  const navigate = useNavigate();
 
   if (!isInitialized || isLoading) {
     return (
-      <Box className={compact ? 'flex flex-col gap-2' : 'flex flex-col gap-3'}>
-        {Array.from({ length: 6 }).map((_, idx) => (
+      <Box className="flex flex-col gap-2">
+        {Array.from({ length: 3 }).map((_, idx) => (
           <Box
             key={idx}
-            className={compact ? 'h-10 rounded-lg' : 'h-10 rounded-xl border'}
-            sx={{
-              borderColor: 'divider',
-              bgcolor: compact ? 'primary.dark' : 'background.paper',
-              opacity: 0.6,
-            }}
+            className="mx-auto h-10 w-10 rounded-lg"
+            sx={{ bgcolor: 'rgba(255,255,255,0.08)' }}
           />
         ))}
       </Box>
     );
   }
 
-  if (error) {
-    return null;
-  }
+  if (error) return null;
 
-  const filteredGroups = groups
-    .filter((g) => isAllowed(permissions, g.permission))
-    .map((g) => ({
-      ...g,
-      items: g.items.filter((it) => isAllowed(permissions, it.permission)),
-    }))
-    .filter((g) => g.items.length > 0);
+  const filteredItems = items.filter((item) =>
+    isAllowed(permissions, item.permission),
+  );
+
+  const isActive = (item: SidebarTopItem) =>
+    item.pathPrefixes.some(
+      (prefix) =>
+        location.pathname === prefix ||
+        location.pathname.startsWith(`${prefix}/`),
+    );
+
+  const handleClick = (item: SidebarTopItem) => {
+    if (item.to) {
+      navigate(item.to);
+      return;
+    }
+    const firstTab = item.tabs?.find((tab) =>
+      isAllowed(permissions, tab.permission),
+    );
+    if (firstTab) navigate(firstTab.to);
+  };
 
   return (
-    <Box className={compact ? 'flex flex-col gap-4' : 'flex flex-col gap-6'}>
-      {filteredGroups.map((group) => (
-        <Box key={group.key}>
-          {!compact && group.section && (
-            <Typography
-              variant="overline"
-              color="text.secondary"
-              className="px-2 font-bold tracking-widest"
-              sx={{ fontSize: '0.65rem' }}
+    <List className="flex flex-col gap-1 p-0">
+      {filteredItems.map((item) => {
+        const active = isActive(item);
+
+        return (
+          <Tooltip key={item.key} title={item.label} placement="right">
+            <ListItemButton
+              onClick={() => handleClick(item)}
+              sx={{
+                minHeight: 56,
+                borderRadius: 1.5,
+                mx: 0.5,
+                px: 0.5,
+                py: 1,
+                flexDirection: 'column',
+                gap: 0.5,
+                justifyContent: 'center',
+                alignItems: 'center',
+                color: 'primary.contrastText',
+                opacity: active ? 1 : 0.6,
+                bgcolor: active
+                  ? 'rgba(255,255,255,0.15)'
+                  : 'transparent',
+                '&:hover': {
+                  bgcolor: 'rgba(255,255,255,0.1)',
+                  opacity: 1,
+                },
+              }}
             >
-              {group.section}
-            </Typography>
-          )}
-
-          <List dense className={compact ? 'mt-0 p-0' : 'mt-2 p-0'}>
-            {group.items.map((item) => {
-              const isActive =
-                location.pathname === item.to ||
-                (item.to !== '/' &&
-                  location.pathname.startsWith(`${item.to}/`));
-
-              if (compact) {
-                return (
-                  <Tooltip key={item.key} title={item.label} placement="right">
-                    <ListItemButton
-                      component={NavLink}
-                      to={item.to}
-                      className="mb-1 rounded-lg"
-                      sx={{
-                        minHeight: 40,
-                        borderRadius: 1.5,
-                        px: 0,
-                        justifyContent: 'center',
-                        color: 'primary.contrastText',
-                        opacity: isActive ? 1 : 0.85,
-                        '&:hover': {
-                          bgcolor: 'primary.dark',
-                          opacity: 1,
-                        },
-                        '&.active': {
-                          bgcolor: 'primary.dark',
-                          color: 'primary.contrastText',
-                          opacity: 1,
-                        },
-                        '& .MuiListItemIcon-root': {
-                          minWidth: 0,
-                          color: 'inherit',
-                          justifyContent: 'center',
-                        },
-                      }}
-                    >
-                      {item.icon ? (
-                        <ListItemIcon>{item.icon as ReactNode}</ListItemIcon>
-                      ) : (
-                        <Typography variant="caption" fontWeight={600}>
-                          {item.label.slice(0, 1)}
-                        </Typography>
-                      )}
-                    </ListItemButton>
-                  </Tooltip>
-                );
-              }
-
-              return (
-                <ListItemButton
-                  key={item.key}
-                  component={NavLink}
-                  to={item.to}
-                  className="mb-1 rounded-lg"
-                  sx={{
-                    minHeight: 44,
-                    borderRadius: 1,
-                    px: 1.5,
-                    mb: 1,
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                    },
-                    '&.active': {
-                      bgcolor: 'action.selected',
-                      color: 'primary.main',
-                      '&:hover': {
-                        bgcolor: 'action.selected',
-                      },
-                      '& .MuiListItemIcon-root': {
-                        color: 'primary.main',
-                      },
-                    },
-                  }}
-                >
-                  {item.icon && (
-                    <ListItemIcon
-                      sx={{
-                        minWidth: 36,
-                        color: isActive ? 'primary.main' : 'inherit',
-                      }}
-                    >
-                      {item.icon as ReactNode}
-                    </ListItemIcon>
-                  )}
-
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      flexGrow: 1,
-                      fontWeight: isActive ? 600 : 400,
-                      color: isActive ? 'primary.main' : 'text.primary',
-                    }}
-                  >
-                    {item.label}
-                  </Typography>
-                </ListItemButton>
-              );
-            })}
-          </List>
-        </Box>
-      ))}
-    </Box>
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  color: 'inherit',
+                  justifyContent: 'center',
+                }}
+              >
+                {item.icon}
+              </ListItemIcon>
+              <Typography
+                variant="caption"
+                color="inherit"
+                className="text-center leading-tight"
+                sx={{ fontSize: '1rem' }}
+              >
+                {item.label}
+              </Typography>
+            </ListItemButton>
+          </Tooltip>
+        );
+      })}
+    </List>
   );
 };

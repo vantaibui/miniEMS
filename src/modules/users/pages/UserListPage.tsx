@@ -1,10 +1,11 @@
 import { useState } from 'react';
 
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import { Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-import { UiBreadcrumb, UiButton, useDialogConfirm } from '@libs/ui';
+import { UiButton, useDialogConfirm } from '@libs/ui';
+
+import { PageLayout } from '@/components/layout';
 
 import { UserTable } from '../components/UserTable';
 import { useUserDelete, useUsers } from '../hooks';
@@ -47,44 +48,22 @@ export const UserListPage = () => {
   };
 
   return (
-    <Box>
-      <Box sx={{ mb: 2 }}>
-        <UiBreadcrumb
-          items={[
-            { label: 'Dashboard', href: '/' },
-            { label: 'Administration', href: '#' },
-            { label: 'User Management' },
-          ]}
-        />
-
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            mt: 2,
-          }}
+    <PageLayout
+      title="User Management"
+      breadcrumbs={[
+        { label: 'Home', href: '/' },
+        { label: 'User Management' },
+      ]}
+      actions={
+        <UiButton
+          variant="contained"
+          startIcon={<PersonAddIcon />}
+          onClick={handleCreate}
         >
-          <Box>
-            <Typography
-              variant="h4"
-              sx={{ fontWeight: 700, color: 'text.primary' }}
-            >
-              RBAC User Management
-            </Typography>
-          </Box>
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <UiButton
-              variant="contained"
-              startIcon={<PersonAddIcon />}
-              onClick={handleCreate}
-            >
-              Add New User
-            </UiButton>
-          </Box>
-        </Box>
-      </Box>
-
+          Add New User
+        </UiButton>
+      }
+    >
       <UserTable
         rows={users}
         loading={isLoading}
@@ -93,6 +72,6 @@ export const UserListPage = () => {
         pagination={pagination}
         onPaginationChange={setParams}
       />
-    </Box>
+    </PageLayout>
   );
 };

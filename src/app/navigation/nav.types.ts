@@ -28,3 +28,25 @@ export type NavGroup = {
   permission?: NavPermission;
   items: Array<NavItem>;
 };
+
+/** Tab item rendered below the header when a sidebar group is active */
+export type TabNavItem = {
+  key: string;
+  label: string;
+  to: string;
+  permission?: NavPermission;
+};
+
+/** Top-level sidebar entry — may link directly or hold child tabs */
+export type SidebarTopItem = {
+  key: string;
+  label: string;
+  icon: ReactNode;
+  /** Direct route (items without tabs) */
+  to?: string;
+  /** URL prefixes used to determine whether this item is active */
+  pathPrefixes: Array<string>;
+  /** Sub-navigation rendered as tabs when this sidebar item is active */
+  tabs?: Array<TabNavItem>;
+  permission?: NavPermission;
+};

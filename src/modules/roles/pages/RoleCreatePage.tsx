@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-import { UiBreadcrumb } from '@libs/ui';
+import { PageLayout } from '@/components/layout';
 
 import { RoleForm } from '../components/RoleForm';
 import { usePermissions, useRoleCreate } from '../hooks';
@@ -29,66 +29,32 @@ export const RoleCreatePage = () => {
   };
 
   return (
-    <Box>
-      <Box sx={{ mb: 4 }}>
-        <Box sx={{ mb: 2 }}>
-          <UiBreadcrumb
-            items={[
-              { label: 'Dashboard', href: '/' },
-              { label: 'Administration', href: '#' },
-              { label: 'Roles & Permissions', href: '/roles' },
-              { label: 'Add New Role' },
-            ]}
-          />
+    <PageLayout
+      title="Add New Role"
+      breadcrumbs={[
+        { label: 'Home', href: '/' },
+        { label: 'Role Management', href: '/roles' },
+        { label: 'Add New Role' },
+      ]}
+    >
+      {isLoadingPermissions && !permissions.length ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
+          <CircularProgress />
         </Box>
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: 700,
-            color: 'text.primary',
-            mb: 1,
-            display: 'inline-block',
-            position: 'relative',
-            '&::after': {
-              content: '""',
-              position: 'absolute',
-              bottom: -4,
-              left: 0,
-              width: '40px',
-              height: '3px',
-              bgcolor: 'primary.main',
-              borderRadius: '2px',
-            },
-          }}
-        >
-          Add New Role
-        </Typography>
-        <Typography variant="body1" sx={{ color: 'text.secondary', mt: 2 }}>
-          Define a new security role and configure specific module-level access
-          permissions.
-        </Typography>
-      </Box>
-
-      <Box sx={{ mt: 4 }}>
-        {isLoadingPermissions && !permissions.length ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
-            <CircularProgress />
-          </Box>
-        ) : permissions.length > 0 ? (
-          <RoleForm
-            Permissions={permissions}
-            onSubmit={handleSubmit}
-            onCancel={() => navigate('/roles')}
-            isLoading={isCreating}
-            submitLabel="Create Role"
-            permissionsPagination={permissionsPagination}
-            onPermissionsPaginationChange={setPagination}
-            isPermissionsLoading={isLoadingPermissions}
-          />
-        ) : (
-          <Typography color="error">Failed to load permissions.</Typography>
-        )}
-      </Box>
-    </Box>
+      ) : permissions.length > 0 ? (
+        <RoleForm
+          Permissions={permissions}
+          onSubmit={handleSubmit}
+          onCancel={() => navigate('/roles')}
+          isLoading={isCreating}
+          submitLabel="Create Role"
+          permissionsPagination={permissionsPagination}
+          onPermissionsPaginationChange={setPagination}
+          isPermissionsLoading={isLoadingPermissions}
+        />
+      ) : (
+        <Typography color="error">Failed to load permissions.</Typography>
+      )}
+    </PageLayout>
   );
 };

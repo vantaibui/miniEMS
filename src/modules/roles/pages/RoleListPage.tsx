@@ -1,9 +1,10 @@
 import { useState } from 'react';
 
-import { Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-import { AddIcon, UiBreadcrumb, UiButton, useDialogConfirm } from '@libs/ui';
+import { AddIcon, UiButton, useDialogConfirm } from '@libs/ui';
+
+import { PageLayout } from '@/components/layout';
 
 import { RoleTable } from '../components/RoleTable';
 import { useRoleDelete, useRoles } from '../hooks';
@@ -46,43 +47,22 @@ export const RoleListPage = () => {
   };
 
   return (
-    <Box>
-      <Box sx={{ mb: 2 }}>
-        <UiBreadcrumb
-          items={[
-            { label: 'Dashboard', href: '/' },
-            { label: 'Administration', href: '#' },
-            { label: 'Role Permissions Management' },
-          ]}
-        />
-
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-          }}
+    <PageLayout
+      title="Role Management"
+      breadcrumbs={[
+        { label: 'Home', href: '/' },
+        { label: 'Role Management' },
+      ]}
+      actions={
+        <UiButton
+          variant="primary"
+          startIcon={<AddIcon />}
+          onClick={handleCreate}
         >
-          <Box>
-            <Typography
-              variant="h4"
-              sx={{ fontWeight: 700, color: 'text.primary' }}
-            >
-              Role Permissions Management
-            </Typography>
-          </Box>
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <UiButton
-              variant="primary"
-              startIcon={<AddIcon />}
-              onClick={handleCreate}
-            >
-              Add New Role
-            </UiButton>
-          </Box>
-        </Box>
-      </Box>
-
+          Add New Role
+        </UiButton>
+      }
+    >
       <RoleTable
         rows={roles}
         loading={isLoading}
@@ -91,6 +71,6 @@ export const RoleListPage = () => {
         pagination={pagination}
         onPaginationChange={setParams}
       />
-    </Box>
+    </PageLayout>
   );
 };

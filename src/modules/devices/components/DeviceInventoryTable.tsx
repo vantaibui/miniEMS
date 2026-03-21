@@ -6,6 +6,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
   Box,
+  Chip,
   IconButton,
   ListItemIcon,
   ListItemText,
@@ -14,7 +15,7 @@ import {
   Typography,
 } from '@mui/material';
 
-import { UiDataTable, UiEntityTableCard, UiStatusBadge } from '@libs/ui';
+import { UiDataTable, UiEntityTableCard } from '@libs/ui';
 import { DATE_FORMATS, formatUtcOrFallback } from '@libs/utils';
 
 import type { PaginationResult } from '@services/http';
@@ -141,13 +142,25 @@ export const DeviceInventoryTable = ({
       {
         key: 'status',
         header: 'STATUS',
-        render: ({ status }: Device) => (
-          <UiStatusBadge
-            status={status.value === 'IN_SERVICE' ? 'active' : 'inactive'}
-            activeLabel="IS"
-            inactiveLabel="OOS"
-          />
-        ),
+        render: ({ status }: Device) => {
+          const isActive = status.value === 'IN_SERVICE';
+          const label = status.display || status.value || 'N/A';
+          return (
+            <Chip
+              label={label}
+              sx={{
+                height: 28,
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: 0.8,
+                px: 1.5,
+                borderRadius: 999,
+                bgcolor: isActive ? '#D1FAE5' : '#FEE2E2',
+                color: isActive ? '#047857' : '#B91C1C',
+              }}
+            />
+          );
+        },
       },
       {
         key: 'lastModifiedDate',

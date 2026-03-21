@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import {
   Avatar,
   Box,
+  Chip,
   IconButton,
   ListItemIcon,
   Menu,
@@ -16,7 +17,6 @@ import {
   MoreVertIcon,
   UiDataTable,
   UiEntityTableCard,
-  UiStatusBadge,
 } from '@libs/ui';
 
 import type { PaginationResult } from '@services/http';
@@ -113,13 +113,24 @@ export const RoleTable = ({
       {
         key: 'status',
         header: 'STATUS',
-        render: (row: Role) => (
-          <UiStatusBadge
-            status={row.status ? 'active' : 'inactive'}
-            activeLabel="Active"
-            inactiveLabel="Inactive"
-          />
-        ),
+        render: (row: Role) => {
+          const isActive = row.status;
+          return (
+            <Chip
+              label={isActive ? 'Active' : 'Inactive'}
+              sx={{
+                height: 28,
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: 0.8,
+                px: 1.5,
+                borderRadius: 999,
+                bgcolor: isActive ? '#D1FAE5' : '#FEE2E2',
+                color: isActive ? '#047857' : '#B91C1C',
+              }}
+            />
+          );
+        },
       },
       {
         key: 'actions',

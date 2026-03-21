@@ -1,11 +1,56 @@
 import AnalyticsOutlinedIcon from '@mui/icons-material/AnalyticsOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
+import DevicesOtherOutlinedIcon from '@mui/icons-material/DevicesOtherOutlined';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined';
 
 import { PERMISSION_SUBMODULES } from '@modules/auth';
 
-import type { NavGroup } from './nav.types';
+import type { NavGroup, SidebarTopItem } from './nav.types';
+
+/* ------------------------------------------------------------------ */
+/*  Top-level sidebar navigation (3 direct items, no tabs)            */
+/* ------------------------------------------------------------------ */
+
+export const SIDEBAR_NAV: Array<SidebarTopItem> = [
+  {
+    key: 'users',
+    label: 'Users',
+    icon: <PeopleAltOutlinedIcon sx={{ fontSize: 24 }} />,
+    to: '/users',
+    pathPrefixes: ['/users'],
+    permission: {
+      subModule: PERMISSION_SUBMODULES.USER_MANAGEMENT,
+      action: 'read',
+    },
+  },
+  {
+    key: 'roles',
+    label: 'Roles',
+    icon: <SecurityOutlinedIcon sx={{ fontSize: 24 }} />,
+    to: '/roles',
+    pathPrefixes: ['/roles'],
+    permission: {
+      subModule: PERMISSION_SUBMODULES.ROLE_MANAGEMENT,
+      action: 'read',
+    },
+  },
+  {
+    key: 'devices',
+    label: 'Devices',
+    icon: <DevicesOtherOutlinedIcon sx={{ fontSize: 24 }} />,
+    to: '/device-inventory',
+    pathPrefixes: ['/device-inventory'],
+    permission: {
+      subModule: PERMISSION_SUBMODULES.DEVICE_MANAGEMENT,
+      action: 'read',
+    },
+  },
+];
+
+/* ------------------------------------------------------------------ */
+/*  Legacy flat navigation (kept for backward-compat)                 */
+/* ------------------------------------------------------------------ */
 
 export const NAV_MAIN: Array<NavGroup> = [
   {
@@ -87,7 +132,6 @@ export const NAV_ASSET: Array<NavGroup> = [
 ];
 
 export const NAV_MANAGEMENT: Array<NavGroup> = [
-  // ...NAV_MAIN,
   ...NAV_ACCESS,
   ...NAV_ASSET,
 ];

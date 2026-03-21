@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { UiBreadcrumb } from '@libs/ui';
+import { PageLayout } from '@/components/layout';
 
 import { usePermissions } from '../../roles/hooks';
 import { UserForm } from '../components/UserForm';
@@ -35,73 +35,42 @@ export const UserEditPage = () => {
   };
 
   return (
-    <Box>
-      <Box sx={{ mb: 4 }}>
-        <Box sx={{ mb: 2 }}>
-          <UiBreadcrumb
-            items={[
-              { label: 'Dashboard', href: '/' },
-              { label: 'User Management', href: '/users' },
-              { label: 'Edit User' },
-            ]}
-          />
+    <PageLayout
+      title={
+        user ? `Edit User: ${user.firstName} ${user.lastName}` : 'Edit User'
+      }
+      breadcrumbs={[
+        { label: 'Home', href: '/' },
+        { label: 'User Management', href: '/users' },
+        { label: 'Edit User' },
+      ]}
+    >
+      {isLoadingUser ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
+          <CircularProgress />
         </Box>
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: 700,
-            color: 'text.primary',
-            mb: 1,
-            display: 'inline-block',
-            position: 'relative',
-            '&::after': {
-              content: '""',
-              position: 'absolute',
-              bottom: -4,
-              left: 0,
-              width: '40px',
-              height: '3px',
-              bgcolor: 'primary.main',
-              borderRadius: '2px',
-            },
+      ) : user ? (
+        <UserForm
+          initialValues={{
+            firstName: user.firstName || '',
+            lastName: user.lastName || '',
+            username: user.username,
+            email: user.email,
+            roleId: user.roleId,
           }}
-        >
-          {user ? `Edit User: ${user.firstName} ${user.lastName}` : 'Edit User'}
-        </Typography>
-        <Typography variant="body1" sx={{ color: 'text.secondary', mt: 2 }}>
-          Modify account settings and permission levels for the selected user
-          profile.
-        </Typography>
-      </Box>
-
-      <Box sx={{ mt: 4 }}>
-        {isLoadingUser ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
-            <CircularProgress />
-          </Box>
-        ) : user ? (
-          <UserForm
-            initialValues={{
-              firstName: user.firstName || '',
-              lastName: user.lastName || '',
-              username: user.username,
-              email: user.email,
-              roleId: user.roleId,
-            }}
-            onSubmit={handleSubmit}
-            onCancel={() => navigate('/users')}
-            onDelete={() => deleteUser(user.id)}
-            isLoading={isUpdating || isDeleting}
-            submitLabel="Update User"
-            isEdit
-            pagination={permissionsPagination}
-            onPaginationChange={setPagination}
-            isPermissionsLoading={isLoadingPermissions}
-          />
-        ) : (
-          <Typography color="error">Failed to load user details.</Typography>
-        )}
-      </Box>
-    </Box>
+          onSubmit={handleSubmit}
+          onCancel={() => navigate('/users')}
+          onDelete={() => deleteUser(user.id)}
+          isLoading={isUpdating || isDeleting}
+          submitLabel="Update User"
+          isEdit
+          pagination={permissionsPagination}
+          onPaginationChange={setPagination}
+          isPermissionsLoading={isLoadingPermissions}
+        />
+      ) : (
+        <Typography color="error">Failed to load user details.</Typography>
+      )}
+    </PageLayout>
   );
 };

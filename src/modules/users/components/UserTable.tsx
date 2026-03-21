@@ -6,6 +6,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
   Avatar,
   Box,
+  Chip,
   IconButton,
   ListItemIcon,
   ListItemText,
@@ -14,7 +15,7 @@ import {
   Typography,
 } from '@mui/material';
 
-import { UiDataTable, UiEntityTableCard, UiStatusBadge } from '@libs/ui';
+import { UiDataTable, UiEntityTableCard } from '@libs/ui';
 
 import { useUserPermissions } from '../hooks';
 
@@ -107,13 +108,24 @@ export const UserTable = ({
       {
         key: 'status',
         header: 'STATUS',
-        render: (row: User) => (
-          <UiStatusBadge
-            status={row.status ? 'active' : 'inactive'}
-            activeLabel="Active"
-            inactiveLabel="Inactive"
-          />
-        ),
+        render: (row: User) => {
+          const isActive = row.status;
+          return (
+            <Chip
+              label={isActive ? 'Active' : 'Inactive'}
+              sx={{
+                height: 28,
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: 0.8,
+                px: 1.5,
+                borderRadius: 999,
+                bgcolor: isActive ? '#D1FAE5' : '#FEE2E2',
+                color: isActive ? '#047857' : '#B91C1C',
+              }}
+            />
+          );
+        },
       },
       {
         key: 'lastActivity',

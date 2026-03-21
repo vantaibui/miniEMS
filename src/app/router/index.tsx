@@ -10,6 +10,7 @@ import {
 import { NotFoundPage } from '@libs/pages';
 
 import { authRoutes } from '@modules/auth';
+import HomePage from '@modules/dashboard/pages/HomePage';
 import { rolesRoutes } from '@modules/roles';
 import { usersRoutes } from '@modules/users';
 
@@ -17,11 +18,6 @@ import { AuthLayout, RootLayout } from '../layouts';
 import { ProtectedRoute } from './ProtectedRoute';
 
 import { deviceRoutes } from '@/modules/devices';
-
-/**
- * Centrally managed route registry for the application shell.
- * Delegates feature-specific routing to their respective modules.
- */
 
 const withSuspense = (Component: ComponentType<unknown>) => (
   <Suspense
@@ -59,6 +55,10 @@ const routes: Array<RouteObject> = [
       {
         index: true,
         element: <Navigate to="/users" replace />,
+      },
+      {
+        path: 'dashboard',
+        element: <HomePage />,
       },
       ...usersRoutes,
       ...rolesRoutes,

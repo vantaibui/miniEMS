@@ -132,13 +132,6 @@ export const DeviceDetailsContent = ({
               {deviceInfo?.model ?? fallback}
             </Typography>
           </Box>
-
-          <UiButton
-            variant="secondary"
-            startIcon={<DownloadIcon fontSize="small" />}
-          >
-            Download Logs
-          </UiButton>
         </Box>
       ) : null}
 
