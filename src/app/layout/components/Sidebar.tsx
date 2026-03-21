@@ -98,10 +98,7 @@ export const Sidebar = ({ width = 100, items }: SidebarProps) => {
       className="flex shrink-0 flex-col bg-primary-dark text-primary-contrast"
       style={{ width, minWidth: width }}
     >
-      <Box
-        className="flex h-14 items-center justify-center border-b px-1"
-        sx={{ borderColor: 'rgba(255,255,255,0.15)' }}
-      >
+      <Box className="flex h-14 items-center justify-center border-b border-white/15 px-1">
         <Box
           component="img"
           src={assets.svgs.miniEMSSvg}
@@ -161,8 +158,7 @@ export const Sidebar = ({ width = 100, items }: SidebarProps) => {
                     <Typography
                       variant="caption"
                       color="inherit"
-                      className="text-center leading-tight"
-                      sx={{ fontSize: '1rem' }}
+                      className="text-center text-base leading-tight"
                     >
                       {item.label}
                     </Typography>
@@ -174,10 +170,7 @@ export const Sidebar = ({ width = 100, items }: SidebarProps) => {
         )}
       </Box>
 
-      <Box
-        className="flex flex-col items-center gap-3 border-t px-1 py-4"
-        sx={{ borderColor: 'rgba(255,255,255,0.15)' }}
-      >
+      <Box className="flex flex-col items-center gap-3 border-t border-white/15 px-1 py-4">
         <Tooltip title="Notifications" placement="right">
           <IconButton sx={{ color: 'primary.contrastText' }}>
             <Badge color="error" variant="dot" overlap="circular">

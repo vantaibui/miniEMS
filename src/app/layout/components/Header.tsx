@@ -21,10 +21,10 @@ export const Header = ({ title, description, actions }: HeaderProps) => {
   const breadcrumbItems = getBreadcrumbItems(pathname);
 
   return (
-    <Box className="sticky top-0 z-10 shrink-0 border-b border-divider bg-surface-card px-6 py-4">
+    <Box className="sticky top-0 z-10 shrink-0 border-b border-divider bg-surface-card px-6">
       <UiBreadcrumb items={breadcrumbItems} />
 
-      <Box className="mt-2 flex items-start justify-between gap-4">
+      <Box className="py-2 flex items-center justify-between gap-4">
         <Box className="min-w-0">
           <Typography
             variant="h4"

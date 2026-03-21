@@ -27,16 +27,15 @@ export const TabsNav = () => {
   const value = getActiveTabIndex(pathname, tabs);
 
   return (
-    <Box className="-mx-6 mt-3 border-t border-divider px-6 pt-2">
+    <Box className="-mx-6 border-t border-divider px-6 pt-2">
       <Tabs
         value={value}
         onChange={(_, v: number) => {
           const tab = tabs[v];
           if (tab) navigate(tab.path);
         }}
-        className="min-h-0"
+        className="min-h-10"
         sx={{
-          minHeight: 40,
           borderBottom: 0,
           '& .MuiTabs-indicator': { backgroundColor: 'primary.main' },
         }}
