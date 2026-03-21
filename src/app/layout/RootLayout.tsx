@@ -7,7 +7,7 @@ import { Sidebar } from './components/Sidebar';
 
 export interface RootLayoutProps {
   sidebarWidth?: number;
-  sidebarItems: Array<SidebarTopItem>;
+  sidebarItems?: Array<SidebarTopItem>;
 }
 
 export const RootLayout = ({

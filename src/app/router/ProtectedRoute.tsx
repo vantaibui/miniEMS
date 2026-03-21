@@ -11,14 +11,7 @@ export const ProtectedRoute = ({ children }: { children: ReactNode }) => {
 
   if (!isInitialized) {
     return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
-      >
+      <Box className="flex h-screen w-full items-center justify-center">
         <CircularProgress />
       </Box>
     );

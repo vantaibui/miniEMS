@@ -1,4 +1,4 @@
-import { Suspense, type ComponentType } from 'react';
+import { lazy, Suspense, type ComponentType } from 'react';
 
 import { Box, CircularProgress } from '@mui/material';
 import {
@@ -9,33 +9,29 @@ import {
 
 import { AuthLayout, RootLayout } from '@app/layout';
 
-import { NotFoundPage } from '@libs/pages';
-
 import { authRoutes } from '@modules/auth';
-import { HomePage } from '@modules/dashboard';
 import { deviceRoutes } from '@modules/devices';
 import { rolesRoutes } from '@modules/roles';
 import { usersRoutes } from '@modules/users';
 
-
 import { ProtectedRoute } from './ProtectedRoute';
 
-const withSuspense = (Component: ComponentType<unknown>) => (
-  <Suspense
-    fallback={
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '60vh',
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    }
-  >
-    <Component />
+// Lazy-loaded to reduce initial bundle size (HomePage is 436 lines)
+const HomePage = lazy(() => import('@modules/dashboard/pages/HomePage'));
+// @libs/pages is a barrel file (→ index.ts), so use @ alias to reach the real file
+const NotFoundPage = lazy(() => import('@/libs/pages/not-found/NotFoundPage'));
+
+// Shared suspense fallback
+const PageFallback = () => (
+  <Box className="flex h-screen w-full items-center justify-center">
+    <CircularProgress />
+  </Box>
+);
+
+// Wrap a lazy component with Suspense — preserves typing for RouteObject
+const withFallback = (LazyComponent: ComponentType) => (
+  <Suspense fallback={<PageFallback />}>
+    <LazyComponent />
   </Suspense>
 );
 
@@ -59,7 +55,7 @@ const routes: Array<RouteObject> = [
       },
       {
         path: 'dashboard',
-        element: <HomePage />,
+        element: withFallback(HomePage),
       },
       {
         path: 'admin',
@@ -77,8 +73,12 @@ const routes: Array<RouteObject> = [
   },
   {
     path: '*',
-    element: withSuspense(NotFoundPage),
+    element: withFallback(NotFoundPage),
   },
 ];
 
-export const router = createBrowserRouter(routes);
+export const router = createBrowserRouter(routes, {
+  future: {
+    v7_fallbackPersist: true,
+  },
+});

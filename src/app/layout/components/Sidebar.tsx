@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
@@ -18,62 +18,30 @@ import {
 } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import type { NavPermission, SidebarTopItem } from '@app/navigation';
+import { useAppUser, useSidebarNavigation } from '@app/hooks';
+import type { SidebarTopItem } from '@app/navigation';
+import { isAllowed } from '@app/navigation';
 
-import type { PermissionNode } from '@libs/types';
-
-import { hasPermission, useAuthStore, useRbacStore } from '@modules/auth';
+import { useRbacStore } from '@modules/auth';
 
 import assets from '@/libs/assets';
-
-
 
 export interface SidebarProps {
   width?: number;
   items: Array<SidebarTopItem>;
 }
 
-const isAllowed = (
-  permissions: Array<PermissionNode> | null,
-  permission?: NavPermission,
-) => {
-  if (!permission) return true;
-  return hasPermission(
-    permissions,
-    permission.subModule,
-    permission.action ?? 'read',
-  );
-};
-
-const isItemAllowed = (
-  permissions: Array<PermissionNode> | null,
-  item: SidebarTopItem,
-) => {
-  if (item.permissionAnyOf?.length) {
-    return item.permissionAnyOf.some((p) => isAllowed(permissions, p));
-  }
-  return isAllowed(permissions, item.permission);
-};
-
 export const Sidebar = ({ width = 100, items }: SidebarProps) => {
-  const logout = useAuthStore((s) => s.logout);
-  const user = useRbacStore((s) => s.user);
+  const { initials, logout } = useAppUser();
+  const visibleItems = useSidebarNavigation(items);
   const permissions = useRbacStore((s) => s.permissions);
   const isLoading = useRbacStore((s) => s.isLoading);
   const isInitialized = useRbacStore((s) => s.isInitialized);
   const error = useRbacStore((s) => s.error);
+
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-
-  const initials = useMemo(() => {
-    if (!user) return 'AU';
-    const f = user.firstName?.[0] ?? '';
-    const l = user.lastName?.[0] ?? '';
-    return `${f}${l}` || user.username?.[0]?.toUpperCase() || 'AU';
-  }, [user]);
-
-  const visibleItems = items.filter((item) => isItemAllowed(permissions, item));
 
   const isActive = (item: SidebarTopItem) =>
     item.pathPrefixes.some(
