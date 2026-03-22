@@ -99,3 +99,5 @@ export function UiInput({
     />
   );
 }
+
+UiInput.displayName = 'UiInput';

@@ -35,3 +35,5 @@ export function UiToolbar({
     </Box>
   );
 }
+
+UiToolbar.displayName = 'UiToolbar';

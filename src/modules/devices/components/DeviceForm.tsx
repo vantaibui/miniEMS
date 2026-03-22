@@ -18,7 +18,7 @@ import { Controller, useForm, useWatch } from 'react-hook-form';
 import * as yup from 'yup';
 
 import { useToast } from '@libs/hooks';
-import { UiButton, UiFormField, UiInput } from '@libs/ui';
+import { tokens, UiButton, UiFormField, UiInput } from '@libs/ui';
 
 import { useDeviceTestConnection } from '../hooks';
 import { ProtocolSelect } from './ProtocolSelect';
@@ -35,16 +35,14 @@ const AUTH_OPTIONS: Array<{ label: string; value: DeviceAuthenticationType }> =
 
 const MAX_CERT_FILE_SIZE_KB = 100;
 const ALLOWED_CERT_EXTENSIONS: Array<string> = ['.crt', '.cert'];
+const IPV4_REGEX = /^(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/;
 
 const schema: yup.ObjectSchema<CreateDevicePayload> = yup
   .object({
     managementIp: yup
       .string()
       .required('Management IP is required')
-      .matches(
-        /^(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/,
-        'Invalid IPv4 address',
-      ),
+      .matches(IPV4_REGEX, 'Invalid IPv4 address'),
     port: yup
       .number()
       .typeError('Port must be a number')
@@ -323,7 +321,7 @@ export const DeviceForm = ({
         sx={{
           p: { xs: 3, md: 5 },
           borderRadius: 3,
-          boxShadow: '0px 2px 10px rgba(0,0,0,0.05)',
+          boxShadow: tokens.shadows.sm,
         }}
       >
         <Stack spacing={4}>

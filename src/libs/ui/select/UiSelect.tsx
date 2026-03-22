@@ -116,3 +116,5 @@ export function UiSelect({
     </FormControl>
   );
 }
+
+UiSelect.displayName = 'UiSelect';

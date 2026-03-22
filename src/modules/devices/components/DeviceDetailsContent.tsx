@@ -28,7 +28,7 @@ const SpecItem = ({
       <Typography
         variant="caption"
         sx={{
-          color: '#94A3B8',
+          color: 'text.secondary',
           textTransform: 'uppercase',
           letterSpacing: 1,
           fontWeight: 600,
@@ -36,7 +36,7 @@ const SpecItem = ({
       >
         {label}
       </Typography>
-      <Typography variant="body1" sx={{ fontWeight: 600, color: '#334155' }}>
+      <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
         {value ?? fallback}
       </Typography>
     </Box>
@@ -97,12 +97,13 @@ export const DeviceDetailsContent = ({
             >
               <Typography
                 variant="h3"
-                sx={{ fontWeight: 800, color: '#0F172A' }}
+                sx={{ fontWeight: 800, color: 'text.primary' }}
               >
                 {deviceInfo?.name ?? fallback}
               </Typography>
               <Chip
                 label={statusDisplay}
+                color={isActive ? 'success' : 'error'}
                 sx={{
                   height: 28,
                   fontSize: 12,
@@ -110,8 +111,6 @@ export const DeviceDetailsContent = ({
                   letterSpacing: 0.8,
                   px: 1.5,
                   borderRadius: 999,
-                  bgcolor: isActive ? '#D1FAE5' : '#FEE2E2',
-                  color: isActive ? '#047857' : '#B91C1C',
                 }}
               />
             </Box>
@@ -119,7 +118,7 @@ export const DeviceDetailsContent = ({
               variant="body1"
               sx={{
                 mt: 1,
-                color: '#64748B',
+                color: 'text.secondary',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 0.75,
@@ -150,7 +149,7 @@ export const DeviceDetailsContent = ({
       <Grid
         container
         spacing={2.5}
-        sx={{ borderTop: '1px solid', borderColor: '#E2E8F0', pt: 3 }}
+        sx={{ borderTop: '1px solid', borderColor: 'divider', pt: 3 }}
       >
         <SpecItem label="Distribution" value={deviceInfo?.distribution} />
         <SpecItem label="Kernel" value={deviceInfo?.kernel} />

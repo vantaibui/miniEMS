@@ -66,3 +66,5 @@ export function UiModal({
     </Dialog>
   );
 }
+
+UiModal.displayName = 'UiModal';

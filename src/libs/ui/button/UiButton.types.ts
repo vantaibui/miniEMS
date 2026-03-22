@@ -8,6 +8,8 @@ export type UiButtonVariant =
   | 'secondary'
   | 'ghost'
   | 'danger'
+  | 'warning'
+  | 'success'
   | 'contained'
   | 'outlined'
   | 'text';

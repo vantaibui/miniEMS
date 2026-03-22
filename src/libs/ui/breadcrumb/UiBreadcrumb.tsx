@@ -43,7 +43,6 @@ const UiBreadcrumb: React.FC<BreadcrumbProps> = ({ items, className = '' }) => {
           return (
             <Typography
               key={index}
-              color="text.primary"
               sx={{
                 fontWeight: isLast ? 600 : 400,
                 fontSize: '0.8125rem',
@@ -75,5 +74,7 @@ const UiBreadcrumb: React.FC<BreadcrumbProps> = ({ items, className = '' }) => {
     </MuiBreadcrumbs>
   );
 };
+
+UiBreadcrumb.displayName = 'UiBreadcrumb';
 
 export { UiBreadcrumb };

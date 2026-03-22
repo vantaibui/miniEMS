@@ -44,3 +44,5 @@ export function UiFormField({
     </Box>
   );
 }
+
+UiFormField.displayName = 'UiFormField';

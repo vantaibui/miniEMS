@@ -6,7 +6,7 @@ import { Box, Card, Divider, Grid, Stack, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import { UiButton, UiFormActions, UiFormField, UiInput } from '@libs/ui';
+import { UiButton, UiFormActions, UiFormField, UiInput, tokens } from '@libs/ui';
 
 import type { PaginationResult } from '@services/http';
 
@@ -68,7 +68,8 @@ export const RoleForm = ({
     handleSubmit,
     formState: { errors, isDirty, isValid },
   } = useForm<CreateRolePayload>({
-    resolver: yupResolver(schema) as never,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: yupResolver(schema) as any,
     mode: 'onChange',
     defaultValues: initialValues || {
       name: '',
@@ -83,7 +84,7 @@ export const RoleForm = ({
         sx={{
           p: { xs: 3, md: 5 },
           borderRadius: 3,
-          boxShadow: '0px 2px 10px rgba(0,0,0,0.05)',
+          boxShadow: tokens.shadows.sm,
         }}
       >
         <Stack spacing={4}>

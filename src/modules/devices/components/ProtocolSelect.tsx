@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import { Box, CircularProgress, MenuItem, Select } from '@mui/material';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -48,70 +48,84 @@ export const ProtocolSelect = ({
       },
     });
 
-  const protocolMap = new Map<number, string>();
-
-  data?.pages.forEach((page) => {
-    page.data.forEach(({ id, name }) => {
-      const normalizedId = Number(id);
-      if (!Number.isNaN(normalizedId)) {
-        const displayLabel = name;
-        if (displayLabel) {
-          protocolMap.set(normalizedId, displayLabel);
+  // Build Map once per data change — avoids O(n) lookups on every render
+  const protocolMap = useMemo(() => {
+    const map = new Map<number, string>();
+    data?.pages.forEach((page) => {
+      page.data.forEach(({ id, name }) => {
+        const normalizedId = Number(id);
+        if (!Number.isNaN(normalizedId) && name) {
+          map.set(normalizedId, name);
         }
-      }
+      });
     });
-  });
+    return map;
+  }, [data]);
 
-  const protocolOptions = Array.from(protocolMap.entries()).map(
-    ([id, label]) => ({ id, label }),
+  const protocolOptions = useMemo(
+    () => Array.from(protocolMap.entries()).map(([id, label]) => ({ id, label })),
+    [protocolMap],
   );
 
+  // Derive display label via memo instead of useEffect
+  const displayLabel = useMemo(() => {
+    if (!value) return;
+    return protocolOptions.find((opt) => opt.id === value)?.label;
+  }, [value, protocolOptions]);
+
   useEffect(() => {
-    if (!value || !onDisplayChange) return;
-    const selectedOption = protocolOptions.find((opt) => opt.id === value);
-    if (selectedOption?.label) {
-      onDisplayChange(selectedOption.label);
+    if (displayLabel && onDisplayChange) {
+      onDisplayChange(displayLabel);
     }
-  }, [value, protocolOptions, onDisplayChange]);
+  }, [displayLabel, onDisplayChange]);
 
-  const handleScroll = (event: React.UIEvent<HTMLUListElement>) => {
-    const target = event.currentTarget;
-    const reachedBottom =
-      target.scrollTop + target.clientHeight >= target.scrollHeight - 12;
+  const handleChange = useCallback(
+    (event: unknown) => {
+      const selectedId = Number(
+        (event as { target: { value: string | number } }).target.value,
+      );
+      onChange(selectedId);
+      onResetTestStatus?.();
 
-    if (reachedBottom && hasNextPage && !isFetchingNextPage) {
-      void fetchNextPage();
+      const selectedOption = protocolOptions.find((opt) => opt.id === selectedId);
+      if (selectedOption?.label) {
+        onDisplayChange?.(selectedOption.label);
+      }
+    },
+    [onChange, onResetTestStatus, onDisplayChange, protocolOptions],
+  );
+
+  const handleScroll = useCallback(
+    (event: React.UIEvent<HTMLUListElement>) => {
+      const target = event.currentTarget;
+      const reachedBottom =
+        target.scrollTop + target.clientHeight >= target.scrollHeight - 12;
+
+      if (reachedBottom && hasNextPage && !isFetchingNextPage) {
+        void fetchNextPage();
+      }
+    },
+    [hasNextPage, isFetchingNextPage, fetchNextPage],
+  );
+
+  const renderValue = (selected: unknown) => {
+    if (!selected) {
+      return <Box sx={{ color: 'text.disabled' }}>Select protocol</Box>;
     }
+
+    const selectedOption = protocolOptions.find((opt) => opt.id === selected);
+    return selectedOption?.label ?? 'Unknown protocol';
   };
 
   return (
     <UiFormField label="PROTOCOL" required={required} errorText={errorText}>
       <Select
         value={value === '' ? '' : Number(value)}
-        onChange={(event) => {
-          const selectedId = Number(event.target.value);
-          onChange(selectedId);
-          onResetTestStatus?.();
-          const selectedOption = protocolOptions.find(
-            (opt) => opt.id === selectedId,
-          );
-          if (selectedOption?.label) {
-            onDisplayChange?.(selectedOption.label);
-          }
-        }}
+        onChange={handleChange}
         fullWidth
         disabled={disabled}
         displayEmpty
-        renderValue={(selected) => {
-          if (!selected) {
-            return <Box sx={{ color: 'text.disabled' }}>Select protocol</Box>;
-          }
-
-          const selectedOption = protocolOptions.find(
-            (opt) => opt.id === selected,
-          );
-          return selectedOption?.label ?? 'Unknown protocol';
-        }}
+        renderValue={renderValue}
         MenuProps={{
           PaperProps: {
             sx: { maxHeight: 320 },

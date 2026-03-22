@@ -148,6 +148,7 @@ export const DeviceInventoryTable = ({
           return (
             <Chip
               label={label}
+              color={isActive ? 'success' : 'error'}
               sx={{
                 height: 28,
                 fontSize: 12,
@@ -155,8 +156,6 @@ export const DeviceInventoryTable = ({
                 letterSpacing: 0.8,
                 px: 1.5,
                 borderRadius: 999,
-                bgcolor: isActive ? '#D1FAE5' : '#FEE2E2',
-                color: isActive ? '#047857' : '#B91C1C',
               }}
             />
           );

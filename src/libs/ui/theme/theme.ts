@@ -86,7 +86,6 @@ const baseTheme = createTheme({
         input: {
           padding: `${tokens.spacing.sm} ${tokens.spacing.md}`,
           lineHeight: 1.5,
-          // boxSizing: 'border-box',
         },
         inputSizeSmall: {
           padding: `${tokens.spacing.xs} ${tokens.spacing.sm}`,

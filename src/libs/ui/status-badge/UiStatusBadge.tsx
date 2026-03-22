@@ -32,3 +32,5 @@ export function UiStatusBadge({
     </span>
   );
 }
+
+UiStatusBadge.displayName = 'UiStatusBadge';

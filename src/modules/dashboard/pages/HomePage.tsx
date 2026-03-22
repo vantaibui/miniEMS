@@ -282,10 +282,7 @@ export default function HomePage() {
                 </UiButton>
 
                 <UiButton
-                  sx={{
-                    backgroundColor: '#ED6C02',
-                    '&:hover': { backgroundColor: '#E65100' },
-                  }}
+                  variant="warning"
                   onClick={() =>
                     setConfirmDialog({
                       isOpen: true,
@@ -299,10 +296,7 @@ export default function HomePage() {
                 </UiButton>
 
                 <UiButton
-                  sx={{
-                    backgroundColor: '#4CAF50',
-                    '&:hover': { backgroundColor: '#2E7D32' },
-                  }}
+                  variant="success"
                   onClick={() =>
                     setConfirmDialog({
                       isOpen: true,

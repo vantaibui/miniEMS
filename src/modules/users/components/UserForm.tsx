@@ -9,6 +9,7 @@ import * as yup from 'yup';
 
 import {
   DeleteIcon,
+  tokens,
   UiButton,
   UiFormActions,
   UiFormField,
@@ -97,7 +98,8 @@ export const UserForm = ({
     handleSubmit,
     formState: { errors, isDirty, isValid },
   } = useForm<CreateUserPayload>({
-    resolver: yupResolver(createSchema(isEdit)) as never,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: yupResolver(createSchema(isEdit)) as any,
     mode: 'onChange',
     defaultValues: initialValues || {
       firstName: '',
@@ -114,7 +116,7 @@ export const UserForm = ({
     page: pagination?.page,
     size: pagination?.size,
   });
-  const Permissions = permissionsRes?.items || [];
+  const permissions = permissionsRes?.items || [];
 
   const { data: rolePermissionsRes } = usePermissionsById(selectedRoleId);
   const rolePermissions = rolePermissionsRes?.items || [];
@@ -169,7 +171,7 @@ export const UserForm = ({
         sx={{
           p: { xs: 3, md: 5 },
           borderRadius: 3,
-          boxShadow: '0px 2px 10px rgba(0,0,0,0.05)',
+          boxShadow: tokens.shadows.sm,
         }}
       >
         <Stack spacing={4}>
@@ -341,7 +343,7 @@ export const UserForm = ({
               </Box>
 
               <RolePermissionMatrix
-                permissions={Permissions}
+                permissions={permissions}
                 selectedPermissions={extractAllocatedPermissions(
                   rolePermissions,
                 )}

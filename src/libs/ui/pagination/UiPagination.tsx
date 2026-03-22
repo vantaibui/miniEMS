@@ -52,3 +52,5 @@ export function UiPagination(props: UiPaginationProps) {
     />
   );
 }
+
+UiPagination.displayName = 'UiPagination';

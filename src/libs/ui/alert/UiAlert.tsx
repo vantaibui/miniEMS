@@ -37,3 +37,5 @@ export function UiAlert({
     </MuiAlert>
   );
 }
+
+UiAlert.displayName = 'UiAlert';

@@ -21,3 +21,5 @@ export function UiSkeleton({
     />
   );
 }
+
+UiSkeleton.displayName = 'UiSkeleton';

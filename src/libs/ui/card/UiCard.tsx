@@ -39,3 +39,5 @@ export function UiCard({
     </Card>
   );
 }
+
+UiCard.displayName = 'UiCard';

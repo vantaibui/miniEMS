@@ -1,6 +1,5 @@
-import { useEffect } from 'react';
 
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 
 import { getPageTitle, PAGE_TITLES } from '@libs/constants';
 import { useDocumentTitle } from '@libs/hooks';
@@ -9,17 +8,37 @@ import { Box, Button, Paper, Typography, LoginIcon } from '@libs/ui';
 import assets from '../../../libs/assets/index';
 import { useAuthStore } from '../store/auth.store';
 
+/* ------------------------------------------------------------------ */
+/*  Static chart data — hoisted outside component                      */
+/* ------------------------------------------------------------------ */
+
+const ACTIVITY_CHART_DATA = [
+  { month: 'Jan', value: 10 },
+  { month: 'Mar', value: 20 },
+  { month: 'May', value: 15 },
+  { month: 'Jul', value: 25 },
+  { month: 'Sep', value: 30 },
+  { month: 'Nov', value: 38 },
+] as const;
+
+const DONUT_SEGMENTS = [
+  { stroke: 'success.main', dasharray: '132 188', dashoffset: 0 },
+  { stroke: 'warning.main', dasharray: '19 188', dashoffset: -132 },
+  { stroke: 'info.main', dasharray: '19 188', dashoffset: -151 },
+] as const;
+
+const STATUS_LEGEND = [
+  { label: 'Active', strokeKey: 'success.main' },
+  { label: 'Idle', strokeKey: 'warning.main' },
+  { label: 'Maintenance', strokeKey: 'info.main' },
+] as const;
+
+/* ------------------------------------------------------------------ */
+
 const LoginPage = () => {
   useDocumentTitle(getPageTitle(PAGE_TITLES.LOGIN));
 
-  const { login, isAuthenticated } = useAuthStore();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/', { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
+  const { login } = useAuthStore();
 
   return (
     <Box
@@ -30,12 +49,12 @@ const LoginPage = () => {
         overflow: 'hidden',
       }}
     >
-      {/* Left Side - Blue Background with Dashboard Preview */}
+      {/* Left Side — primary background with dashboard preview */}
       <Box
         sx={{
           flex: 1,
-          backgroundColor: '#0B5394',
-          color: 'white',
+          bgcolor: 'primary.main',
+          color: 'primary.contrastText',
           p: { xs: 2.5, sm: 2.5, md: 3 },
           display: 'flex',
           flexDirection: 'column',
@@ -62,7 +81,7 @@ const LoginPage = () => {
               lineHeight: 1.2,
             }}
           >
-            Welcome back! We're glad to see you again.
+            Welcome back! We&apos;re glad to see you again.
           </Typography>
           <Typography
             variant="body1"
@@ -82,7 +101,7 @@ const LoginPage = () => {
             <Paper
               elevation={3}
               sx={{
-                backgroundColor: 'white',
+                backgroundColor: 'common.white',
                 p: { xs: 1.5, sm: 2 },
                 borderRadius: 2,
               }}
@@ -106,16 +125,9 @@ const LoginPage = () => {
                   height: 120,
                 }}
               >
-                {[
-                  { month: 'Jan', value: 10 },
-                  { month: 'Mar', value: 20 },
-                  { month: 'May', value: 15 },
-                  { month: 'Jul', value: 25 },
-                  { month: 'Sep', value: 30 },
-                  { month: 'Nov', value: 38 },
-                ].map((item, index) => (
+                {ACTIVITY_CHART_DATA.map((item) => (
                   <Box
-                    key={index}
+                    key={item.month}
                     sx={{
                       flex: 1,
                       display: 'flex',
@@ -128,7 +140,7 @@ const LoginPage = () => {
                       sx={{
                         width: '100%',
                         height: `${(item.value / 40) * 95}px`,
-                        backgroundColor: '#0B5394',
+                        bgcolor: 'primary.main',
                         borderRadius: '4px 4px 0 0',
                       }}
                     />
@@ -147,7 +159,7 @@ const LoginPage = () => {
             <Paper
               elevation={3}
               sx={{
-                backgroundColor: 'white',
+                backgroundColor: 'common.white',
                 p: { xs: 1.5, sm: 2 },
                 borderRadius: 2,
               }}
@@ -167,90 +179,46 @@ const LoginPage = () => {
                 {/* Donut Chart */}
                 <Box sx={{ position: 'relative', width: 80, height: 80 }}>
                   <svg width="80" height="80" viewBox="0 0 80 80">
-                    <circle
-                      cx="40"
-                      cy="40"
-                      r="30"
-                      fill="none"
-                      stroke="#0B5394"
-                      strokeWidth="14"
-                      strokeDasharray="132 188"
-                      transform="rotate(-90 40 40)"
-                    />
-                    <circle
-                      cx="40"
-                      cy="40"
-                      r="30"
-                      fill="none"
-                      stroke="#F9C74F"
-                      strokeWidth="14"
-                      strokeDasharray="19 188"
-                      strokeDashoffset="-132"
-                      transform="rotate(-90 40 40)"
-                    />
-                    <circle
-                      cx="40"
-                      cy="40"
-                      r="30"
-                      fill="none"
-                      stroke="#90CCF4"
-                      strokeWidth="14"
-                      strokeDasharray="19 188"
-                      strokeDashoffset="-151"
-                      transform="rotate(-90 40 40)"
-                    />
+                    {DONUT_SEGMENTS.map((seg, i) => (
+                      <circle
+                        key={i}
+                        cx="40"
+                        cy="40"
+                        r="30"
+                        fill="none"
+                        stroke={`var(--mui-palette-${seg.stroke.replace('.', '-')})`}
+                        strokeWidth="14"
+                        strokeDasharray={seg.dasharray}
+                        strokeDashoffset={seg.dashoffset}
+                        transform="rotate(-90 40 40)"
+                      />
+                    ))}
                   </svg>
                 </Box>
+
                 {/* Legend */}
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  {STATUS_LEGEND.map((item) => (
                     <Box
-                      sx={{
-                        width: 10,
-                        height: 10,
-                        borderRadius: '50%',
-                        backgroundColor: '#0B5394',
-                      }}
-                    />
-                    <Typography
-                      variant="body2"
-                      sx={{ color: 'text.primary', fontSize: '0.8125rem' }}
+                      key={item.label}
+                      sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                     >
-                      Active
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Box
-                      sx={{
-                        width: 10,
-                        height: 10,
-                        borderRadius: '50%',
-                        backgroundColor: '#F9C74F',
-                      }}
-                    />
-                    <Typography
-                      variant="body2"
-                      sx={{ color: 'text.primary', fontSize: '0.8125rem' }}
-                    >
-                      Idle
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Box
-                      sx={{
-                        width: 10,
-                        height: 10,
-                        borderRadius: '50%',
-                        backgroundColor: '#90CCF4',
-                      }}
-                    />
-                    <Typography
-                      variant="body2"
-                      sx={{ color: 'text.primary', fontSize: '0.8125rem' }}
-                    >
-                      Maintenance
-                    </Typography>
-                  </Box>
+                      <Box
+                        sx={{
+                          width: 10,
+                          height: 10,
+                          borderRadius: '50%',
+                          bgcolor: item.strokeKey,
+                        }}
+                      />
+                      <Typography
+                        variant="body2"
+                        sx={{ color: 'text.primary', fontSize: '0.8125rem' }}
+                      >
+                        {item.label}
+                      </Typography>
+                    </Box>
+                  ))}
                 </Box>
               </Box>
             </Paper>
@@ -258,11 +226,11 @@ const LoginPage = () => {
         </Box>
       </Box>
 
-      {/* Right Side - Light Background with Login */}
+      {/* Right Side — light background with login form */}
       <Box
         sx={{
           flex: 1,
-          backgroundColor: '#F5F5F5',
+          bgcolor: 'background.default',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -280,7 +248,7 @@ const LoginPage = () => {
             alignItems: 'center',
           }}
         >
-          {/* Logo/Brand with Icon */}
+          {/* Logo / Brand */}
           <Box
             sx={{
               display: 'flex',
@@ -291,12 +259,14 @@ const LoginPage = () => {
           >
             <RouterLink
               to="/"
-              style={{ textDecoration: 'none', display: 'flex' }}
+              className="flex items-center gap-2"
+              style={{ textDecoration: 'none' }}
             >
-              <img
+              <Box
+                component="img"
                 src={assets.svgs.miniEMSSvg}
                 alt="miniEMS Logo"
-                style={{ height: '60px', width: 'auto', cursor: 'pointer' }}
+                className="h-15 w-auto cursor-pointer"
               />
             </RouterLink>
           </Box>
@@ -371,7 +341,7 @@ const LoginPage = () => {
                 textDecoration: 'none',
                 fontSize: '0.875rem',
                 '&:hover': {
-                  color: '#0B5394',
+                  color: 'primary.main',
                 },
               }}
             >
@@ -386,7 +356,7 @@ const LoginPage = () => {
                 textDecoration: 'none',
                 fontSize: '0.875rem',
                 '&:hover': {
-                  color: '#0B5394',
+                  color: 'primary.main',
                 },
               }}
             >
