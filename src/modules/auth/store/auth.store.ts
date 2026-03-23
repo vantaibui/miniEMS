@@ -97,7 +97,7 @@ export const useRbacStore = create<AuthState>()(
           const user = userResponse.data;
           set({ user });
 
-          const roleId = user.roleId;
+          const {roleId} = user;
           if (!roleId) {
             set({ permissions: null, isInitialized: true });
             return;

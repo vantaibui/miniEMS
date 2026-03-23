@@ -2,9 +2,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import CircleIcon from '@mui/icons-material/Circle';
+import DeleteIcon from '@mui/icons-material/Delete';
 import LanIcon from '@mui/icons-material/Lan';
 import RouterIcon from '@mui/icons-material/Router';
+import WifiTetheringIcon from '@mui/icons-material/WifiTethering';
 import {
   Box,
   Card,
@@ -12,18 +13,19 @@ import {
   MenuItem,
   Select,
   Stack,
+  Tooltip,
   Typography,
 } from '@mui/material';
-import { Controller, useForm, useWatch } from 'react-hook-form';
+import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import * as yup from 'yup';
 
 import { useToast } from '@libs/hooks';
-import { tokens, UiButton, UiFormField, UiInput } from '@libs/ui';
+import { AddIcon, tokens, UiBadge, UiButton, UiFormField, UiInput } from '@libs/ui';
 
+import { TestConnectionStatus, type TestStatus } from '../constants';
 import { useDeviceTestConnection } from '../hooks';
 import { ProtocolSelect } from './ProtocolSelect';
 import { UploadFiled } from './UploadFiled';
-import { TestConnectionStatus, type TestStatus } from '../constants';
 
 import type { CreateDevicePayload, DeviceAuthenticationType } from '../types';
 
@@ -32,17 +34,58 @@ const AUTH_OPTIONS: Array<{ label: string; value: DeviceAuthenticationType }> =
     { label: 'Certificate-based', value: 'CERT_BASE' },
     { label: 'Username/Password', value: 'USERNAME_PASSWORD' },
   ];
+const FUNCTION_TYPE_OPTIONS: Array<{ label: string; value: DeviceFunctionType }> =
+  [
+    { label: 'Configuration Management', value: 'CM' },
+    { label: 'Performance Management', value: 'PM' },
+  ];
 
 const MAX_CERT_FILE_SIZE_KB = 100;
-const ALLOWED_CERT_EXTENSIONS: Array<string> = ['.crt', '.cert'];
+const ALLOWED_CERT_EXTENSIONS: Array<string> = ['.crt', '.cert', '.cer'];
 const IPV4_REGEX = /^(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/;
 
-const schema: yup.ObjectSchema<CreateDevicePayload> = yup
+type DeviceFunctionType = 'CM' | 'PM';
+
+interface DeviceConnectionFormValues {
+  functionType: DeviceFunctionType;
+  port: number;
+  protocolId: number;
+  authenticationType: DeviceAuthenticationType;
+  username: string;
+  password: string;
+  clientCertificate: string;
+}
+
+interface DeviceFormValues {
+  managementIp: string;
+  connections: Array<DeviceConnectionFormValues>;
+}
+
+interface DeviceFormInitialValues extends Partial<CreateDevicePayload> {
+  connections?: Array<Partial<DeviceConnectionFormValues>>;
+}
+
+type DeviceConnectionSeed = Partial<CreateDevicePayload> & {
+  functionType?: DeviceFunctionType;
+};
+
+interface DeviceFormProps {
+  initialValues?: DeviceFormInitialValues;
+  onSubmit: (data: FormData) => void;
+  onCancel?: () => void;
+  isLoading?: boolean;
+  submitLabel?: string;
+  formId?: string;
+  showFooterActions?: boolean;
+  onFormStateChange?: (state: { isDirty: boolean; isValid: boolean }) => void;
+}
+
+const connectionSchema: yup.ObjectSchema<DeviceConnectionFormValues> = yup
   .object({
-    managementIp: yup
-      .string()
-      .required('Management IP is required')
-      .matches(IPV4_REGEX, 'Invalid IPv4 address'),
+    functionType: yup
+      .mixed<DeviceFunctionType>()
+      .oneOf(['CM', 'PM'])
+      .required('Function Type is required'),
     port: yup
       .number()
       .typeError('Port must be a number')
@@ -60,43 +103,84 @@ const schema: yup.ObjectSchema<CreateDevicePayload> = yup
       .mixed<DeviceAuthenticationType>()
       .oneOf(['CERT_BASE', 'USERNAME_PASSWORD'])
       .required('Authentication type is required'),
-    username: yup.string().when('authenticationType', {
-      is: 'USERNAME_PASSWORD',
-      then: (s) => s.required('Username is required'),
-      otherwise: (s) => s.optional(),
-    }),
-    password: yup.string().when('authenticationType', {
-      is: 'USERNAME_PASSWORD',
-      then: (s) => s.required('Password is required').min(3),
-      otherwise: (s) => s.optional(),
-    }),
-    clientCertificate: yup.string().when('authenticationType', {
-      is: 'CERT_BASE',
-      then: (s) => s.required('Certificate file is required'),
-      otherwise: (s) => s.optional(),
-    }),
+    username: yup
+      .string()
+      .default('')
+      .when('authenticationType', {
+        is: 'USERNAME_PASSWORD',
+        then: (s) => s.required('Username is required'),
+        otherwise: (s) => s,
+      })
+      .defined(),
+    password: yup
+      .string()
+      .default('')
+      .when('authenticationType', {
+        is: 'USERNAME_PASSWORD',
+        then: (s) => s.required('Password is required').min(3),
+        otherwise: (s) => s,
+      })
+      .defined(),
+    clientCertificate: yup
+      .string()
+      .default('')
+      .when('authenticationType', {
+        is: 'CERT_BASE',
+        then: (s) => s.required('Certificate file is required'),
+        otherwise: (s) => s,
+      })
+      .defined(),
   })
   .required();
 
-interface DeviceFormProps {
-  initialValues?: Partial<CreateDevicePayload>;
-  onSubmit: (data: FormData) => void;
-  onCancel: () => void;
-  isLoading?: boolean;
-  submitLabel?: string;
-}
+const schema: yup.ObjectSchema<DeviceFormValues> = yup
+  .object({
+    managementIp: yup
+      .string()
+      .required('Management IP is required')
+      .matches(IPV4_REGEX, 'Invalid IPv4 address'),
+    connections: yup
+      .array()
+      .of(connectionSchema)
+      .min(1, 'At least one connection is required')
+      .required(),
+  })
+  .required();
 
-const buildDefaults = (
-  initialValues?: Partial<CreateDevicePayload>,
-): CreateDevicePayload => ({
-  managementIp: initialValues?.managementIp ?? '',
+const createConnectionDefaults = (
+  initialValues?: Partial<DeviceConnectionFormValues> | DeviceConnectionSeed,
+): DeviceConnectionFormValues => ({
+  functionType: initialValues?.functionType ?? 'CM',
   port: initialValues?.port ?? 443,
   protocolId: initialValues?.protocolId ?? 0,
-  authenticationType: initialValues?.authenticationType ?? 'USERNAME_PASSWORD',
+  authenticationType:
+    initialValues?.authenticationType ?? 'USERNAME_PASSWORD',
   username: initialValues?.username ?? '',
   password: initialValues?.password ?? '',
   clientCertificate: initialValues?.clientCertificate ?? '',
 });
+
+const buildDefaults = (
+  initialValues?: DeviceFormInitialValues,
+): DeviceFormValues => {
+  const initialConnections =
+    initialValues?.connections && initialValues.connections.length > 0
+      ? initialValues.connections
+      : [initialValues ?? {}];
+
+  return {
+    managementIp: initialValues?.managementIp ?? '',
+    connections: initialConnections.map((connection) =>
+      createConnectionDefaults(connection),
+    ),
+  };
+};
+
+const buildEmptyTestStates = (count: number) =>
+  Array.from({ length: count }, () => ({
+    status: TestConnectionStatus.NotTested as TestStatus,
+    signature: '',
+  }));
 
 export const DeviceForm = ({
   initialValues,
@@ -104,21 +188,23 @@ export const DeviceForm = ({
   onCancel,
   isLoading,
   submitLabel = 'Add Device',
+  formId,
+  showFooterActions = true,
+  onFormStateChange,
 }: DeviceFormProps) => {
-  const [certificateFileName, setCertificateFileName] = useState('');
-  const [certificateFile, setCertificateFile] = useState<File | null>(null);
-  const [lastTestStatus, setLastTestStatus] = useState<TestStatus>(
-    TestConnectionStatus.OutOfService,
-  );
-  const [lastTestSignature, setLastTestSignature] = useState('');
+  const [connectionFiles, setConnectionFiles] = useState<Array<File | null>>([]);
+  const [connectionTests, setConnectionTests] = useState<
+    Array<{ status: TestStatus; signature: string }>
+  >([]);
   const toast = useToast();
 
-  const resetTestStatus = useCallback(() => {
-    setLastTestStatus(TestConnectionStatus.OutOfService);
-    setLastTestSignature('');
-  }, []);
   const { mutateAsync: testConnection, isPending: isTestingConnection } =
     useDeviceTestConnection();
+
+  const defaultValues = useMemo(
+    () => buildDefaults(initialValues),
+    [initialValues],
+  );
 
   const {
     control,
@@ -126,143 +212,259 @@ export const DeviceForm = ({
     reset,
     setValue,
     formState: { errors, isDirty, isValid },
-  } = useForm<CreateDevicePayload>({
+  } = useForm<DeviceFormValues>({
     resolver: yupResolver(schema),
     mode: 'onChange',
-    defaultValues: buildDefaults(initialValues),
+    defaultValues,
   });
 
-  const defaultValues = useMemo(
-    () => buildDefaults(initialValues),
-    [initialValues],
-  );
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'connections',
+  });
 
   useEffect(() => {
     reset(defaultValues);
   }, [defaultValues, reset]);
 
-  const authenticationType = useWatch({ control, name: 'authenticationType' });
-  const hasInitialCertificate = Boolean(initialValues?.clientCertificate);
-  const managementIp = useWatch({ control, name: 'managementIp' });
-  const port = useWatch({ control, name: 'port' });
-  const protocolId = useWatch({ control, name: 'protocolId' });
-  const username = useWatch({ control, name: 'username' });
-  const password = useWatch({ control, name: 'password' });
-  const clientCertificate = useWatch({ control, name: 'clientCertificate' });
+  useEffect(() => {
+    onFormStateChange?.({ isDirty, isValid });
+  }, [isDirty, isValid, onFormStateChange]);
 
-  const testSignature = useMemo(
+  const managementIp = useWatch({ control, name: 'managementIp' });
+  const watchedConnections = useWatch({ control, name: 'connections' });
+  const connections = useMemo(
+    () => watchedConnections ?? [],
+    [watchedConnections],
+  );
+
+  const connectionSignatures = useMemo(
     () =>
-      [
-        managementIp,
+      connections.map((connection) =>
+        [
+          managementIp,
+          connection?.functionType,
+          connection?.port,
+          connection?.protocolId,
+          connection?.authenticationType,
+          connection?.username,
+          connection?.password,
+          connection?.clientCertificate,
+        ]
+          .map((value) => value ?? '')
+          .join('|'),
+      ),
+    [connections, managementIp],
+  );
+
+  const resetAllTestStatuses = useCallback(() => {
+    setConnectionTests(buildEmptyTestStates(fields.length || 1));
+  }, [fields.length]);
+
+  const resetConnectionTestStatus = useCallback(
+    (index: number) => {
+      setConnectionTests((current) => {
+        const next =
+          current.length === fields.length
+            ? [...current]
+            : buildEmptyTestStates(fields.length || 1);
+        next[index] = {
+          status: TestConnectionStatus.NotTested,
+          signature: '',
+        };
+        return next;
+      });
+    },
+    [fields.length],
+  );
+
+  const handleCertificateLoaded = useCallback(
+    (
+      index: number,
+      payload: {
+        file: File;
+        fileName: string;
+        content: string;
+      },
+    ) => {
+      setConnectionFiles((current) => {
+        const next = [...current];
+        next[index] = payload.file;
+        return next;
+      });
+      setValue(`connections.${index}.clientCertificate`, payload.content, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      resetConnectionTestStatus(index);
+    },
+    [resetConnectionTestStatus, setValue],
+  );
+
+  const handleCertificateInvalid = useCallback(
+    (index: number, message: string) => {
+      toast.error(message);
+      setConnectionFiles((current) => {
+        const next = [...current];
+        next[index] = null;
+        return next;
+      });
+      setValue(`connections.${index}.clientCertificate`, '', {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      resetConnectionTestStatus(index);
+    },
+    [resetConnectionTestStatus, setValue, toast],
+  );
+
+  const handleAddConnection = () => {
+    append(createConnectionDefaults());
+    setConnectionFiles((current) => [...current, null]);
+    setConnectionTests((current) => [
+      ...current,
+      {
+        status: TestConnectionStatus.NotTested,
+        signature: '',
+      },
+    ]);
+  };
+
+  const handleRemoveConnection = (index: number) => {
+    if (fields.length === 1) return;
+
+    remove(index);
+    setConnectionFiles((current) =>
+      current.filter((_, itemIndex) => itemIndex !== index),
+    );
+    setConnectionTests((current) =>
+      current.filter((_, itemIndex) => itemIndex !== index),
+    );
+  };
+
+  const buildDeviceFormData = (
+    payload: DeviceFormValues,
+    options: {
+      certificateFiles: Array<File | null>;
+    },
+  ) => {
+    const formData = new FormData();
+    const { managementIp: payloadManagementIp, connections: payloadConnections } =
+      payload;
+    formData.append('managementIp', payloadManagementIp);
+
+    payloadConnections.forEach((connection, index) => {
+      const {
         port,
+        functionType,
         protocolId,
         authenticationType,
         username,
         password,
-        clientCertificate,
-      ]
-        .map((value) => value ?? '')
-        .join('|'),
-    [
-      managementIp,
+      } = connection;
+
+      formData.append(`connections[${index}].port`, String(port));
+      formData.append(
+        `connections[${index}].functionType`,
+        functionType,
+      );
+      formData.append(
+        `connections[${index}].protocolId`,
+        String(protocolId),
+      );
+      formData.append(
+        `connections[${index}].authenticationType`,
+        authenticationType,
+      );
+
+      if (authenticationType === 'USERNAME_PASSWORD') {
+        if (username) {
+          formData.append(`connections[${index}].username`, username);
+        }
+        if (password) {
+          formData.append(`connections[${index}].password`, password);
+        }
+      }
+
+      if (
+        authenticationType === 'CERT_BASE' &&
+        options.certificateFiles[index]
+      ) {
+        formData.append(
+          `connections[${index}].clientCertificate`,
+          options.certificateFiles[index] as Blob,
+        );
+      }
+    });
+
+    return formData;
+  };
+
+  const buildConnectionTestFormData = (
+    connection: DeviceConnectionFormValues,
+    options: {
+      certificateFile?: File | null;
+    },
+  ) => {
+    const {
+      functionType,
+      port,
+      protocolId,
+      authenticationType,
+      username,
+      password,
+    } = connection;
+    const formData = new FormData();
+    formData.append('managementIp', managementIp || '');
+    formData.append('connections[0].functionType', functionType);
+    formData.append('connections[0].port', String(port));
+    formData.append('connections[0].protocolId', String(protocolId));
+    formData.append(
+      'connections[0].authenticationType',
+      authenticationType,
+    );
+
+    if (authenticationType === 'USERNAME_PASSWORD') {
+      if (username) {
+        formData.append('connections[0].username', username);
+      }
+      if (password) {
+        formData.append('connections[0].password', password);
+      }
+    }
+
+    if (authenticationType === 'CERT_BASE' && options.certificateFile) {
+      formData.append('connections[0].clientCertificate', options.certificateFile);
+    }
+
+    return formData;
+  };
+
+  const handleTestConnection = async (index: number) => {
+    const connection = connections[index];
+    if (!connection) return;
+    const {
+      functionType,
       port,
       protocolId,
       authenticationType,
       username,
       password,
       clientCertificate,
-    ],
-  );
+    } = connection;
 
-  const displayTestStatus = useMemo(
-    () =>
-      testSignature === lastTestSignature
-        ? lastTestStatus
-        : TestConnectionStatus.OutOfService,
-    [testSignature, lastTestSignature, lastTestStatus],
-  );
-
-  const clearCertificate = useCallback(() => {
-    if (!certificateFile && !certificateFileName && !clientCertificate) return;
-    setCertificateFile(null);
-    setCertificateFileName('');
-    setValue('clientCertificate', '', {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-  }, [certificateFile, certificateFileName, clientCertificate, setValue]);
-
-  const handleCertificateLoaded = ({
-    file,
-    fileName,
-    content,
-  }: {
-    file: File;
-    fileName: string;
-    content: string;
-  }) => {
-    setCertificateFile(file);
-    setCertificateFileName(fileName);
-    setValue('clientCertificate', content, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-    resetTestStatus();
-  };
-
-  const handleCertificateInvalid = (message: string) => {
-    toast.error(message);
-    clearCertificate();
-    resetTestStatus();
-  };
-
-  const displayedCertificateName =
-    certificateFileName ||
-    (hasInitialCertificate ? initialValues?.clientCertificate || '' : '');
-
-  const buildDeviceFormData = (
-    payload: CreateDevicePayload,
-    options: {
-      includeCertificate: boolean;
-      certificateFile?: File | null;
-    },
-  ) => {
-    const formData = new FormData();
-    formData.append('managementIp', payload.managementIp);
-    formData.append('port', String(payload.port));
-    formData.append('protocolId', String(payload.protocolId));
-    formData.append('authenticationType', payload.authenticationType);
-
-    if (payload.authenticationType === 'USERNAME_PASSWORD') {
-      if (payload.username) formData.append('username', payload.username);
-      if (payload.password) formData.append('password', payload.password);
-    }
-
-    if (
-      payload.authenticationType === 'CERT_BASE' &&
-      options.includeCertificate
-    ) {
-      if (options.certificateFile) {
-        formData.append('clientCertificate', options.certificateFile);
-      }
-    }
-
-    return formData;
-  };
-
-  const handleTestConnection = async () => {
-    const payload: CreateDevicePayload = {
-      managementIp: managementIp || '',
-      authenticationType,
+    const payload: DeviceConnectionFormValues = {
+      functionType,
       port: Number(port),
       protocolId: Number(protocolId),
-      username,
-      password,
-      clientCertificate,
+      authenticationType,
+      username: username ?? '',
+      password: password ?? '',
+      clientCertificate: clientCertificate ?? '',
     };
 
     const isRequiredFieldsMissing =
-      !payload.managementIp || !payload.port || !payload.protocolId;
+      !managementIp || !payload.port || !payload.protocolId;
 
     if (isRequiredFieldsMissing) {
       toast.error(
@@ -271,9 +473,24 @@ export const DeviceForm = ({
       return;
     }
 
-    const formData = buildDeviceFormData(payload, {
-      includeCertificate: payload.authenticationType === 'CERT_BASE',
-      certificateFile,
+    if (
+      payload.authenticationType === 'USERNAME_PASSWORD' &&
+      (!payload.username || !payload.password)
+    ) {
+      toast.error('Please fill Username and Password before testing.');
+      return;
+    }
+
+    if (
+      payload.authenticationType === 'CERT_BASE' &&
+      !payload.clientCertificate
+    ) {
+      toast.error('Please upload a certificate before testing.');
+      return;
+    }
+
+    const formData = buildConnectionTestFormData(payload, {
+      certificateFile: connectionFiles[index],
     });
 
     try {
@@ -288,35 +505,45 @@ export const DeviceForm = ({
         toast.error(response.message || 'Connection test failed');
       }
 
-      setLastTestSignature(testSignature);
-      setLastTestStatus(resultStatus as TestStatus);
+      setConnectionTests((current) => {
+        const next =
+          current.length === fields.length
+            ? [...current]
+            : buildEmptyTestStates(fields.length || 1);
+        next[index] = {
+          status: resultStatus as TestStatus,
+          signature: connectionSignatures[index] ?? '',
+        };
+        return next;
+      });
     } catch {
-      setLastTestStatus(TestConnectionStatus.OutOfService);
+      resetConnectionTestStatus(index);
     }
   };
 
-  const handleFormSubmit = (data: CreateDevicePayload) => {
-    const payload = {
+  const handleFormSubmit = (data: DeviceFormValues) => {
+    const payload: DeviceFormValues = {
       managementIp: data.managementIp,
-      authenticationType: data.authenticationType,
-      port: Number(data.port),
-      protocolId: Number(data.protocolId),
-      username: data.username,
-      password: data.password,
-      clientCertificate: data.clientCertificate,
-    } as CreateDevicePayload;
+      connections: data.connections.map((connection) => ({
+        ...connection,
+        port: Number(connection.port),
+        protocolId: Number(connection.protocolId),
+      })),
+    };
 
     const formData = buildDeviceFormData(payload, {
-      includeCertificate:
-        payload.authenticationType === 'CERT_BASE' && Boolean(certificateFile),
-      certificateFile,
+      certificateFiles: connectionFiles,
     });
 
     onSubmit(formData);
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit(handleFormSubmit)}>
+    <Box
+      component="form"
+      id={formId}
+      onSubmit={handleSubmit(handleFormSubmit)}
+    >
       <Card
         sx={{
           p: { xs: 3, md: 5 },
@@ -354,157 +581,19 @@ export const DeviceForm = ({
                         placeholder="Enter IP..."
                         onChange={(event) => {
                           field.onChange(event);
-                          resetTestStatus();
+                          resetAllTestStatuses();
                         }}
                       />
                     </UiFormField>
                   )}
                 />
               </Grid>
-
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Controller
-                  name="port"
-                  control={control}
-                  render={({ field }) => (
-                    <UiFormField
-                      label="PORT"
-                      required
-                      errorText={errors.port?.message}
-                    >
-                      <UiInput
-                        {...field}
-                        type="number"
-                        placeholder="443"
-                        value={String(field.value ?? '')}
-                        onChange={(event) => {
-                          field.onChange(Number(event.target.value));
-                          resetTestStatus();
-                        }}
-                      />
-                    </UiFormField>
-                  )}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Controller
-                  name="protocolId"
-                  control={control}
-                  render={({ field }) => (
-                    <ProtocolSelect
-                      value={field.value ? Number(field.value) : ''}
-                      onChange={field.onChange}
-                      errorText={errors.protocolId?.message}
-                      disabled={isLoading}
-                      onResetTestStatus={resetTestStatus}
-                    />
-                  )}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Controller
-                  name="authenticationType"
-                  control={control}
-                  render={({ field }) => (
-                    <UiFormField
-                      label="AUTHENTICATION"
-                      required
-                      errorText={errors.authenticationType?.message}
-                    >
-                      <Select
-                        {...field}
-                        value={field.value || ''}
-                        fullWidth
-                        onChange={(event) => {
-                          field.onChange(event);
-                          resetTestStatus();
-                        }}
-                      >
-                        {AUTH_OPTIONS.map((opt) => (
-                          <MenuItem key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </UiFormField>
-                  )}
-                />
-              </Grid>
-
-              {authenticationType === 'CERT_BASE' ? (
-                <Grid size={{ md: 12 }}>
-                  <UiFormField
-                    label="CLIENT CERTIFICATE"
-                    required
-                    errorText={errors.clientCertificate?.message}
-                  >
-                    <UploadFiled
-                      acceptedExtensions={ALLOWED_CERT_EXTENSIONS}
-                      maxFileSizeKb={MAX_CERT_FILE_SIZE_KB}
-                      selectedFileName={displayedCertificateName}
-                      onFileLoaded={handleCertificateLoaded}
-                      onInvalidFile={handleCertificateInvalid}
-                    />
-                  </UiFormField>
-                </Grid>
-              ) : (
-                <>
-                  <Grid size={{ xs: 12, md: 6 }}>
-                    <Controller
-                      name="username"
-                      control={control}
-                      render={({ field }) => (
-                        <UiFormField
-                          label="USERNAME"
-                          required
-                          errorText={errors.username?.message}
-                        >
-                          <UiInput
-                            {...field}
-                            placeholder="Enter username..."
-                            onChange={(event) => {
-                              field.onChange(event);
-                              resetTestStatus();
-                            }}
-                          />
-                        </UiFormField>
-                      )}
-                    />
-                  </Grid>
-
-                  <Grid size={{ xs: 12, md: 6 }}>
-                    <Controller
-                      name="password"
-                      control={control}
-                      render={({ field }) => (
-                        <UiFormField
-                          label="PASSWORD"
-                          required
-                          errorText={errors.password?.message}
-                        >
-                          <UiInput
-                            {...field}
-                            type="password"
-                            passwordToggle
-                            placeholder="Enter password..."
-                            onChange={(event) => {
-                              field.onChange(event);
-                              resetTestStatus();
-                            }}
-                          />
-                        </UiFormField>
-                      )}
-                    />
-                  </Grid>
-                </>
-              )}
             </Grid>
           </Box>
+
           <Box>
             <Box
-              sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}
+              sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}
             >
               <LanIcon color="primary" />
               <Typography
@@ -515,64 +604,360 @@ export const DeviceForm = ({
               </Typography>
             </Box>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <Typography variant="body2" color="text.secondary">
-                Connection Status:
-              </Typography>
-              <CircleIcon
-                sx={{
-                  fontSize: 10,
-                  color:
-                    displayTestStatus === TestConnectionStatus.InService
-                      ? '#16A34A'
-                      : '#DC2626',
-                }}
-              />
-              <Typography variant="body2" color="text.primary">
-                {displayTestStatus === TestConnectionStatus.InService
-                  ? 'In Service'
-                  : 'Out of Service'}
-              </Typography>
-              <UiButton
-                type="button"
-                variant="outlined"
-                sx={{ ml: 2 }}
-                onClick={handleTestConnection}
-                disabled={!isValid || isTestingConnection}
-                loading={isTestingConnection}
-              >
-                Test Connection
-              </UiButton>
-            </Box>
+            <Stack spacing={2}>
+              {fields.map((field, index) => {
+                const connection = connections[index];
+                const { authenticationType } = connection ?? {};
+                const connectionErrors = errors.connections?.[index];
+                const connectionTest = connectionTests[index];
+                const connectionSignature = connectionSignatures[index] ?? '';
+                const displayTestStatus =
+                  connectionTest?.signature === connectionSignature
+                    ? connectionTest?.status ?? TestConnectionStatus.NotTested
+                    : TestConnectionStatus.NotTested;
+                const statusLabel =
+                  displayTestStatus === TestConnectionStatus.NotTested
+                    ? 'Not Tested'
+                    : displayTestStatus === TestConnectionStatus.InService
+                      ? 'In Service'
+                      : 'Out of Service';
+                const isActive =
+                  displayTestStatus === TestConnectionStatus.InService;
+                const deleteConnectionDisabled =
+                  fields.length === 1 || Boolean(isLoading);
+                const deleteConnectionDisabledReason =
+                  fields.length === 1
+                    ? 'At least one connection is required.'
+                    : isLoading
+                      ? 'Please wait while the form is loading.'
+                      : '';
+                const isNotTested =
+                  displayTestStatus === TestConnectionStatus.NotTested;
+
+                return (
+                  <Box
+                    key={field.id}
+                    sx={{
+                      pt: index === 0 ? 0 : 2.5,
+                      borderTop: index === 0 ? 'none' : '1px solid',
+                      borderColor: 'divider',
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: { xs: 'flex-start', md: 'center' },
+                        gap: 2,
+                        mb: 1.5,
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1.5,
+                          flexWrap: 'wrap',
+                        }}
+                      >
+                        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                          Connection {index + 1}
+                        </Typography>
+                        <UiBadge
+                          variant={
+                            isNotTested
+                              ? 'neutral'
+                              : isActive
+                                ? 'success'
+                                : 'danger'
+                          }
+                          size="sm"
+                          appearance="status"
+                        >
+                          {statusLabel}
+                        </UiBadge>
+                      </Box>
+
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1,
+                          flexWrap: 'wrap',
+                          ml: 'auto',
+                        }}
+                      >
+                        <UiButton
+                          type="button"
+                          variant="outlined"
+                          size="sm"
+                          startIcon={<WifiTetheringIcon />}
+                          onClick={() => handleTestConnection(index)}
+                          disabled={isTestingConnection}
+                          loading={isTestingConnection}
+                        >
+                          Test Connection
+                        </UiButton>
+                        <Tooltip
+                          title={deleteConnectionDisabledReason}
+                          disableHoverListener={!deleteConnectionDisabled}
+                          disableFocusListener={!deleteConnectionDisabled}
+                          disableTouchListener={!deleteConnectionDisabled}
+                        >
+                          <span>
+                            <UiButton
+                              type="button"
+                              variant="outlined"
+                              color="error"
+                              size="sm"
+                              startIcon={<DeleteIcon />}
+                              onClick={() => handleRemoveConnection(index)}
+                              disabled={deleteConnectionDisabled}
+                            >
+                              Delete Connection
+                            </UiButton>
+                          </span>
+                        </Tooltip>
+                      </Box>
+                    </Box>
+
+                    <Box className="grid gap-3 md:grid-cols-12">
+                      <Box className="md:col-span-3">
+                        <Controller
+                          name={`connections.${index}.protocolId`}
+                          control={control}
+                          render={({ field: connectionField }) => (
+                            <ProtocolSelect
+                              value={
+                                connectionField.value
+                                  ? Number(connectionField.value)
+                                  : ''
+                              }
+                              onChange={connectionField.onChange}
+                              errorText={connectionErrors?.protocolId?.message}
+                              disabled={isLoading}
+                              onResetTestStatus={() =>
+                                resetConnectionTestStatus(index)
+                              }
+                            />
+                          )}
+                        />
+                      </Box>
+
+                      <Box className="md:col-span-3">
+                        <Controller
+                          name={`connections.${index}.port`}
+                          control={control}
+                          render={({ field: connectionField }) => (
+                            <UiFormField
+                              label="PORT"
+                              required
+                              errorText={connectionErrors?.port?.message}
+                            >
+                              <UiInput
+                                {...connectionField}
+                                type="number"
+                                placeholder="443"
+                                value={String(connectionField.value ?? '')}
+                                onChange={(event) => {
+                                  connectionField.onChange(
+                                    Number(event.target.value),
+                                  );
+                                  resetConnectionTestStatus(index);
+                                }}
+                              />
+                            </UiFormField>
+                          )}
+                        />
+                      </Box>
+
+                      <Box className="md:col-span-3">
+                        <Controller
+                          name={`connections.${index}.authenticationType`}
+                          control={control}
+                          render={({ field: connectionField }) => (
+                            <UiFormField
+                              label="AUTHENTICATION"
+                              required
+                              errorText={connectionErrors?.authenticationType?.message}
+                            >
+                              <Select
+                                {...connectionField}
+                                value={connectionField.value || ''}
+                                fullWidth
+                                onChange={(event) => {
+                                  connectionField.onChange(event);
+                                  resetConnectionTestStatus(index);
+                                }}
+                              >
+                                {AUTH_OPTIONS.map((opt) => (
+                                  <MenuItem key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </UiFormField>
+                          )}
+                        />
+                      </Box>
+
+                      <Box className="md:col-span-3">
+                        <Controller
+                          name={`connections.${index}.functionType`}
+                          control={control}
+                          render={({ field: connectionField }) => (
+                            <UiFormField
+                              label="FUNCTION TYPE"
+                              required
+                              errorText={connectionErrors?.functionType?.message}
+                            >
+                              <Select
+                                {...connectionField}
+                                value={connectionField.value || ''}
+                                fullWidth
+                                onChange={(event) => {
+                                  connectionField.onChange(event);
+                                  resetConnectionTestStatus(index);
+                                }}
+                              >
+                                {FUNCTION_TYPE_OPTIONS.map((opt) => (
+                                  <MenuItem key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </UiFormField>
+                          )}
+                        />
+                      </Box>
+
+                      {authenticationType === 'CERT_BASE' ? (
+                        <Box className="md:col-span-12">
+                          <UiFormField
+                            label="CLIENT CERTIFICATE"
+                            required
+                            errorText={connectionErrors?.clientCertificate?.message}
+                          >
+                            <UploadFiled
+                              acceptedExtensions={ALLOWED_CERT_EXTENSIONS}
+                              maxFileSizeKb={MAX_CERT_FILE_SIZE_KB}
+                              selectedFileName={
+                                connectionFiles[index]?.name ||
+                                connection?.clientCertificate ||
+                                ''
+                              }
+                              onFileLoaded={(payload) =>
+                                handleCertificateLoaded(index, payload)
+                              }
+                              onInvalidFile={(message) =>
+                                handleCertificateInvalid(index, message)
+                              }
+                            />
+                          </UiFormField>
+                        </Box>
+                      ) : (
+                        <>
+                          <Box className="md:col-span-6">
+                            <Controller
+                              name={`connections.${index}.username`}
+                              control={control}
+                              render={({ field: connectionField }) => (
+                                <UiFormField
+                                  label="USERNAME"
+                                  required
+                                  errorText={connectionErrors?.username?.message}
+                                >
+                                  <UiInput
+                                    {...connectionField}
+                                    placeholder="Enter username..."
+                                    onChange={(event) => {
+                                      connectionField.onChange(event);
+                                      resetConnectionTestStatus(index);
+                                    }}
+                                  />
+                                </UiFormField>
+                              )}
+                            />
+                          </Box>
+
+                          <Box className="md:col-span-6">
+                            <Controller
+                              name={`connections.${index}.password`}
+                              control={control}
+                              render={({ field: connectionField }) => (
+                                <UiFormField
+                                  label="PASSWORD"
+                                  required
+                                  errorText={connectionErrors?.password?.message}
+                                >
+                                  <UiInput
+                                    {...connectionField}
+                                    type="password"
+                                    passwordToggle
+                                    placeholder="Enter password..."
+                                    onChange={(event) => {
+                                      connectionField.onChange(event);
+                                      resetConnectionTestStatus(index);
+                                    }}
+                                  />
+                                </UiFormField>
+                              )}
+                            />
+                          </Box>
+                        </>
+                      )}
+                    </Box>
+                  </Box>
+                );
+              })}
+
+              <Box>
+                <UiButton
+                  type="button"
+                  variant="outlined"
+                  size="sm"
+                  startIcon={<AddIcon />}
+                  onClick={handleAddConnection}
+                  disabled={isLoading}
+                >
+                  Add Connection
+                </UiButton>
+              </Box>
+            </Stack>
           </Box>
 
-          <Box
-            sx={{
-              borderTop: '1px solid',
-              borderColor: 'divider',
-              pt: 3,
-              display: 'flex',
-              justifyContent: 'flex-end',
-              gap: 2,
-            }}
-          >
-            <UiButton
-              type="button"
-              variant="outlined"
-              onClick={onCancel}
-              disabled={isLoading}
+          {showFooterActions ? (
+            <Box
+              sx={{
+                borderTop: '1px solid',
+                borderColor: 'divider',
+                pt: 3,
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: 2,
+              }}
             >
-              Cancel
-            </UiButton>
-            <UiButton
-              type="submit"
-              variant="contained"
-              disabled={isLoading || !isDirty || !isValid}
-              loading={isLoading}
-            >
-              {submitLabel}
-            </UiButton>
-          </Box>
+              {onCancel ? (
+                <UiButton
+                  type="button"
+                  variant="outlined"
+                  onClick={onCancel}
+                  disabled={isLoading}
+                >
+                  Cancel
+                </UiButton>
+              ) : null}
+              <UiButton
+                type="submit"
+                variant="contained"
+                disabled={isLoading || !isDirty || !isValid}
+                loading={isLoading}
+              >
+                {submitLabel}
+              </UiButton>
+            </Box>
+          ) : null}
         </Stack>
       </Card>
     </Box>

@@ -7,7 +7,7 @@ export type RetryOptions = {
 };
 
 function isServerOrNetworkError(error: AppError): boolean {
-  const status = error.status;
+  const {status} = error;
   return status === undefined || status >= 500;
 }
 

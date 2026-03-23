@@ -50,7 +50,7 @@ export const UiCommonModal = ({
   const maxWidth = mapSize(size);
 
   const handleRequestClose = () => {
-    const activeElement = document.activeElement;
+    const {activeElement} = document;
     if (activeElement instanceof HTMLElement) {
       activeElement.blur();
     }

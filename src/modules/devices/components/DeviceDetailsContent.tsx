@@ -1,7 +1,8 @@
 // cspell:ignore asic hwsku sonic
 import DesktopWindowsIcon from '@mui/icons-material/DesktopWindows';
-import { Box, Card, Chip, Grid, Typography } from '@mui/material';
+import { Box, Card, Grid, Typography } from '@mui/material';
 
+import { UiBadge } from '@libs/ui';
 
 import type { DeviceDetail } from '../types';
 
@@ -101,18 +102,13 @@ export const DeviceDetailsContent = ({
               >
                 {deviceInfo?.name ?? fallback}
               </Typography>
-              <Chip
-                label={statusDisplay}
-                color={isActive ? 'success' : 'error'}
-                sx={{
-                  height: 28,
-                  fontSize: 12,
-                  fontWeight: 700,
-                  letterSpacing: 0.8,
-                  px: 1.5,
-                  borderRadius: 999,
-                }}
-              />
+              <UiBadge
+                variant={isActive ? 'success' : 'danger'}
+                size="sm"
+                appearance="status"
+              >
+                {statusDisplay}
+              </UiBadge>
             </Box>
             <Typography
               variant="body1"

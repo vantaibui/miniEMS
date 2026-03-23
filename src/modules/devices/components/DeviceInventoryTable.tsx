@@ -6,7 +6,6 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
   Box,
-  Chip,
   IconButton,
   ListItemIcon,
   ListItemText,
@@ -15,7 +14,7 @@ import {
   Typography,
 } from '@mui/material';
 
-import { UiDataTable, UiEntityTableCard } from '@libs/ui';
+import { UiBadge, UiDataTable, UiEntityTableCard } from '@libs/ui';
 import { DATE_FORMATS, formatUtcOrFallback } from '@libs/utils';
 
 import type { PaginationResult } from '@services/http';
@@ -54,7 +53,7 @@ export const DeviceInventoryTable = ({
   };
 
   const blurActiveElement = () => {
-    const activeElement = document.activeElement;
+    const {activeElement} = document;
     if (activeElement instanceof HTMLElement) {
       activeElement.blur();
     }
@@ -146,18 +145,13 @@ export const DeviceInventoryTable = ({
           const isActive = status.value === 'IN_SERVICE';
           const label = status.display || status.value || 'N/A';
           return (
-            <Chip
-              label={label}
-              color={isActive ? 'success' : 'error'}
-              sx={{
-                height: 28,
-                fontSize: 12,
-                fontWeight: 700,
-                letterSpacing: 0.8,
-                px: 1.5,
-                borderRadius: 999,
-              }}
-            />
+            <UiBadge
+              variant={isActive ? 'success' : 'danger'}
+              size="sm"
+              appearance="status"
+            >
+              {label}
+            </UiBadge>
           );
         },
       },

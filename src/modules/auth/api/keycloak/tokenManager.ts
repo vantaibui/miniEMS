@@ -38,7 +38,7 @@ export const refreshToken = async (
   refreshPromise = (async () => {
     try {
       await keycloak.updateToken(minValiditySeconds);
-      const token = keycloak.token;
+      const {token} = keycloak;
       flushRefreshQueue(null, token);
       return token;
     } catch (err) {

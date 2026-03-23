@@ -98,39 +98,54 @@ export const UploadFiled = ({
 
   return (
     <Box
-      className={`rounded-lg border border-dashed bg-background p-3 text-center transition-colors md:p-4 ${
+      className={`rounded-lg border border-dashed bg-background p-3 transition-colors ${
         isDragging ? 'border-primary' : 'border-divider'
       }`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <FileUploadOutlinedIcon color="primary" sx={{ fontSize: 40, mb: 1.5 }} />
-      <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 0.5 }}>
-        Certificate Upload
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-        Drag and drop your certificate files ({acceptedExtensions.join(', ')})
-        here to secure your connection.
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        Maximum size: {maxFileSizeKb}KB
-      </Typography>
-      <UiButton variant="contained" component="label">
-        Browse Files
-        <input
-          ref={inputRef}
-          type="file"
-          hidden
-          accept={acceptedExtensions.join(',')}
-          onChange={handleChange}
-        />
-      </UiButton>
-      {selectedFileName ? (
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5 }}>
-          Selected file: {selectedFileName}
-        </Typography>
-      ) : null}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: { xs: 'flex-start', md: 'center' },
+          justifyContent: 'space-between',
+          gap: 2,
+          flexDirection: { xs: 'column', md: 'row' },
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+          <FileUploadOutlinedIcon color="primary" sx={{ fontSize: 28, mt: 0.25 }} />
+          <Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.25 }}>
+              Certificate Upload
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Accepted: {acceptedExtensions.join(', ')}. Max size: {maxFileSizeKb}KB
+            </Typography>
+            {selectedFileName ? (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 0.75, wordBreak: 'break-all' }}
+              >
+                Selected file: {selectedFileName}
+              </Typography>
+            ) : null}
+          </Box>
+        </Box>
+
+        <UiButton variant="contained" component="label">
+          Browse Files
+          <input
+            ref={inputRef}
+            type="file"
+            hidden
+            accept={acceptedExtensions.join(',')}
+            onChange={handleChange}
+          />
+        </UiButton>
+      </Box>
     </Box>
   );
 };

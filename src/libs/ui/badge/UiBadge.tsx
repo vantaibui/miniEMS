@@ -3,6 +3,7 @@ import Chip from '@mui/material/Chip';
 import { cn } from '@libs/utils';
 
 import type {
+  UiBadgeAppearance,
   UiBadgeProps,
   UiBadgeSize,
   UiBadgeVariant,
@@ -45,10 +46,24 @@ function mapSize(size: UiBadgeSize): 'small' | 'medium' {
   }
 }
 
+function mapAppearanceClassName(appearance: UiBadgeAppearance): string {
+  switch (appearance) {
+    case 'default':
+      return '';
+    case 'status':
+      return 'h-7 min-w-[104px] justify-center rounded-md [&_.MuiChip-label]:px-2 [&_.MuiChip-label]:font-semibold';
+    default: {
+      const _exhaustive: never = appearance;
+      return _exhaustive;
+    }
+  }
+}
+
 export function UiBadge({
   children,
   variant = 'neutral',
   size = 'md',
+  appearance = 'default',
   className,
 }: UiBadgeProps) {
   const muiColor = mapVariant(variant);
@@ -59,7 +74,7 @@ export function UiBadge({
       label={children}
       variant={variant === 'neutral' ? 'outlined' : 'filled'}
       color={muiColor}
-      className={cn('min-w-0', className)}
+      className={cn('min-w-0', mapAppearanceClassName(appearance), className)}
     />
   );
 }

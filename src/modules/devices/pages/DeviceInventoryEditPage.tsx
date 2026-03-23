@@ -1,10 +1,11 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { PageLayout } from '@app/layout';
 
 import { useToast } from '@libs/hooks';
+import { UiButton } from '@libs/ui';
 
 
 import { DeviceForm } from '../components/DeviceForm';
@@ -14,6 +15,8 @@ export const DeviceInventoryEditPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const toast = useToast();
+  const formId = 'device-edit-form';
+  const [formState, setFormState] = useState({ isDirty: false, isValid: false });
 
   const parsedId = useMemo(() => {
     if (!id) return undefined;
@@ -46,8 +49,35 @@ export const DeviceInventoryEditPage = () => {
   return (
     <PageLayout
       title="Edit Device"
+      actions={
+        <>
+          <UiButton
+            type="button"
+            variant="outlined"
+            onClick={() => navigate('/devices')}
+            disabled={isUpdating || isLoadingDetail}
+          >
+            Cancel
+          </UiButton>
+          <UiButton
+            type="submit"
+            variant="contained"
+            form={formId}
+            loading={isUpdating}
+            disabled={
+              isUpdating ||
+              isLoadingDetail ||
+              !formState.isDirty ||
+              !formState.isValid
+            }
+          >
+            Save Changes
+          </UiButton>
+        </>
+      }
     >
       <DeviceForm
+        formId={formId}
         initialValues={{
           managementIp: device?.device?.managementIp ?? '',
           port: device?.connection?.port ?? 8080,
@@ -59,9 +89,10 @@ export const DeviceInventoryEditPage = () => {
           clientCertificate: device?.credential?.clientCertificate ?? '',
         }}
         onSubmit={handleSubmit}
-        onCancel={() => navigate('/devices')}
         isLoading={isUpdating || isLoadingDetail}
         submitLabel="Save Changes"
+        showFooterActions={false}
+        onFormStateChange={setFormState}
       />
     </PageLayout>
   );

@@ -23,6 +23,8 @@ type VariantMapping = {
     | 'warning';
 };
 
+type MuiColorKey = Exclude<VariantMapping['muiColor'], 'inherit' | undefined>;
+
 function mapVariant(variant: UiButtonVariant): VariantMapping {
   switch (variant) {
     case 'primary':
@@ -82,6 +84,10 @@ export function UiButton({
   const muiSize = mapSize(size);
 
   const isDisabled = Boolean(disabled || loading);
+  const paletteColorKey: MuiColorKey =
+    mappedVariant.muiColor && mappedVariant.muiColor !== 'inherit'
+      ? mappedVariant.muiColor
+      : 'primary';
 
   return (
     <MuiButton
@@ -96,9 +102,29 @@ export function UiButton({
       sx={{
         fontWeight: 600,
         boxShadow: '0px 4px 12px rgba(11, 87, 208, 0.2)',
+        '&.Mui-disabled':
+          mappedVariant.muiVariant === 'contained'
+            ? {
+                opacity: 0.2,
+                color: (theme) => theme.palette[paletteColorKey].contrastText,
+                bgcolor: (theme) => theme.palette[paletteColorKey].main,
+              }
+            : {
+                opacity: 0.2,
+                color:
+                  mappedVariant.muiColor === 'inherit'
+                    ? 'text.primary'
+                    : `${paletteColorKey}.main`,
+                borderColor:
+                  mappedVariant.muiVariant === 'outlined'
+                    ? mappedVariant.muiColor === 'inherit'
+                      ? 'text.primary'
+                      : `${paletteColorKey}.main`
+                    : undefined,
+              },
       }}
       className={cn(
-        'min-w-0 disabled:opacity-50',
+        'min-w-0',
         loading && 'pointer-events-none',
         className,
       )}
