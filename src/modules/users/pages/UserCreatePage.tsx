@@ -30,7 +30,6 @@ export const UserCreatePage = () => {
   return (
     <PageLayout
       title="Add New User"
-      description="Create a new user profile and define their system-wide access permissions."
     >
       <UserForm
         onSubmit={handleSubmit}

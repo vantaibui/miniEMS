@@ -19,8 +19,7 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useAppUser, useSidebarNavigation } from '@app/hooks';
-import type { SidebarTopItem } from '@app/navigation';
-import { isAllowed } from '@app/navigation';
+import { isAllowed, type SidebarTopItem } from '@app/navigation';
 
 import { useRbacStore } from '@modules/auth';
 

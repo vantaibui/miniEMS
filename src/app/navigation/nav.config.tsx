@@ -52,10 +52,10 @@ export const TAB_GROUPS: Array<TabGroup> = [
       { label: 'Role Management', path: '/admin/roles' },
     ],
   },
-  {
-    matchPrefix: '/devices',
-    tabs: [{ label: 'Device Management', path: '/devices' }],
-  },
+  // {
+  //   matchPrefix: '/devices',
+  //   tabs: [{ label: 'Device Management', path: '/devices' }],
+  // },
 ];
 
 /* ------------------------------------------------------------------ */

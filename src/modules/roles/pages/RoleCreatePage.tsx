@@ -31,7 +31,6 @@ export const RoleCreatePage = () => {
   return (
     <PageLayout
       title="Add New Role"
-      description="Define a new security role and configure specific module-level access permissions."
     >
       {isLoadingPermissions && !permissions.length ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>

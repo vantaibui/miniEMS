@@ -19,7 +19,6 @@ export const DeviceInventoryCreatePage = () => {
   return (
     <PageLayout
       title="Add Device"
-      description="Configure management connection and authentication for a new device."
     >
       <DeviceForm
         onSubmit={handleSubmit}

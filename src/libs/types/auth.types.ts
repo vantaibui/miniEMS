@@ -2,16 +2,6 @@ import type { PermissionNode } from './permission.types';
 import type { User } from './user.types';
 import type { KeycloakTokenParsed } from 'keycloak-js';
 
-// export interface UserProfile {
-//   id?: string;
-//   username?: string;
-//   email?: string;
-//   firstName?: string;
-//   lastName?: string;
-//   fullName?: string;
-//   roles?: Array<string>;
-//   [key: string]: unknown;
-// }
 export interface TokenPayload extends KeycloakTokenParsed {
   preferred_username?: string;
   email?: string;

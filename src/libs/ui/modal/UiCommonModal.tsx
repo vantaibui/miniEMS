@@ -8,6 +8,8 @@ import {
   Typography,
 } from '@mui/material';
 
+import { tokens } from '../theme/tokens';
+
 import type {
   UiCommonModalProps,
   UiCommonModalSize,
@@ -77,29 +79,24 @@ export const UiCommonModal = ({
           sx: {
             borderRadius: 3,
             overflow: 'hidden',
-            bgcolor: '#FFFFFF',
-            boxShadow: '0px 20px 40px rgba(15, 23, 42, 0.2)',
+            bgcolor: 'background.paper',
+            boxShadow: tokens.shadows.modal,
           },
         },
       }}
     >
       <Box
+        className="flex items-start justify-between gap-2 px-3 py-2"
         sx={{
-          px: 3,
-          py: 2,
           borderBottom: '1px solid',
-          borderColor: '#E2E8F0',
-          bgcolor: '#F8FAFC',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          gap: 2,
+          borderColor: 'divider',
+          bgcolor: tokens.colors.surface.modalHeader,
         }}
       >
         <Box>
           {title ? title : null}
           {subtitle ? (
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            <Typography variant="body2" color="text.secondary" className="mt-1">
               {subtitle}
             </Typography>
           ) : null}
@@ -108,16 +105,16 @@ export const UiCommonModal = ({
           onClick={handleRequestClose}
           size="small"
           aria-label="Close dialog"
-          sx={{ mt: 0.25 }}
+          className="mt-1"
         >
           <CloseIcon fontSize="small" />
         </IconButton>
       </Box>
 
       <DialogContent
+        className="p-3"
         sx={{
-          p: 3,
-          bgcolor: '#FFFFFF',
+          bgcolor: 'background.paper',
           ...contentSx,
         }}
       >
@@ -125,12 +122,11 @@ export const UiCommonModal = ({
       </DialogContent>
       {actions ? (
         <DialogActions
+          className="px-3 py-2"
           sx={{
-            px: 3,
-            py: 2,
             borderTop: '1px solid',
-            borderColor: '#E2E8F0',
-            bgcolor: '#F8FAFC',
+            borderColor: 'divider',
+            bgcolor: tokens.colors.surface.modalHeader,
             ...actionsSx,
           }}
         >

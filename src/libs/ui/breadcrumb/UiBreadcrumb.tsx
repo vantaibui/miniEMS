@@ -14,7 +14,7 @@ const UiBreadcrumb: React.FC<BreadcrumbProps> = ({ items, className = '' }) => {
         <NavigateNextIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
       }
       aria-label="breadcrumb"
-      className={`${className} pt-2`}
+      className={className}
     >
       {items.map((item, index) => {
         const isLast = index === items.length - 1;

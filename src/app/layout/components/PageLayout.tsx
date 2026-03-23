@@ -12,7 +12,6 @@ export type PageLayoutProps = HeaderProps & {
 
 export const PageLayout = ({
   title,
-  description,
   actions,
   children,
 }: PageLayoutProps) => {
@@ -22,7 +21,7 @@ export const PageLayout = ({
 
   return (
     <Box className="flex min-h-full flex-col">
-      <Header title={title} description={description} actions={actions} />
+      <Header title={title} actions={actions} />
 
       <Box className="min-h-0 flex-1 bg-[#F1F5F9] p-6">
         <Box className="rounded-lg shadow-sm">

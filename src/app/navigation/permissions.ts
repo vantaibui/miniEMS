@@ -1,6 +1,8 @@
-import type { NavPermission, SidebarTopItem } from './nav.types';
-import { hasPermission } from '@modules/auth';
 import type { PermissionNode } from '@libs/types';
+
+import { hasPermission } from '@modules/auth';
+
+import type { NavPermission, SidebarTopItem } from './nav.types';
 
 /**
  * Check if a permission object grants access.

@@ -39,7 +39,6 @@ export const UserEditPage = () => {
       title={
         user ? `Edit User: ${user.firstName} ${user.lastName}` : 'Edit User'
       }
-      description="Modify account settings and permission levels for the selected user profile."
     >
       {isLoadingUser ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>

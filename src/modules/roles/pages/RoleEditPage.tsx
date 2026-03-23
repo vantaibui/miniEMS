@@ -91,7 +91,6 @@ export const RoleEditPage = () => {
   return (
     <PageLayout
       title={role ? `Edit Role: ${role.name}` : 'Edit Role'}
-      description="Modify security role configurations and module-level access permissions for the selected role."
     >
       {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>

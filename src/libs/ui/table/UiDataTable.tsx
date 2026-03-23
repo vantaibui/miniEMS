@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import { UiCard } from '../card';
 import { cn } from '../utils/cn';
 
-import type { UiDataTableProps, UiDataTableId } from './UiDataTable.types';
+import type { UiDataTableProps } from './UiDataTable.types';
 
 export function UiDataTable<TData>({
   rows,

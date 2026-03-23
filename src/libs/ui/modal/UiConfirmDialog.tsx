@@ -7,7 +7,6 @@ import {
   Dialog,
   DialogContent,
   IconButton,
-  Stack,
   Typography,
 } from '@mui/material';
 
@@ -33,7 +32,7 @@ function getVariantConfig(type: UiConfirmDialogType): VariantConfig {
       return {
         icon: <DeleteOutlineIcon sx={{ color: tokens.colors.error.main }} />,
         iconColor: tokens.colors.error.main,
-        iconBg: 'rgba(211, 47, 47, 0.08)',
+        iconBg: tokens.colors.dialog.iconErrorBg,
         confirmButtonSx: {
           backgroundColor: tokens.colors.error.main,
           '&:hover': { backgroundColor: tokens.colors.error.dark },
@@ -43,7 +42,7 @@ function getVariantConfig(type: UiConfirmDialogType): VariantConfig {
       return {
         icon: <ErrorOutlineIcon sx={{ color: tokens.colors.warning.main }} />,
         iconColor: tokens.colors.warning.main,
-        iconBg: 'rgba(237, 108, 2, 0.10)',
+        iconBg: tokens.colors.dialog.iconWarningBg,
         confirmButtonSx: {
           backgroundColor: tokens.colors.warning.main,
           '&:hover': { backgroundColor: tokens.colors.warning.dark },
@@ -55,7 +54,7 @@ function getVariantConfig(type: UiConfirmDialogType): VariantConfig {
           <CheckCircleOutlineIcon sx={{ color: tokens.colors.success.main }} />
         ),
         iconColor: tokens.colors.success.main,
-        iconBg: 'rgba(46, 125, 50, 0.10)',
+        iconBg: tokens.colors.dialog.iconSuccessBg,
         confirmButtonSx: {
           backgroundColor: tokens.colors.success.light,
           '&:hover': { backgroundColor: tokens.colors.success.main },
@@ -70,11 +69,11 @@ function getVariantConfig(type: UiConfirmDialogType): VariantConfig {
 
 const PAPER_SX: DialogProps['PaperProps'] = {
   sx: {
-    borderRadius: '24px',
+    borderRadius: tokens.shape.borderRadius.lg,
     p: 0,
     boxShadow: tokens.shadows.sm,
     border: `1px solid ${tokens.colors.neutral[200]}`,
-    backgroundColor: tokens.colors.neutral[50],
+    backgroundColor: tokens.colors.surface.pageBg,
   },
 };
 
@@ -109,22 +108,15 @@ export function UiConfirmDialog({
       fullWidth
     >
       <DialogContent
-        sx={{
-          p: 4,
-          pt: 3,
-          position: 'relative',
-          textAlign: 'center',
-        }}
+        className="relative p-4 pt-3 text-center"
       >
         {showCloseIcon ? (
           <IconButton
             aria-label="close"
             onClick={onClose}
             size="small"
+            className="absolute right-2.5 top-2.5"
             sx={{
-              position: 'absolute',
-              top: 10,
-              right: 10,
               color: tokens.colors.neutral[600],
               backgroundColor: tokens.colors.neutral[100],
               '&:hover': { backgroundColor: tokens.colors.neutral[200] },
@@ -135,23 +127,14 @@ export function UiConfirmDialog({
         ) : null}
 
         <Box
+          className="mx-auto mb-2 grid h-14 w-14 place-items-center rounded-full"
           sx={{
-            mx: 'auto',
-            mb: 2,
-            width: 56,
-            height: 56,
-            borderRadius: '9999px',
-            display: 'grid',
-            placeItems: 'center',
             backgroundColor: variant.iconBg,
           }}
         >
           <Box
+            className="grid h-8 w-8 place-items-center"
             sx={{
-              width: 32,
-              height: 32,
-              display: 'grid',
-              placeItems: 'center',
               '& svg': { fontSize: 24, color: variant.iconColor },
             }}
           >
@@ -160,32 +143,22 @@ export function UiConfirmDialog({
         </Box>
 
         <Typography
-          sx={{ fontWeight: 700, fontSize: tokens.typography.sizes.xl }}
+          sx={{ fontWeight: tokens.typography.fontWeight.bold, fontSize: tokens.typography.sizes.xl }}
         >
           {title}
         </Typography>
 
         {description ? (
           <Typography
-            sx={{
-              mt: 0.75,
-              color: tokens.colors.neutral[600],
-              fontSize: tokens.typography.sizes.sm,
-            }}
+            className="mt-1.5 text-neutral-600"
+            sx={{ fontSize: tokens.typography.sizes.sm }}
           >
             {description}
           </Typography>
         ) : null}
 
-        <Stack
-          direction={isSingleButton ? 'column' : 'row'}
-          spacing={1.5}
-          sx={{
-            mt: 3,
-            ...(isSingleButton
-              ? { alignItems: 'center' }
-              : { alignItems: 'stretch' }),
-          }}
+        <Box
+          className={isSingleButton ? 'mt-6 flex flex-col items-center gap-3' : 'mt-6 flex flex-row items-stretch gap-3'}
         >
           {!isSingleButton ? (
             <UiButton
@@ -195,7 +168,7 @@ export function UiConfirmDialog({
               fullWidth
               sx={{
                 flex: 1,
-                borderRadius: '9999px',
+                borderRadius: tokens.shape.borderRadius.full,
                 borderColor: tokens.colors.neutral[200],
                 color: tokens.colors.neutral[900],
                 backgroundColor: tokens.colors.neutral[50],
@@ -217,7 +190,7 @@ export function UiConfirmDialog({
             fullWidth={isSingleButton}
             sx={{
               flex: 1,
-              borderRadius: '9999px',
+              borderRadius: tokens.shape.borderRadius.full,
               color: tokens.colors.neutral[50],
               ...(isSingleButton ? { minWidth: 220 } : null),
               ...variant.confirmButtonSx,
@@ -225,7 +198,7 @@ export function UiConfirmDialog({
           >
             {confirmText}
           </UiButton>
-        </Stack>
+        </Box>
       </DialogContent>
     </Dialog>
   );

@@ -12,19 +12,20 @@ import { TabsNav } from './TabsNav';
 
 export interface HeaderProps {
   title: string;
-  description?: string;
   actions?: ReactNode;
 }
 
-export const Header = ({ title, description, actions }: HeaderProps) => {
+export const Header = ({ title, actions }: HeaderProps) => {
   const { pathname } = useLocation();
   const breadcrumbItems = getBreadcrumbItems(pathname);
 
   return (
     <Box className="sticky top-0 z-10 shrink-0 border-b border-divider bg-surface-card px-6">
-      <UiBreadcrumb items={breadcrumbItems} />
+      <Box className="flex min-h-8 items-center pt-2">
+        <UiBreadcrumb items={breadcrumbItems} />
+      </Box>
 
-      <Box className="py-2 flex items-center justify-between gap-4">
+      <Box className="flex min-h-14 items-center justify-between gap-4 py-2">
         <Box className="min-w-0">
           <Typography
             variant="h4"
@@ -32,14 +33,6 @@ export const Header = ({ title, description, actions }: HeaderProps) => {
           >
             {title}
           </Typography>
-          {description && (
-            <Typography
-              variant="body2"
-              sx={{ color: 'text.secondary', mt: 0.5 }}
-            >
-              {description}
-            </Typography>
-          )}
         </Box>
 
         {actions && (

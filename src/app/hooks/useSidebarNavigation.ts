@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import type { SidebarTopItem } from '@app/navigation';
+
 import { useRbacStore } from '@modules/auth';
 
 import { isItemAllowed } from '../navigation';

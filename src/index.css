@@ -93,6 +93,40 @@
   --color-surface-page: rgb(var(--mui-palette-background-defaultChannel));
   --color-surface-card: rgb(var(--mui-palette-background-paperChannel));
 
+  /* Surface-specific backgrounds (used by PageLayout, UiCommonModal, UiDataTable, UiEntityTableCard) */
+  --color-surface-page-bg: #f1f5f9;      /* page content area background (MUI background.default is white) */
+  --color-surface-modal-header: #f8fafc; /* modal header/toolbar surface */
+  --color-surface-table-head: #e5eaf2;   /* table head row background */
+  --color-surface-divider-subtle: #e2e8f0; /* subtle dividers in modal/modal-like surfaces */
+
+  /* Neutral palette — exposed so Tailwind utilities can reference exact tones */
+  --color-neutral-50: #f3f6f9;
+  --color-neutral-100: #e5eaf2;
+  --color-neutral-200: #dae2ed;
+  --color-neutral-300: #c7d0dd;
+  --color-neutral-400: #b0b8c4;
+  --color-neutral-500: #9da8b7;
+  --color-neutral-600: #6b7a90;
+  --color-neutral-700: #434d5b;
+  --color-neutral-800: #303740;
+  --color-neutral-900: #1c2025;
+
+  /* Sidebar transparent overlays (white with opacity) */
+  --color-sidebar-overlay: rgba(255, 255, 255, 0.08);
+  --color-sidebar-overlay-hover: rgba(255, 255, 255, 0.10);
+  --color-sidebar-overlay-active: rgba(255, 255, 255, 0.15);
+
+  /* Dialog / ConfirmDialog icon backgrounds */
+  --color-dialog-icon-error-bg: rgba(211, 47, 47, 0.08);
+  --color-dialog-icon-warning-bg: rgba(237, 108, 2, 0.10);
+  --color-dialog-icon-success-bg: rgba(46, 125, 50, 0.10);
+
+  /* Primary button shadow */
+  --shadow-btn-primary: 0px 4px 12px rgba(11, 87, 208, 0.20);
+
+  /* Modal shadow (used by UiCommonModal) */
+  --shadow-modal: 0px 20px 40px rgba(15, 23, 42, 0.20);
+
   /* -----------------------------
    * Layout Tokens
    * ----------------------------- */

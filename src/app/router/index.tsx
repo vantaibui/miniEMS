@@ -21,16 +21,15 @@ const HomePage = lazy(() => import('@modules/dashboard/pages/HomePage'));
 // @libs/pages is a barrel file (→ index.ts), so use @ alias to reach the real file
 const NotFoundPage = lazy(() => import('@/libs/pages/not-found/NotFoundPage'));
 
-// Shared suspense fallback
-const PageFallback = () => (
-  <Box className="flex h-screen w-full items-center justify-center">
-    <CircularProgress />
-  </Box>
-);
-
 // Wrap a lazy component with Suspense — preserves typing for RouteObject
 const withFallback = (LazyComponent: ComponentType) => (
-  <Suspense fallback={<PageFallback />}>
+  <Suspense
+    fallback={
+      <Box className="flex h-screen w-full items-center justify-center">
+        <CircularProgress />
+      </Box>
+    }
+  >
     <LazyComponent />
   </Suspense>
 );

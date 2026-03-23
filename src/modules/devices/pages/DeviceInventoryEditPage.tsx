@@ -46,7 +46,6 @@ export const DeviceInventoryEditPage = () => {
   return (
     <PageLayout
       title="Edit Device"
-      description="Update management connection and authentication settings for this device."
     >
       <DeviceForm
         initialValues={{
