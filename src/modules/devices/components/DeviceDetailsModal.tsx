@@ -16,7 +16,7 @@ export const DeviceDetailsModal = ({
   deviceId,
   onClose,
 }: DeviceDetailsModalProps) => {
-  const { data: device, isLoading } = useDeviceDetail(deviceId);
+  const { data: device, isLoading } = useDeviceDetail(open ? deviceId : undefined);
 
   return (
     <UiCommonModal

@@ -2,7 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SecurityIcon from '@mui/icons-material/Security';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import { Box, Card, Divider, Grid, Stack, Typography } from '@mui/material';
+import { Box, Card, Grid, Stack, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -16,7 +16,7 @@ import type { CreateRolePayload, PermissionNode } from '../types';
 
 const schema = yup.object().shape({
   name: yup.string().required('Role name is required').min(2).max(50),
-  description: yup.string().required('Description is required'),
+  description: yup.string(),
   permissions: yup
     .array()
     .of(
@@ -82,7 +82,7 @@ export const RoleForm = ({
     <Box component="form" onSubmit={handleSubmit(onSubmit)}>
       <Card
         sx={{
-          p: { xs: 3, md: 5 },
+          p: { md: 3 },
           borderRadius: 3,
           boxShadow: tokens.shadows.sm,
         }}
@@ -165,7 +165,6 @@ export const RoleForm = ({
               )}
             />
           </Box>
-          <Divider />
           <UiFormActions
             onCancel={onCancel}
             cancelDisabled={isLoading}

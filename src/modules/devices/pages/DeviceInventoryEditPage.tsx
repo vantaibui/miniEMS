@@ -1,12 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { PageLayout } from '@app/layout';
 
 import { useToast } from '@libs/hooks';
-import { UiButton } from '@libs/ui';
-
 
 import { DeviceForm } from '../components/DeviceForm';
 import { useDeviceDetail, useDeviceUpdate } from '../hooks';
@@ -15,8 +13,6 @@ export const DeviceInventoryEditPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const toast = useToast();
-  const formId = 'device-edit-form';
-  const [formState, setFormState] = useState({ isDirty: false, isValid: false });
 
   const parsedId = useMemo(() => {
     if (!id) return undefined;
@@ -28,6 +24,20 @@ export const DeviceInventoryEditPage = () => {
   const { data: device, isLoading: isLoadingDetail } =
     useDeviceDetail(parsedId);
   const { mutate: updateDevice, isPending: isUpdating } = useDeviceUpdate();
+
+  const connections =
+    device?.connections
+      ?.map((item) => ('connection' in item ? item.connection : item))
+      ?.filter(Boolean) ?? [];
+
+  const primaryConnection =
+    device?.connections?.[0]?.connection ?? device?.connection ?? null;
+  const primaryProtocol =
+    device?.connections?.[0]?.connection?.protocol ?? device?.protocol ?? null;
+  const primaryCredential =
+    device?.connections?.[0]?.connection?.credential ??
+    device?.credential ??
+    null;
 
   const handleSubmit = (data: FormData) => {
     if (parsedId === undefined) {
@@ -47,52 +57,49 @@ export const DeviceInventoryEditPage = () => {
   };
 
   return (
-    <PageLayout
-      title="Edit Device"
-      actions={
-        <>
-          <UiButton
-            type="button"
-            variant="outlined"
-            onClick={() => navigate('/devices')}
-            disabled={isUpdating || isLoadingDetail}
-          >
-            Cancel
-          </UiButton>
-          <UiButton
-            type="submit"
-            variant="contained"
-            form={formId}
-            loading={isUpdating}
-            disabled={
-              isUpdating ||
-              isLoadingDetail ||
-              !formState.isDirty ||
-              !formState.isValid
-            }
-          >
-            Save Changes
-          </UiButton>
-        </>
-      }
-    >
+    <PageLayout title="Edit Device">
       <DeviceForm
-        formId={formId}
         initialValues={{
           managementIp: device?.device?.managementIp ?? '',
-          port: device?.connection?.port ?? 8080,
-          protocolId: device?.protocol?.id ?? 6,
-          authenticationType:
-            device?.credential?.authenticationType ?? 'USERNAME_PASSWORD',
-          username: device?.credential?.username ?? '',
-          password: device?.credential?.password ?? '',
-          clientCertificate: device?.credential?.clientCertificate ?? '',
+          connections:
+            connections.length > 0
+              ? connections.map((connection) => ({
+                  connectionId: connection?.id ?? null,
+                  functionType: connection?.functionType?.value ?? 'CM',
+                  port: connection?.port ?? 8080,
+                  protocolId: connection?.protocol?.id ?? 6,
+                  authenticationType:
+                    connection?.credential?.authenticationType ??
+                    'USERNAME_PASSWORD',
+                  username: connection?.credential?.username ?? '',
+                  password: connection?.credential?.password ?? '',
+                  // Backend returns filename; keep it to satisfy validation,
+                  // actual upload will be sent only when user re-uploads a file.
+                  clientCertificate:
+                    connection?.credential?.clientCertificate ?? '',
+                }))
+              : [
+                  {
+                    connectionId:
+                      // older API shape fallback
+                      (primaryConnection as { id?: number | string | null } | null)
+                        ?.id ?? null,
+                    functionType: 'CM',
+                    port: primaryConnection?.port ?? 8080,
+                    protocolId: primaryProtocol?.id ?? 6,
+                    authenticationType:
+                      primaryCredential?.authenticationType ??
+                      'USERNAME_PASSWORD',
+                    username: primaryCredential?.username ?? '',
+                    password: primaryCredential?.password ?? '',
+                    clientCertificate: primaryCredential?.clientCertificate ?? '',
+                  },
+                ],
         }}
         onSubmit={handleSubmit}
+        onCancel={() => navigate('/devices')}
         isLoading={isUpdating || isLoadingDetail}
         submitLabel="Save Changes"
-        showFooterActions={false}
-        onFormStateChange={setFormState}
       />
     </PageLayout>
   );

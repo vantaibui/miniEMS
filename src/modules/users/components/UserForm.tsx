@@ -169,7 +169,7 @@ export const UserForm = ({
     <Box component="form" onSubmit={handleSubmit(handleFormSubmit)}>
       <Card
         sx={{
-          p: { xs: 3, md: 5 },
+          p: { md: 3 },
           borderRadius: 3,
           boxShadow: tokens.shadows.sm,
         }}

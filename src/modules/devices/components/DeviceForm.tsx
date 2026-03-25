@@ -46,7 +46,11 @@ const IPV4_REGEX = /^(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-
 
 type DeviceFunctionType = 'CM' | 'PM';
 
+type ConnectionAction = 'UPDATE' | 'DELETE';
+
 interface DeviceConnectionFormValues {
+  connectionId?: number | string | null;
+  action?: ConnectionAction | null;
   functionType: DeviceFunctionType;
   port: number;
   protocolId: number;
@@ -59,6 +63,7 @@ interface DeviceConnectionFormValues {
 interface DeviceFormValues {
   managementIp: string;
   connections: Array<DeviceConnectionFormValues>;
+  deletedConnectionIds: Array<number | string>;
 }
 
 interface DeviceFormInitialValues extends Partial<CreateDevicePayload> {
@@ -82,6 +87,8 @@ interface DeviceFormProps {
 
 const connectionSchema: yup.ObjectSchema<DeviceConnectionFormValues> = yup
   .object({
+    connectionId: yup.mixed<number | string>().nullable().notRequired(),
+    action: yup.mixed<ConnectionAction>().oneOf(['UPDATE', 'DELETE']).nullable().notRequired(),
     functionType: yup
       .mixed<DeviceFunctionType>()
       .oneOf(['CM', 'PM'])
@@ -117,7 +124,10 @@ const connectionSchema: yup.ObjectSchema<DeviceConnectionFormValues> = yup
       .default('')
       .when('authenticationType', {
         is: 'USERNAME_PASSWORD',
-        then: (s) => s.required('Password is required').min(3),
+        then: (s) =>
+          s
+            .required('Password is required')
+            .min(3, 'Password must be at least 3 characters'),
         otherwise: (s) => s,
       })
       .defined(),
@@ -143,13 +153,31 @@ const schema: yup.ObjectSchema<DeviceFormValues> = yup
       .array()
       .of(connectionSchema)
       .min(1, 'At least one connection is required')
+      .max(2, 'Each device supports up to 2 connections (CM + PM).')
+      .test(
+        'unique-function-type',
+        'Each device can only have one CM and one PM connection.',
+        (value) => {
+          if (!value) return true;
+          const types = value
+            .map((v) => v?.functionType)
+            .filter(Boolean) as Array<DeviceFunctionType>;
+          return new Set(types).size === types.length;
+        },
+      )
       .required(),
+    deletedConnectionIds: yup.array().of(yup.mixed<number | string>().required()).required(),
   })
   .required();
 
 const createConnectionDefaults = (
   initialValues?: Partial<DeviceConnectionFormValues> | DeviceConnectionSeed,
 ): DeviceConnectionFormValues => ({
+  connectionId:
+    'connectionId' in (initialValues ?? {})
+      ? (initialValues as Partial<DeviceConnectionFormValues>)?.connectionId ??
+        null
+      : null,
   functionType: initialValues?.functionType ?? 'CM',
   port: initialValues?.port ?? 443,
   protocolId: initialValues?.protocolId ?? 0,
@@ -173,6 +201,7 @@ const buildDefaults = (
     connections: initialConnections.map((connection) =>
       createConnectionDefaults(connection),
     ),
+    deletedConnectionIds: [],
   };
 };
 
@@ -233,9 +262,17 @@ export const DeviceForm = ({
 
   const managementIp = useWatch({ control, name: 'managementIp' });
   const watchedConnections = useWatch({ control, name: 'connections' });
+  const watchedDeletedConnectionIds = useWatch({
+    control,
+    name: 'deletedConnectionIds',
+  });
   const connections = useMemo(
     () => watchedConnections ?? [],
     [watchedConnections],
+  );
+  const deletedConnectionIds = useMemo(
+    () => watchedDeletedConnectionIds ?? [],
+    [watchedDeletedConnectionIds],
   );
 
   const connectionSignatures = useMemo(
@@ -319,7 +356,11 @@ export const DeviceForm = ({
   );
 
   const handleAddConnection = () => {
-    append(createConnectionDefaults());
+    if (fields.length >= 2) return;
+
+    const used = new Set(connections.map((c) => c?.functionType).filter(Boolean));
+    const nextFunctionType: DeviceFunctionType = used.has('CM') ? 'PM' : 'CM';
+    append(createConnectionDefaults({ functionType: nextFunctionType }));
     setConnectionFiles((current) => [...current, null]);
     setConnectionTests((current) => [
       ...current,
@@ -332,6 +373,15 @@ export const DeviceForm = ({
 
   const handleRemoveConnection = (index: number) => {
     if (fields.length === 1) return;
+
+    const connectionId = connections[index]?.connectionId;
+    if (connectionId !== undefined && connectionId !== null && connectionId !== '') {
+      setValue(
+        'deletedConnectionIds',
+        [...deletedConnectionIds, connectionId],
+        { shouldDirty: true },
+      );
+    }
 
     remove(index);
     setConnectionFiles((current) =>
@@ -349,12 +399,16 @@ export const DeviceForm = ({
     },
   ) => {
     const formData = new FormData();
-    const { managementIp: payloadManagementIp, connections: payloadConnections } =
-      payload;
+    const {
+      managementIp: payloadManagementIp,
+      connections: payloadConnections,
+      deletedConnectionIds,
+    } = payload;
     formData.append('managementIp', payloadManagementIp);
 
     payloadConnections.forEach((connection, index) => {
       const {
+        connectionId,
         port,
         functionType,
         protocolId,
@@ -362,6 +416,14 @@ export const DeviceForm = ({
         username,
         password,
       } = connection;
+
+      if (connectionId !== undefined && connectionId !== null && connectionId !== '') {
+        formData.append(`connections[${index}].action`, 'UPDATE');
+        formData.append(
+          `connections[${index}].connectionId`,
+          String(connectionId),
+        );
+      }
 
       formData.append(`connections[${index}].port`, String(port));
       formData.append(
@@ -397,45 +459,61 @@ export const DeviceForm = ({
       }
     });
 
+    deletedConnectionIds.forEach((connectionId, deleteIndex) => {
+      const index = payloadConnections.length + deleteIndex;
+      formData.append(`connections[${index}].action`, 'DELETE');
+      formData.append(`connections[${index}].connectionId`, String(connectionId));
+    });
+
     return formData;
   };
 
-  const buildConnectionTestFormData = (
-    connection: DeviceConnectionFormValues,
+  const buildConnectionsTestFormData = (
+    testConnections: Array<DeviceConnectionFormValues>,
     options: {
-      certificateFile?: File | null;
+      certificateFiles: Array<File | null>;
     },
   ) => {
-    const {
-      functionType,
-      port,
-      protocolId,
-      authenticationType,
-      username,
-      password,
-    } = connection;
     const formData = new FormData();
     formData.append('managementIp', managementIp || '');
-    formData.append('connections[0].functionType', functionType);
-    formData.append('connections[0].port', String(port));
-    formData.append('connections[0].protocolId', String(protocolId));
-    formData.append(
-      'connections[0].authenticationType',
-      authenticationType,
-    );
 
-    if (authenticationType === 'USERNAME_PASSWORD') {
-      if (username) {
-        formData.append('connections[0].username', username);
-      }
-      if (password) {
-        formData.append('connections[0].password', password);
-      }
-    }
+    testConnections.forEach((connection, index) => {
+      const {
+        port,
+        functionType,
+        protocolId,
+        authenticationType,
+        username,
+        password,
+      } = connection;
 
-    if (authenticationType === 'CERT_BASE' && options.certificateFile) {
-      formData.append('connections[0].clientCertificate', options.certificateFile);
-    }
+      formData.append(`connections[${index}].port`, String(port));
+      formData.append(`connections[${index}].functionType`, functionType);
+      formData.append(`connections[${index}].protocolId`, String(protocolId));
+      formData.append(
+        `connections[${index}].authenticationType`,
+        authenticationType,
+      );
+
+      if (authenticationType === 'USERNAME_PASSWORD') {
+        if (username) {
+          formData.append(`connections[${index}].username`, username);
+        }
+        if (password) {
+          formData.append(`connections[${index}].password`, password);
+        }
+      }
+
+      if (
+        authenticationType === 'CERT_BASE' &&
+        options.certificateFiles[index]
+      ) {
+        formData.append(
+          `connections[${index}].clientCertificate`,
+          options.certificateFiles[index] as Blob,
+        );
+      }
+    });
 
     return formData;
   };
@@ -454,6 +532,7 @@ export const DeviceForm = ({
     } = connection;
 
     const payload: DeviceConnectionFormValues = {
+      connectionId: connection.connectionId ?? null,
       functionType,
       port: Number(port),
       protocolId: Number(protocolId),
@@ -489,11 +568,11 @@ export const DeviceForm = ({
       return;
     }
 
-    const formData = buildConnectionTestFormData(payload, {
-      certificateFile: connectionFiles[index],
-    });
-
     try {
+      const formData = buildConnectionsTestFormData(
+        [payload],
+        { certificateFiles: [connectionFiles[index] ?? null] },
+      );
       const response = await testConnection(formData);
       const resultStatus =
         response.data?.status?.value ?? TestConnectionStatus.OutOfService;
@@ -529,6 +608,7 @@ export const DeviceForm = ({
         port: Number(connection.port),
         protocolId: Number(connection.protocolId),
       })),
+      deletedConnectionIds: data.deletedConnectionIds ?? [],
     };
 
     const formData = buildDeviceFormData(payload, {
@@ -546,7 +626,7 @@ export const DeviceForm = ({
     >
       <Card
         sx={{
-          p: { xs: 3, md: 5 },
+          p: { md: 3 },
           borderRadius: 3,
           boxShadow: tokens.shadows.sm,
         }}
@@ -774,6 +854,47 @@ export const DeviceForm = ({
 
                       <Box className="md:col-span-3">
                         <Controller
+                          name={`connections.${index}.functionType`}
+                          control={control}
+                          render={({ field: connectionField }) => (
+                            <UiFormField
+                              label="FUNCTION TYPE"
+                              required
+                              errorText={connectionErrors?.functionType?.message}
+                            >
+                              <Select
+                                {...connectionField}
+                                value={connectionField.value || ''}
+                                fullWidth
+                                onChange={(event) => {
+                                  connectionField.onChange(event);
+                                  resetConnectionTestStatus(index);
+                                }}
+                              >
+                                {FUNCTION_TYPE_OPTIONS.map((opt) => {
+                                  const usedByOtherConnections = connections.some(
+                                    (c, connectionIndex) =>
+                                      connectionIndex !== index &&
+                                      c?.functionType === opt.value,
+                                  );
+                                  return (
+                                    <MenuItem
+                                      key={opt.value}
+                                      value={opt.value}
+                                      disabled={usedByOtherConnections}
+                                    >
+                                      {opt.label}
+                                    </MenuItem>
+                                  );
+                                })}
+                              </Select>
+                            </UiFormField>
+                          )}
+                        />
+                      </Box>
+
+                      <Box className="md:col-span-3">
+                        <Controller
                           name={`connections.${index}.authenticationType`}
                           control={control}
                           render={({ field: connectionField }) => (
@@ -792,36 +913,6 @@ export const DeviceForm = ({
                                 }}
                               >
                                 {AUTH_OPTIONS.map((opt) => (
-                                  <MenuItem key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                  </MenuItem>
-                                ))}
-                              </Select>
-                            </UiFormField>
-                          )}
-                        />
-                      </Box>
-
-                      <Box className="md:col-span-3">
-                        <Controller
-                          name={`connections.${index}.functionType`}
-                          control={control}
-                          render={({ field: connectionField }) => (
-                            <UiFormField
-                              label="FUNCTION TYPE"
-                              required
-                              errorText={connectionErrors?.functionType?.message}
-                            >
-                              <Select
-                                {...connectionField}
-                                value={connectionField.value || ''}
-                                fullWidth
-                                onChange={(event) => {
-                                  connectionField.onChange(event);
-                                  resetConnectionTestStatus(index);
-                                }}
-                              >
-                                {FUNCTION_TYPE_OPTIONS.map((opt) => (
                                   <MenuItem key={opt.value} value={opt.value}>
                                     {opt.label}
                                   </MenuItem>
@@ -913,16 +1004,29 @@ export const DeviceForm = ({
               })}
 
               <Box>
-                <UiButton
-                  type="button"
-                  variant="outlined"
-                  size="sm"
-                  startIcon={<AddIcon />}
-                  onClick={handleAddConnection}
-                  disabled={isLoading}
+                <Tooltip
+                  title={
+                    fields.length >= 2
+                      ? 'Maximum 2 connections (Configuration Management + Performance Management).'
+                      : ''
+                  }
+                  disableHoverListener={fields.length < 2}
+                  disableFocusListener={fields.length < 2}
+                  disableTouchListener={fields.length < 2}
                 >
-                  Add Connection
-                </UiButton>
+                  <span>
+                    <UiButton
+                      type="button"
+                      variant="outlined"
+                      size="sm"
+                      startIcon={<AddIcon />}
+                      onClick={handleAddConnection}
+                      disabled={Boolean(isLoading) || fields.length >= 2}
+                    >
+                      Add Connection
+                    </UiButton>
+                  </span>
+                </Tooltip>
               </Box>
             </Stack>
           </Box>

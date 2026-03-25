@@ -16,14 +16,7 @@ export interface Device {
 
 export type DeviceAuthenticationType = 'CERT_BASE' | 'USERNAME_PASSWORD';
 
-export interface DeviceConnection {
-  id: number | null;
-  port: number;
-  caCert?: string | null;
-  thumbprint?: string | null;
-  protocol?: string | null;
-  lastModifiedDate?: string | null;
-}
+export type DeviceFunctionType = 'CM' | 'PM';
 
 export interface Protocol {
   id: number;
@@ -38,6 +31,17 @@ export interface Credential {
   username?: string | null;
   password?: string | null;
   clientCertificate?: string | null;
+  lastModifiedDate?: string | null;
+}
+
+export interface DeviceConnectionDetail {
+  id: number | null;
+  functionType?: DisplayValue<DeviceFunctionType> | null;
+  port: number;
+  caCert?: string | null;
+  thumbprint?: string | null;
+  protocol?: Protocol | null;
+  credential?: Credential | null;
   lastModifiedDate?: string | null;
 }
 
@@ -65,12 +69,18 @@ export interface DeviceInfo {
   uptime?: number | null;
 }
 
-// API Response structure - use directly from API
 export interface DeviceDetail {
   device: DeviceInfo;
-  connection: DeviceConnection;
-  protocol: Protocol;
-  credential: Credential;
+  connections?: Array<DeviceConnectionDetail | { connection: DeviceConnectionDetail }>;
+  // Backward compatibility (older API shape)
+  connection?: {
+    id: number | null;
+    port: number;
+    caCert?: string | null;
+    thumbprint?: string | null;
+  } | null;
+  protocol?: Protocol | null;
+  credential?: Credential | null;
   lastModifiedDate: string;
 }
 

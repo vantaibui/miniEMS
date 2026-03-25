@@ -1,18 +1,12 @@
-import { useState } from 'react';
-
 import { useNavigate } from 'react-router-dom';
 
 import { PageLayout } from '@app/layout';
-
-import { UiButton } from '@libs/ui';
 
 import { DeviceForm } from '../components/DeviceForm';
 import { useDeviceCreate } from '../hooks';
 
 export const DeviceInventoryCreatePage = () => {
   const navigate = useNavigate();
-  const formId = 'device-create-form';
-  const [formState, setFormState] = useState({ isDirty: false, isValid: false });
 
   const { mutate: createDevice, isPending: isCreating } = useDeviceCreate();
 
@@ -23,37 +17,12 @@ export const DeviceInventoryCreatePage = () => {
   };
 
   return (
-    <PageLayout
-      title="Add Device"
-      actions={
-        <>
-          <UiButton
-            type="button"
-            variant="outlined"
-            onClick={() => navigate('/devices')}
-            disabled={isCreating}
-          >
-            Cancel
-          </UiButton>
-          <UiButton
-            type="submit"
-            variant="contained"
-            form={formId}
-            loading={isCreating}
-            disabled={isCreating || !formState.isDirty || !formState.isValid}
-          >
-            Add Device
-          </UiButton>
-        </>
-      }
-    >
+    <PageLayout title="Add Device">
       <DeviceForm
-        formId={formId}
         onSubmit={handleSubmit}
+        onCancel={() => navigate('/devices')}
         isLoading={isCreating}
         submitLabel="Add Device"
-        showFooterActions={false}
-        onFormStateChange={setFormState}
       />
     </PageLayout>
   );
